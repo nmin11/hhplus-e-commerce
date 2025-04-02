@@ -4,7 +4,7 @@
 
 ## ⏰ 마일스톤
 
-- [📅 프로젝트 칸반 보드](https://github.com/users/nmin11/projects/1/views/4)
+- [📅 프로젝트 칸반 보드](https://github.com/users/nmin11/projects/1/views/4?sortedBy%5Bdirection%5D=asc&sortedBy%5BcolumnId%5D=180643321)
 - [🚀 마일스톤 목록](https://github.com/nmin11/hhplus-e-commerce/milestones)
 
 ## 🔁 시퀀스 다이어그램
