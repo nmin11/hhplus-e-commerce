@@ -266,3 +266,11 @@ sequenceDiagram
   Statistic-->>User: 인기 상품 목록 (TOP 5) 반환
   deactivate Statistic
 ```
+
+## ERD
+
+<img src="docs/erd.svg">
+
+<a href="https://dbdiagram.io/d/hhplus-e-commerce-67ebd1d24f7afba184ef6b5b" target="_blank">
+    웹에서 ERD 확인하기
+</a>
