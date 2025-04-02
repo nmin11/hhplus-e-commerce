@@ -267,7 +267,15 @@ sequenceDiagram
   deactivate Statistic
 ```
 
-## ERD
+## 🧩 클래스 다이어그램
+
+<img src="docs/class-diagram.svg">
+
+<a href="https://excalidraw.com/#json=Hc605C7zlAejmaIcTEZ-x,OcDHW0BjR6G1ap45K_0_bQ" target="_blank">
+    웹에서 클래스 다이어그램 확인하기
+</a>
+
+## ⚒️ ERD
 
 <img src="docs/erd.svg">
 
