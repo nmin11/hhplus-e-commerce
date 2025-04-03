@@ -6,6 +6,7 @@ import kr.hhplus.be.server.dto.BalanceHistoryResponse
 import kr.hhplus.be.server.dto.BalanceResponse
 import kr.hhplus.be.server.dto.CustomerCouponResponse
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -27,7 +28,7 @@ class CustomerController : CustomerApi {
         return ResponseEntity.ok(response)
     }
 
-    override fun chargeBalance(id: Long, request: BalanceChargeRequest): ResponseEntity<BalanceResponse> {
+    override fun chargeBalance(id: Long, @RequestBody request: BalanceChargeRequest): ResponseEntity<BalanceResponse> {
         return ResponseEntity.ok(BalanceResponse(id, 150000))
     }
 
