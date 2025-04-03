@@ -73,6 +73,16 @@ interface ProductApi {
                     )]
                 )
             ]
+        ),
+        ApiResponse(
+            responseCode = "404",
+            description = "상품을 찾을 수 없음",
+            content = [
+                Content(
+                    mediaType = "application/json",
+                    examples = [ExampleObject(value = """{"error":"찾을 수 없는 상품입니다."}""")]
+                )
+            ]
         )
     )
     @GetMapping("/{id}")

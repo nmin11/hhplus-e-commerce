@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import kr.hhplus.be.server.dto.OrderRequest
 import kr.hhplus.be.server.dto.OrderResponse
@@ -18,15 +19,17 @@ import org.springframework.web.bind.annotation.RequestMapping
 interface OrderApi {
 
     @Operation(summary = "주문 생성")
-    @ApiResponse(
-        responseCode = "201",
-        description = "주문 생성 완료",
-        content = [
-            Content(
-                mediaType = "application/json",
-                schema = Schema(implementation = OrderResponse::class),
-                examples = [ExampleObject(
-                    value = """
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "201",
+                description = "주문 생성 완료",
+                content = [
+                    Content(
+                        mediaType = "application/json",
+                        schema = Schema(implementation = OrderResponse::class),
+                        examples = [ExampleObject(
+                            value = """
                     {
                       "orderId": 1,
                       "customerId": 1,
@@ -48,7 +51,29 @@ interface OrderApi {
                       ]
                     }
                     """
-                )]
+                        )]
+                    )
+                ]
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "사용자를 찾을 수 없음",
+                content = [
+                    Content(
+                        mediaType = "application/json",
+                        examples = [ExampleObject(value = """{"error":"사용자를 찾을 수 없습니다."}""")]
+                    )
+                ]
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "쿠폰을 찾을 수 없음",
+                content = [
+                    Content(
+                        mediaType = "application/json",
+                        examples = [ExampleObject(value = """{"error":"쿠폰을 찾을 수 없습니다."}""")]
+                    )
+                ]
             )
         ]
     )

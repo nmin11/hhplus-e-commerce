@@ -72,6 +72,16 @@ interface CustomerApi {
                         )]
                     )
                 ]
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "사용자를 찾을 수 없음",
+                content = [
+                    Content(
+                        mediaType = "application/json",
+                        examples = [ExampleObject(value = """{"error":"사용자를 찾을 수 없습니다."}""")]
+                    )
+                ]
             )
         ]
     )
@@ -91,6 +101,26 @@ interface CustomerApi {
                         examples = [ExampleObject(
                             value = """{"customerId":1,"amount":150000}"""
                         )]
+                    )
+                ]
+            ),
+            ApiResponse(
+                responseCode = "400",
+                description = "유효하지 않은 액수",
+                content = [
+                    Content(
+                        mediaType = "application/json",
+                        examples = [ExampleObject(value = """{"error":"충전 액수는 1 이상이어야 합니다."}""")]
+                    )
+                ]
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "사용자를 찾을 수 없음",
+                content = [
+                    Content(
+                        mediaType = "application/json",
+                        examples = [ExampleObject(value = """{"error":"사용자를 찾을 수 없습니다."}""")]
                     )
                 ]
             )
