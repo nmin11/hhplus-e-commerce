@@ -4,12 +4,15 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.ExampleObject
 import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import kr.hhplus.be.server.dto.BalanceChargeRequest
 import kr.hhplus.be.server.dto.BalanceHistoryResponse
 import kr.hhplus.be.server.dto.BalanceResponse
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 
@@ -72,4 +75,41 @@ interface CustomerApi {
     )
     @GetMapping("/{id}/balance-histories")
     fun getBalanceHistories(@PathVariable id: Long): ResponseEntity<List<BalanceHistoryResponse>>
+
+    @Operation(summary = "사용자 잔액 충전")
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "충전 성공",
+                content = [
+                    Content(
+                        mediaType = "application/json",
+                        schema = Schema(implementation = BalanceResponse::class),
+                        examples = [ExampleObject(
+                            value = """{"customerId":1,"amount":150000}"""
+                        )]
+                    )
+                ]
+            )
+        ]
+    )
+    @PatchMapping("/{id}/balance/charge")
+    fun chargeBalance(
+        @PathVariable id: Long,
+        @RequestBody(
+            description = "충전할 금액",
+            required = true,
+            content = [
+                Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = BalanceChargeRequest::class),
+                    examples = [ExampleObject(
+                        value = """{"amount":50000}"""
+                    )]
+                )
+            ]
+        )
+        request: BalanceChargeRequest,
+    ): ResponseEntity<BalanceResponse>
 }

@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.controller
 
 import kr.hhplus.be.server.api.CustomerApi
+import kr.hhplus.be.server.dto.BalanceChargeRequest
 import kr.hhplus.be.server.dto.BalanceHistoryResponse
 import kr.hhplus.be.server.dto.BalanceResponse
 import org.springframework.http.ResponseEntity
@@ -21,5 +22,9 @@ class CustomerController : CustomerApi {
                 createdAt = "2025-04-02T16:31:11.959Z"
             )
         ))
+    }
+
+    override fun chargeBalance(id: Long, request: BalanceChargeRequest): ResponseEntity<BalanceResponse> {
+        return ResponseEntity.ok(BalanceResponse(id, 150000))
     }
 }
