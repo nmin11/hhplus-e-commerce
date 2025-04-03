@@ -15,14 +15,16 @@ class CustomerController : CustomerApi {
     }
 
     override fun getBalanceHistories(id: Long): ResponseEntity<List<BalanceHistoryResponse>> {
-        return ResponseEntity.ok(listOf(
+        val response = listOf(
             BalanceHistoryResponse(
                 changeType = "CHARGE",
                 changeAmount = 10000,
                 totalAmount = 60000,
                 createdAt = "2025-04-02T16:31:11.959Z"
             )
-        ))
+        )
+
+        return ResponseEntity.ok(response)
     }
 
     override fun chargeBalance(id: Long, request: BalanceChargeRequest): ResponseEntity<BalanceResponse> {
@@ -30,7 +32,7 @@ class CustomerController : CustomerApi {
     }
 
     override fun getCustomerCoupons(id: Long): ResponseEntity<List<CustomerCouponResponse>> {
-        return ResponseEntity.ok(listOf(
+        val response = listOf(
             CustomerCouponResponse(
                 name = "첫 구매 할인",
                 discountType = "FIXED",
@@ -47,6 +49,8 @@ class CustomerController : CustomerApi {
                 issuedAt = "2025-03-20T11:30:00Z",
                 expiredAt = "2025-04-10T23:59:59Z"
             )
-        ))
+        )
+
+        return ResponseEntity.ok(response)
     }
 }
