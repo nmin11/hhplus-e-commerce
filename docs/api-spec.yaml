@@ -3,14 +3,20 @@ info:
   title: 항해 플러스 E-커머스
   description: ''
   version: 1.0.0
-tags: []
+tags:
+  - name: Balance
+  - name: Products
+  - name: Orders
+  - name: Coupons
+  - name: Payments
 paths:
   /customers/{id}/balance:
     get:
       summary: 사용자 잔액 조회
       deprecated: false
       description: ''
-      tags: []
+      tags:
+        - Balance
       parameters:
         - name: id
           in: path
@@ -46,7 +52,8 @@ paths:
       summary: 사용자 잔액 충전
       deprecated: false
       description: ''
-      tags: []
+      tags:
+        - Balance
       parameters:
         - name: id
           in: path
@@ -95,7 +102,8 @@ paths:
       summary: 사용자 잔액 변경 내역 조회
       deprecated: false
       description: ''
-      tags: []
+      tags:
+        - Balance
       parameters:
         - name: id
           in: path
@@ -114,9 +122,6 @@ paths:
                 items:
                   type: object
                   properties:
-                    id:
-                      type: integer
-                      description: 잔액 변경 내역 ID
                     changeType:
                       type: string
                       description: 잔액 변경 타입("CHARGE", "USE")
@@ -130,14 +135,12 @@ paths:
                       type: string
                       description: 잔액 변경 시점
                   required:
-                    - id
                     - changeType
                     - changeAmount
                     - totalAmount
                     - createdAt
               example:
-                - id: 1
-                  changeType: CHARGE
+                - changeType: CHARGE
                   changeAmount: 10000
                   totalAmount: 60000
                   createdAt: '2025-04-02T16:31:11.959Z'
@@ -148,7 +151,8 @@ paths:
       summary: 상품 목록 조회
       deprecated: false
       description: ''
-      tags: []
+      tags:
+        - Products
       parameters: []
       responses:
         '200':
@@ -190,7 +194,8 @@ paths:
       summary: 상품 상세 조회
       deprecated: false
       description: ''
-      tags: []
+      tags:
+        - Products
       parameters:
         - name: id
           in: path
@@ -254,7 +259,8 @@ paths:
       summary: 인기 상품 조회
       deprecated: false
       description: ''
-      tags: []
+      tags:
+        - Products
       parameters:
         - name: days
           in: query
@@ -317,6 +323,14 @@ paths:
                   name: 운동화
                   basePrice: 59000
                   salesCount: 7
+                - productId: 4
+                  name: 잠바
+                  basePrice: 79000
+                  salesCount: 5
+                - productId: 5
+                  name: 실내화
+                  basePrice: 15000
+                  salesCount: 3
           headers: {}
       security: []
   /orders:
@@ -324,7 +338,8 @@ paths:
       summary: 주문
       deprecated: false
       description: ''
-      tags: []
+      tags:
+        - Orders
       parameters: []
       requestBody:
         content:
@@ -437,7 +452,8 @@ paths:
       summary: 쿠폰 발급
       deprecated: false
       description: ''
-      tags: []
+      tags:
+        - Coupons
       parameters:
         - name: id
           in: path
@@ -496,7 +512,8 @@ paths:
       summary: 사용자 보유 쿠폰 조회
       deprecated: false
       description: ''
-      tags: []
+      tags:
+        - Coupons
       parameters:
         - name: id
           in: path
@@ -514,9 +531,6 @@ paths:
                 items:
                   type: object
                   properties:
-                    couponId:
-                      type: integer
-                      description: 쿠폰 ID
                     name:
                       type: string
                       description: 쿠폰 이름
@@ -536,7 +550,6 @@ paths:
                       type: string
                       description: 쿠폰 만료 시간
                   required:
-                    - couponId
                     - name
                     - discountType
                     - discountAmount
@@ -544,15 +557,13 @@ paths:
                     - issuedAt
                     - expiredAt
               example:
-                - couponId: 2001
-                  name: 첫 구매 할인
+                - name: 첫 구매 할인
                   discountType: FIXED
                   discountAmount: 3000
                   status: ISSUED
                   issuedAt: '2025-04-02T15:00:00Z'
                   expiredAt: '2025-04-30T23:59:59Z'
-                - couponId: 2002
-                  name: 봄맞이 프로모션
+                - name: 봄맞이 프로모션
                   discountType: PERCENT
                   discountAmount: 10
                   status: USED
@@ -565,7 +576,8 @@ paths:
       summary: 결제
       deprecated: false
       description: ''
-      tags: []
+      tags:
+        - Payments
       parameters: []
       requestBody:
         content:
