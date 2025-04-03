@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import io.swagger.v3.oas.annotations.tags.Tag
 import kr.hhplus.be.server.dto.BalanceChargeRequest
 import kr.hhplus.be.server.dto.BalanceHistoryResponse
 import kr.hhplus.be.server.dto.BalanceResponse
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 
+@Tag(name = "Customer", description = "사용자 관련 API")
 @RequestMapping("/customers")
 interface CustomerApi {
     @Operation(summary = "고객 잔액 조회")
