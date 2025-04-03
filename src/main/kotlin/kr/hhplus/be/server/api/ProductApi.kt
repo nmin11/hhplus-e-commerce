@@ -7,9 +7,11 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
+import kr.hhplus.be.server.dto.ProductDetailResponse
 import kr.hhplus.be.server.dto.ProductListResponse
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 
 
@@ -41,5 +43,35 @@ interface ProductApi {
         ]
     )
     @GetMapping
-    fun getProducts(): ResponseEntity<List<ProductListResponse>>
+    fun getAllProduct(): ResponseEntity<List<ProductListResponse>>
+
+    @Operation(summary = "상품 상세 조회")
+    @ApiResponses(
+        ApiResponse(
+            responseCode = "200",
+            description = "상품 상세 정보 반환",
+            content = [
+                Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ProductDetailResponse::class),
+                    examples = [ExampleObject(
+                        value = """
+                        {
+                          "id": 1,
+                          "name": "청바지",
+                          "basePrice": 39000,
+                          "options": [
+                            { "optionName": "S", "extraPrice": 0 },
+                            { "optionName": "M", "extraPrice": 1000 },
+                            { "optionName": "L", "extraPrice": 2000 }
+                          ]
+                        }
+                        """
+                    )]
+                )
+            ]
+        )
+    )
+    @GetMapping("/{id}")
+    fun getProductDetail(@PathVariable id: Long): ResponseEntity<ProductDetailResponse>
 }
