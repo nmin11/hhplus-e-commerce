@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import kr.hhplus.be.server.dto.BalanceHistoryResponse
 import kr.hhplus.be.server.dto.BalanceResponse
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -40,4 +41,35 @@ interface CustomerApi {
     )
     @GetMapping("/{id}/balance")
     fun getBalance(@PathVariable id: Long): ResponseEntity<BalanceResponse>
+
+    @Operation(summary = "사용자 잔액 변경 내역 조회")
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "조회 성공",
+                content = [
+                    Content(
+                        mediaType = "application/json",
+                        schema = Schema(implementation = BalanceHistoryResponse::class),
+                        examples = [ExampleObject(
+                            value = """
+                            [
+                              {
+                                "id": 1,
+                                "changeType": "CHARGE",
+                                "changeAmount": 10000,
+                                "totalAmount": 60000,
+                                "createdAt": "2025-04-02T16:31:11.959Z"
+                              }
+                            ]
+                            """
+                        )]
+                    )
+                ]
+            )
+        ]
+    )
+    @GetMapping("/{id}/balance-histories")
+    fun getBalanceHistories(@PathVariable id: Long): ResponseEntity<List<BalanceHistoryResponse>>
 }
