@@ -125,7 +125,7 @@ interface ProductApi {
             )
         ]
     )
-    @GetMapping("/products/popular")
+    @GetMapping("/popular")
     fun getPopularProducts(
         @Parameter(description = "일 단위", example = "7") @RequestParam(required = false) days: Int?,
         @Parameter(description = "주 단위", example = "4") @RequestParam(required = false) weeks: Int?,

@@ -6,6 +6,7 @@ import kr.hhplus.be.server.dto.ProductDetailResponse
 import kr.hhplus.be.server.dto.ProductListResponse
 import kr.hhplus.be.server.dto.ProductOptionResponse
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -48,9 +49,9 @@ class ProductController : ProductApi {
     }
 
     override fun getPopularProducts(
-        days: Int?,
-        weeks: Int?,
-        months: Int?
+        @RequestParam(required = false) days: Int?,
+        @RequestParam(required = false) weeks: Int?,
+        @RequestParam(required = false) months: Int?
     ): ResponseEntity<List<PopularProductResponse>> {
         val response = listOf(
             PopularProductResponse(1, "청바지", 39000, 12),
