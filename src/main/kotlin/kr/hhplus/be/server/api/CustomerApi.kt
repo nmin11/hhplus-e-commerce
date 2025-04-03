@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import kr.hhplus.be.server.dto.BalanceChargeRequest
 import kr.hhplus.be.server.dto.BalanceHistoryResponse
 import kr.hhplus.be.server.dto.BalanceResponse
+import kr.hhplus.be.server.dto.CustomerCouponResponse
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 @Tag(name = "Customer", description = "사용자 관련 API")
 @RequestMapping("/customers")
 interface CustomerApi {
-    @Operation(summary = "고객 잔액 조회")
+    @Operation(summary = "사용자 잔액 조회")
     @ApiResponses(
         ApiResponse(
             responseCode = "200",
@@ -61,7 +62,6 @@ interface CustomerApi {
                             value = """
                             [
                               {
-                                "id": 1,
                                 "changeType": "CHARGE",
                                 "changeAmount": 10000,
                                 "totalAmount": 60000,
@@ -114,4 +114,44 @@ interface CustomerApi {
         )
         request: BalanceChargeRequest,
     ): ResponseEntity<BalanceResponse>
+
+    @Operation(summary = "사용자 보유 쿠폰 조회")
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "보유 쿠폰 목록 반환",
+                content = [
+                    Content(
+                        mediaType = "application/json",
+                        schema = Schema(implementation = CustomerCouponResponse::class),
+                        examples = [ExampleObject(
+                            value = """
+                            [
+                              {
+                                "name": "첫 구매 할인",
+                                "discountType": "FIXED",
+                                "discountAmount": 3000,
+                                "status": "ISSUED",
+                                "issuedAt": "2025-04-02T15:00:00Z",
+                                "expiredAt": "2025-04-30T23:59:59Z"
+                              },
+                              {
+                                "name": "봄맞이 프로모션",
+                                "discountType": "PERCENT",
+                                "discountAmount": 10,
+                                "status": "USED",
+                                "issuedAt": "2025-03-20T11:30:00Z",
+                                "expiredAt": "2025-04-10T23:59:59Z"
+                              }
+                            ]
+                            """
+                        )]
+                    )
+                ]
+            )
+        ]
+    )
+    @GetMapping("/{id}/coupons")
+    fun getCustomerCoupons(@PathVariable id: Long): ResponseEntity<List<CustomerCouponResponse>>
 }

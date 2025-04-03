@@ -4,6 +4,7 @@ import kr.hhplus.be.server.api.CustomerApi
 import kr.hhplus.be.server.dto.BalanceChargeRequest
 import kr.hhplus.be.server.dto.BalanceHistoryResponse
 import kr.hhplus.be.server.dto.BalanceResponse
+import kr.hhplus.be.server.dto.CustomerCouponResponse
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RestController
 
@@ -26,5 +27,26 @@ class CustomerController : CustomerApi {
 
     override fun chargeBalance(id: Long, request: BalanceChargeRequest): ResponseEntity<BalanceResponse> {
         return ResponseEntity.ok(BalanceResponse(id, 150000))
+    }
+
+    override fun getCustomerCoupons(id: Long): ResponseEntity<List<CustomerCouponResponse>> {
+        return ResponseEntity.ok(listOf(
+            CustomerCouponResponse(
+                name = "첫 구매 할인",
+                discountType = "FIXED",
+                discountAmount = 3000,
+                status = "ISSUED",
+                issuedAt = "2025-04-02T15:00:00Z",
+                expiredAt = "2025-04-30T23:59:59Z"
+            ),
+            CustomerCouponResponse(
+                name = "봄맞이 프로모션",
+                discountType = "PERCENT",
+                discountAmount = 10,
+                status =  "USED",
+                issuedAt = "2025-03-20T11:30:00Z",
+                expiredAt = "2025-04-10T23:59:59Z"
+            )
+        ))
     }
 }
