@@ -53,7 +53,7 @@ interface OrderApi {
         ]
     )
     @PostMapping
-    fun createOrder(
+    fun create(
         @RequestBody(
             required = true,
             description = "주문 요청 정보",

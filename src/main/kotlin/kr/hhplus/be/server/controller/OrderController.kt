@@ -5,12 +5,13 @@ import kr.hhplus.be.server.dto.OrderItemResponse
 import kr.hhplus.be.server.dto.OrderRequest
 import kr.hhplus.be.server.dto.OrderResponse
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 import java.time.Instant
 
 @RestController
 class OrderController : OrderApi {
-    override fun createOrder(request: OrderRequest): ResponseEntity<OrderResponse> {
+    override fun create(@RequestBody request: OrderRequest): ResponseEntity<OrderResponse> {
         val response = OrderResponse(
             orderId = 1,
             customerId = request.customerId,
