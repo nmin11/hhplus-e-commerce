@@ -89,15 +89,16 @@ interface ProductApi {
     fun getProductDetail(@PathVariable id: Long): ResponseEntity<ProductDetailResponse>
 
     @Operation(summary = "인기 상품 조회")
-    @ApiResponse(
-        responseCode = "200",
-        description = "기간 내 가장 많이 팔린 상품 목록",
-        content = [
-            Content(
-                mediaType = "application/json",
-                schema = Schema(implementation = PopularProductResponse::class),
-                examples = [ExampleObject(
-                    value = """
+    @ApiResponses(
+        ApiResponse(
+            responseCode = "200",
+            description = "기간 내 가장 많이 팔린 상품 목록",
+            content = [
+                Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = PopularProductResponse::class),
+                    examples = [ExampleObject(
+                        value = """
                     [
                       {
                         "productId": 1,
@@ -131,9 +132,22 @@ interface ProductApi {
                       }
                     ]
                     """
-                )]
-            )
-        ]
+                    )]
+                )
+            ]
+        ),
+        ApiResponse(
+            responseCode = "404",
+            description = "유효하지 않은 쿼리",
+            content = [
+                Content(
+                    mediaType = "application/json",
+                    examples = [ExampleObject(
+                        value = """{"error":"days, weeks, months 쿼리로 조회 기간을 설정해야 합니다."}"""
+                    )]
+                )
+            ]
+        )
     )
     @GetMapping("/popular")
     fun getPopularProducts(
