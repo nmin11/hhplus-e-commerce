@@ -179,6 +179,16 @@ interface CustomerApi {
                         )]
                     )
                 ]
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "사용자를 찾을 수 없음",
+                content = [
+                    Content(
+                        mediaType = "application/json",
+                        examples = [ExampleObject(value = """{"error":"사용자를 찾을 수 없습니다."}""")]
+                    )
+                ]
             )
         ]
     )
