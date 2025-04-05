@@ -196,15 +196,8 @@ sequenceDiagram
 
   Payment->>Payment: 결제 정보 생성 및 저장
 
-  Payment->>Statistic: 상품별 판매량 통계 반영 요청
-  activate Statistic
-  Statistic-->>Payment: 통계 반영 완료
-  deactivate Statistic
-
-  Payment->>Data Platform: 주문 데이터 전송
-  activate Data Platform
-  Data Platform-->>Payment: 전송 완료
-  deactivate Data Platform
+  Payment-->>Statistic: 통계 반영 요청 (비동기)
+  Payment-->>Data Platform: 주문 데이터 전송 (비동기)
 
   Payment-->>User: 결제 성공 응답
   deactivate Payment
