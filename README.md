@@ -275,3 +275,20 @@ sequenceDiagram
 <a href="https://dbdiagram.io/d/hhplus-e-commerce-67ebd1d24f7afba184ef6b5b" target="_blank">
     웹에서 ERD 확인하기
 </a>
+
+## 📒 API Spec
+
+### Mock API
+
+[Apidog에서 Mock API 확인하러 가기](https://app.apidog.com/invite/project?token=mBBPirh4BaKlY5hdhgMkb)
+
+<details>
+<summary>Mock API Endpoint</summary>
+<div markdown="1">
+https://mock.apidog.com/m1/866205-847191-default
+</div>
+</details>
+
+### Swagger UI
+
+[Swagger UI 확인하러 가기](https://resilient-raindrop-3dee2b.netlify.app)

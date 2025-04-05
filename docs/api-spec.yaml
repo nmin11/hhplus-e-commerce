@@ -1,0 +1,651 @@
+openapi: 3.0.1
+info:
+  title: 항해 플러스 E-커머스
+  description: ''
+  version: 1.0.0
+tags:
+  - name: Balance
+  - name: Products
+  - name: Orders
+  - name: Coupons
+  - name: Payments
+paths:
+  /customers/{id}/balance:
+    get:
+      summary: 사용자 잔액 조회
+      deprecated: false
+      description: ''
+      tags:
+        - Balance
+      parameters:
+        - name: id
+          in: path
+          description: 사용자 ID
+          required: true
+          example: '1'
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  customerId:
+                    type: integer
+                    description: 사용자 ID
+                  amount:
+                    type: integer
+                    description: 사용자의 현재 잔액
+                required:
+                  - amount
+                  - customerId
+              example:
+                customerId: 1
+                amount: 10000
+          headers: {}
+      security: []
+  /customers/{id}/balance/charge:
+    patch:
+      summary: 사용자 잔액 충전
+      deprecated: false
+      description: ''
+      tags:
+        - Balance
+      parameters:
+        - name: id
+          in: path
+          description: 사용자 ID
+          required: true
+          example: '1'
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: integer
+                  description: 충전할 금액
+              required:
+                - amount
+            example:
+              amount: 50000
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  customerId:
+                    type: integer
+                    description: 사용자 ID
+                  amount:
+                    type: integer
+                    description: 충전 후 잔액
+                required:
+                  - customerId
+                  - amount
+              example:
+                customerId: 1
+                amount: 150000
+          headers: {}
+      security: []
+  /customers/{id}/balance-histories:
+    get:
+      summary: 사용자 잔액 변경 내역 조회
+      deprecated: false
+      description: ''
+      tags:
+        - Balance
+      parameters:
+        - name: id
+          in: path
+          description: 사용자 ID
+          required: true
+          example: '1'
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    changeType:
+                      type: string
+                      description: 잔액 변경 타입("CHARGE", "USE")
+                    changeAmount:
+                      type: integer
+                      description: 변경된 액수
+                    totalAmount:
+                      type: integer
+                      description: 변경 이후 총 잔액
+                    createdAt:
+                      type: string
+                      description: 잔액 변경 시점
+                  required:
+                    - changeType
+                    - changeAmount
+                    - totalAmount
+                    - createdAt
+              example:
+                - changeType: CHARGE
+                  changeAmount: 10000
+                  totalAmount: 60000
+                  createdAt: '2025-04-02T16:31:11.959Z'
+          headers: {}
+      security: []
+  /products:
+    get:
+      summary: 상품 목록 조회
+      deprecated: false
+      description: ''
+      tags:
+        - Products
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      description: 상품 ID
+                    name:
+                      type: string
+                      description: 삼품명
+                    basePrice:
+                      type: integer
+                      description: 기본 가격
+                  required:
+                    - id
+                    - name
+                    - basePrice
+              example:
+                - id: 1
+                  name: 청바지
+                  base_price: 39000
+                - id: 2
+                  name: 후드티
+                  base_price: 29000
+                - id: 3
+                  name: 운동화
+                  base_price: 59000
+          headers: {}
+      security: []
+  /products/{id}:
+    get:
+      summary: 상품 상세 조회
+      deprecated: false
+      description: ''
+      tags:
+        - Products
+      parameters:
+        - name: id
+          in: path
+          description: 상품 ID
+          required: true
+          example: '1'
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: 상품 ID
+                  name:
+                    type: string
+                    description: 상품명
+                  basePrice:
+                    type: integer
+                    description: 기본 가격
+                  options:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        optionName:
+                          type: string
+                          description: 옵션 이름
+                        extraPrice:
+                          type: integer
+                          description: 추가 가격
+                      required:
+                        - optionName
+                        - extraPrice
+                    description: 상품 옵션들
+                required:
+                  - id
+                  - name
+                  - basePrice
+                  - options
+              example:
+                id: 1
+                name: 청바지
+                basePrice: 39000
+                options:
+                  - optionName: S
+                    extraPrice: 0
+                  - optionName: M
+                    extraPrice: 1000
+                  - optionName: L
+                    extraPrice: 2000
+          headers: {}
+      security: []
+  /products/popular:
+    get:
+      summary: 인기 상품 조회
+      deprecated: false
+      description: ''
+      tags:
+        - Products
+      parameters:
+        - name: days
+          in: query
+          description: 일 단위
+          required: false
+          example: 7
+          schema:
+            type: integer
+        - name: weeks
+          in: query
+          description: 주 단위
+          required: false
+          example: 4
+          schema:
+            type: integer
+        - name: months
+          in: query
+          description: 월 단위
+          required: false
+          example: 1
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    productId:
+                      type: integer
+                      description: 상품 ID
+                    name:
+                      type: string
+                      description: 상품명
+                    basePrice:
+                      type: integer
+                      description: 기본 가격
+                    salesCount:
+                      type: integer
+                      description: 기간 동안 팔린 횟수
+                  required:
+                    - productId
+                    - name
+                    - basePrice
+                    - salesCount
+              example:
+                - productId: 1
+                  name: 청바지
+                  basePrice: 39000
+                  salesCount: 12
+                - productId: 2
+                  name: 후드티
+                  basePrice: 29000
+                  salesCount: 9
+                - productId: 3
+                  name: 운동화
+                  basePrice: 59000
+                  salesCount: 7
+                - productId: 4
+                  name: 잠바
+                  basePrice: 79000
+                  salesCount: 5
+                - productId: 5
+                  name: 실내화
+                  basePrice: 15000
+                  salesCount: 3
+          headers: {}
+      security: []
+  /orders:
+    post:
+      summary: 주문
+      deprecated: false
+      description: ''
+      tags:
+        - Orders
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                customerId:
+                  type: integer
+                  description: 고객 ID
+                items:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      productId:
+                        type: integer
+                        description: 상품 ID
+                      productOptionId:
+                        type: integer
+                        description: 상품 옵션 ID
+                      quantity:
+                        type: integer
+                        description: 주문 갯수
+                    required:
+                      - productId
+                      - productOptionId
+                      - quantity
+                  description: 주문 항목들
+              required:
+                - customerId
+                - items
+            example:
+              customerId: 1
+              items:
+                - productId: 1
+                  productOptionId: 2
+                  quantity: 1
+                - productId: 2
+                  productOptionId: 3
+                  quantity: 1
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  orderId:
+                    type: integer
+                    description: 주문 ID
+                  customerId:
+                    type: integer
+                    description: 고객 ID
+                  totalPrice:
+                    type: integer
+                    description: 결제할 총 금액
+                  createdAt:
+                    type: string
+                    description: 주문서 생성 시간
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        productName:
+                          type: string
+                          description: 상품명
+                        optionName:
+                          type: string
+                          description: 상품 옵션 이름
+                        quantity:
+                          type: integer
+                          description: 주문 갯수
+                        subtotalPrice:
+                          type: integer
+                          description: 아이템 단위 가격
+                      required:
+                        - productName
+                        - optionName
+                        - quantity
+                        - subtotalPrice
+                      description: 주문 항목
+                    description: 주문한 항목들
+                required:
+                  - orderId
+                  - customerId
+                  - totalPrice
+                  - createdAt
+                  - items
+              example:
+                orderId: 1001
+                customerId: 1
+                totalPrice: 87000
+                createdAt: '2025-04-02T13:15:00Z'
+                items:
+                  - productName: 청바지
+                    optionName: M
+                    quantity: 1
+                    subtotalPrice: 39000
+                  - productName: 후드티
+                    optionName: L
+                    quantity: 1
+                    subtotalPrice: 48000
+          headers: {}
+      security: []
+  /coupons/{id}/issue:
+    post:
+      summary: 쿠폰 발급
+      deprecated: false
+      description: ''
+      tags:
+        - Coupons
+      parameters:
+        - name: id
+          in: path
+          description: 쿠폰 ID
+          required: true
+          example: '1'
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                customerId:
+                  type: integer
+                  description: 고객 ID
+              required:
+                - customerId
+            example:
+              customerId: 1
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  couponId:
+                    type: integer
+                    description: 쿠폰 ID
+                  customerId:
+                    type: integer
+                    description: 고객 ID
+                  status:
+                    type: string
+                    description: 쿠폰 활용 상태
+                  issuedAt:
+                    type: string
+                    description: 쿠폰 발급 시간
+                required:
+                  - couponId
+                  - customerId
+                  - status
+                  - issuedAt
+              example:
+                couponId: 2001
+                customerId: 1
+                status: ISSUED
+                issuedAt: '2025-04-02T15:00:00Z'
+          headers: {}
+      security: []
+  /customers/{id}/coupons:
+    get:
+      summary: 사용자 보유 쿠폰 조회
+      deprecated: false
+      description: ''
+      tags:
+        - Coupons
+      parameters:
+        - name: id
+          in: path
+          description: 고객 ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      description: 쿠폰 이름
+                    discountType:
+                      type: string
+                      description: 할인 유형("FIXED", "PERCENT")
+                    discountAmount:
+                      type: integer
+                      description: 할인량
+                    status:
+                      type: string
+                      description: 쿠폰 사용 상태("ISSUED", "USED")
+                    issuedAt:
+                      type: string
+                      description: 쿠폰 발급 시간
+                    expiredAt:
+                      type: string
+                      description: 쿠폰 만료 시간
+                  required:
+                    - name
+                    - discountType
+                    - discountAmount
+                    - status
+                    - issuedAt
+                    - expiredAt
+              example:
+                - name: 첫 구매 할인
+                  discountType: FIXED
+                  discountAmount: 3000
+                  status: ISSUED
+                  issuedAt: '2025-04-02T15:00:00Z'
+                  expiredAt: '2025-04-30T23:59:59Z'
+                - name: 봄맞이 프로모션
+                  discountType: PERCENT
+                  discountAmount: 10
+                  status: USED
+                  issuedAt: '2025-03-20T11:30:00Z'
+                  expiredAt: '2025-04-10T23:59:59Z'
+          headers: {}
+      security: []
+  /payments:
+    post:
+      summary: 결제
+      deprecated: false
+      description: ''
+      tags:
+        - Payments
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                orderId:
+                  type: integer
+                  description: 주문 ID
+                couponId:
+                  type: integer
+                  description: 쿠폰 ID
+                  nullable: true
+              required:
+                - orderId
+            example:
+              orderId: 1
+              couponId: 1
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  paymentId:
+                    type: integer
+                    description: 결제 ID
+                  orderId:
+                    type: integer
+                    description: 주문 ID
+                  customerId:
+                    type: integer
+                    description: 고객 ID
+                  originalPrice:
+                    type: integer
+                    description: 할인 전 가격
+                  discountAmount:
+                    type: integer
+                    description: 할인가
+                  discountedPrice:
+                    type: integer
+                    description: 할인 후 가격
+                  paidAt:
+                    type: string
+                    description: 결제 시간
+                required:
+                  - paymentId
+                  - orderId
+                  - customerId
+                  - originalPrice
+                  - discountAmount
+                  - discountedPrice
+                  - paidAt
+              example:
+                paymentId: 5001
+                orderId: 1001
+                customerId: 1
+                originalPrice: 87000
+                discountAmount: 5000
+                discountedPrice: 82000
+                paidAt: '2025-04-02T14:00:00Z'
+          headers: {}
+      security: []
+components:
+  schemas: {}
+  securitySchemes: {}
+servers: []
+security: []
