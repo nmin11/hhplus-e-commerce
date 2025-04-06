@@ -1,8 +1,8 @@
-package kr.hhplus.be.server.controller
+package kr.hhplus.be.server.interfaces.controller
 
-import kr.hhplus.be.server.api.CouponApi
-import kr.hhplus.be.server.dto.CouponIssueRequest
-import kr.hhplus.be.server.dto.CouponIssueResponse
+import kr.hhplus.be.server.interfaces.api.CouponApi
+import kr.hhplus.be.server.interfaces.dto.request.CouponIssueRequest
+import kr.hhplus.be.server.interfaces.dto.response.CouponIssueResponse
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController

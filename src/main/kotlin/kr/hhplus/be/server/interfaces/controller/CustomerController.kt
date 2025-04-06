@@ -1,10 +1,10 @@
-package kr.hhplus.be.server.controller
+package kr.hhplus.be.server.interfaces.controller
 
-import kr.hhplus.be.server.api.CustomerApi
-import kr.hhplus.be.server.dto.BalanceChargeRequest
-import kr.hhplus.be.server.dto.BalanceHistoryResponse
-import kr.hhplus.be.server.dto.BalanceResponse
-import kr.hhplus.be.server.dto.CustomerCouponResponse
+import kr.hhplus.be.server.interfaces.api.CustomerApi
+import kr.hhplus.be.server.interfaces.dto.request.BalanceChargeRequest
+import kr.hhplus.be.server.interfaces.dto.response.BalanceHistoryResponse
+import kr.hhplus.be.server.interfaces.dto.response.BalanceResponse
+import kr.hhplus.be.server.interfaces.dto.response.CustomerCouponResponse
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController

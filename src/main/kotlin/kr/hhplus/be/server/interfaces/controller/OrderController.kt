@@ -1,9 +1,9 @@
-package kr.hhplus.be.server.controller
+package kr.hhplus.be.server.interfaces.controller
 
-import kr.hhplus.be.server.api.OrderApi
-import kr.hhplus.be.server.dto.OrderItemResponse
-import kr.hhplus.be.server.dto.OrderRequest
-import kr.hhplus.be.server.dto.OrderResponse
+import kr.hhplus.be.server.interfaces.api.OrderApi
+import kr.hhplus.be.server.interfaces.dto.response.OrderItemResponse
+import kr.hhplus.be.server.interfaces.dto.request.OrderRequest
+import kr.hhplus.be.server.interfaces.dto.response.OrderResponse
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController

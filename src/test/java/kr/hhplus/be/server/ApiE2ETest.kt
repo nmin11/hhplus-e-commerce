@@ -1,10 +1,10 @@
 package kr.hhplus.be.server
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import kr.hhplus.be.server.dto.CouponIssueRequest
-import kr.hhplus.be.server.dto.OrderItemRequest
-import kr.hhplus.be.server.dto.OrderRequest
-import kr.hhplus.be.server.dto.PaymentRequest
+import kr.hhplus.be.server.interfaces.dto.request.CouponIssueRequest
+import kr.hhplus.be.server.interfaces.dto.request.OrderItemRequest
+import kr.hhplus.be.server.interfaces.dto.request.OrderRequest
+import kr.hhplus.be.server.interfaces.dto.request.PaymentRequest
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired

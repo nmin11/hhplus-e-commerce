@@ -1,10 +1,10 @@
-package kr.hhplus.be.server.controller
+package kr.hhplus.be.server.interfaces.controller
 
-import kr.hhplus.be.server.api.ProductApi
-import kr.hhplus.be.server.dto.PopularProductResponse
-import kr.hhplus.be.server.dto.ProductDetailResponse
-import kr.hhplus.be.server.dto.ProductListResponse
-import kr.hhplus.be.server.dto.ProductOptionResponse
+import kr.hhplus.be.server.interfaces.api.ProductApi
+import kr.hhplus.be.server.interfaces.dto.response.PopularProductResponse
+import kr.hhplus.be.server.interfaces.dto.response.ProductDetailResponse
+import kr.hhplus.be.server.interfaces.dto.response.ProductListResponse
+import kr.hhplus.be.server.interfaces.dto.response.ProductOptionResponse
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController

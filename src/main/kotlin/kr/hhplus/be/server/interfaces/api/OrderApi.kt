@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.api
+package kr.hhplus.be.server.interfaces.api
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
@@ -8,8 +8,8 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
-import kr.hhplus.be.server.dto.OrderRequest
-import kr.hhplus.be.server.dto.OrderResponse
+import kr.hhplus.be.server.interfaces.dto.request.OrderRequest
+import kr.hhplus.be.server.interfaces.dto.response.OrderResponse
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping

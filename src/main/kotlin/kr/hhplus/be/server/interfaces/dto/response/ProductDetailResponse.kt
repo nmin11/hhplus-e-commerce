@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.dto
+package kr.hhplus.be.server.interfaces.dto.response
 
 data class ProductDetailResponse(
     val id: Long,

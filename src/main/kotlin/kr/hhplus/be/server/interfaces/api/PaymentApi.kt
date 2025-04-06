@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.api
+package kr.hhplus.be.server.interfaces.api
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
@@ -6,8 +6,8 @@ import io.swagger.v3.oas.annotations.media.ExampleObject
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
-import kr.hhplus.be.server.dto.PaymentRequest
-import kr.hhplus.be.server.dto.PaymentResponse
+import kr.hhplus.be.server.interfaces.dto.request.PaymentRequest
+import kr.hhplus.be.server.interfaces.dto.response.PaymentResponse
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
