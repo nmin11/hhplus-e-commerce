@@ -56,7 +56,7 @@ interface CustomerApi {
                 content = [
                     Content(
                         mediaType = "application/json",
-                        schema = Schema(implementation = BalanceResponse.Histories::class),
+                        schema = Schema(implementation = BalanceResponse.History::class),
                         examples = [ExampleObject(
                             value = """
                             [
@@ -85,7 +85,7 @@ interface CustomerApi {
         ]
     )
     @GetMapping("/{id}/balance-histories")
-    fun getBalanceHistories(@PathVariable id: Long): ResponseEntity<List<BalanceResponse.Histories>>
+    fun getBalanceHistories(@PathVariable id: Long): ResponseEntity<List<BalanceResponse.History>>
 
     @Operation(summary = "사용자 잔액 충전")
     @ApiResponses(

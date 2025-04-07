@@ -3,8 +3,7 @@ package kr.hhplus.be.server
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
-import kr.hhplus.be.server.domain.balance.Balance
-import kr.hhplus.be.server.domain.balance.BalanceRepository
+import kr.hhplus.be.server.domain.balance.*
 import kr.hhplus.be.server.domain.customer.CustomerRepository
 import kr.hhplus.be.server.interfaces.coupon.CouponRequest
 import kr.hhplus.be.server.interfaces.order.OrderRequest
@@ -34,11 +33,23 @@ class ApiE2ETest {
     @MockkBean
     lateinit var balanceRepository: BalanceRepository
 
+    @MockkBean
+    lateinit var balanceHistoryRepository: BalanceHistoryRepository
+
     @Test
     @DisplayName("전체 API 성공 흐름 테스트")
     fun allApiSuccessFlow() {
         every { customerRepository.existsById(1L) } returns true
         every { balanceRepository.findByCustomerId(1L) } returns Balance(1L, 150000)
+        every { balanceHistoryRepository.findAllByCustomerId(1L) } returns
+            listOf(
+                BalanceHistory(
+                    1L,
+                    BalanceChangeType.CHARGE,
+                    1000,
+                    6000
+                )
+            )
 
         // 1. 고객 잔액 충전
         mockMvc.perform(

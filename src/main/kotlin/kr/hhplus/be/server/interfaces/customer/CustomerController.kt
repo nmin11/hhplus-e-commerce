@@ -13,21 +13,13 @@ class CustomerController(
     private val balanceFacade: BalanceFacade
 ) : CustomerApi {
     override fun getBalance(id: Long): ResponseEntity<BalanceResponse.Summary> {
-        val balance = balanceFacade.getByCustomerId(id)
+        val balance = balanceFacade.getBalance(id)
         return ResponseEntity.ok(BalanceResponse.from(balance))
     }
 
-    override fun getBalanceHistories(id: Long): ResponseEntity<List<BalanceResponse.Histories>> {
-        val response = listOf(
-            BalanceResponse.Histories(
-                changeType = "CHARGE",
-                changeAmount = 10000,
-                totalAmount = 60000,
-                createdAt = "2025-04-02T16:31:11.959Z"
-            )
-        )
-
-        return ResponseEntity.ok(response)
+    override fun getBalanceHistories(id: Long): ResponseEntity<List<BalanceResponse.History>> {
+        val balanceHistories = balanceFacade.getHistories(id).map { BalanceResponse.from(it) }
+        return ResponseEntity.ok(balanceHistories)
     }
 
     override fun chargeBalance(
@@ -37,6 +29,7 @@ class CustomerController(
         return ResponseEntity.ok(BalanceResponse.Summary(id, 150000))
     }
 
+    /* TODO STEP 6 쿠폰 기능 구현 시 수정 */
     override fun getCustomerCoupons(id: Long): ResponseEntity<List<CouponResponse.Owned>> {
         val response = listOf(
             CouponResponse.Owned(
