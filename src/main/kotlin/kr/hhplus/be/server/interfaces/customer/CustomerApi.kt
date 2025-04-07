@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.interfaces.api
+package kr.hhplus.be.server.interfaces.customer
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
@@ -8,10 +8,9 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
-import kr.hhplus.be.server.interfaces.dto.request.BalanceChargeRequest
-import kr.hhplus.be.server.interfaces.dto.response.BalanceHistoryResponse
-import kr.hhplus.be.server.interfaces.dto.response.BalanceResponse
-import kr.hhplus.be.server.interfaces.dto.response.CustomerCouponResponse
+import kr.hhplus.be.server.interfaces.balance.BalanceRequest
+import kr.hhplus.be.server.interfaces.balance.BalanceResponse
+import kr.hhplus.be.server.interfaces.coupon.CouponResponse
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
@@ -29,7 +28,7 @@ interface CustomerApi {
             content = [
                 Content(
                     mediaType = "application/json",
-                    schema = Schema(implementation = BalanceResponse::class),
+                    schema = Schema(implementation = BalanceResponse.Summary::class),
                     examples = [ExampleObject(value = """{"customerId":1,"amount":10000}""")]
                 )
             ]
@@ -46,7 +45,7 @@ interface CustomerApi {
         )
     )
     @GetMapping("/{id}/balance")
-    fun getBalance(@PathVariable id: Long): ResponseEntity<BalanceResponse>
+    fun getBalance(@PathVariable id: Long): ResponseEntity<BalanceResponse.Summary>
 
     @Operation(summary = "사용자 잔액 변경 내역 조회")
     @ApiResponses(
@@ -57,7 +56,7 @@ interface CustomerApi {
                 content = [
                     Content(
                         mediaType = "application/json",
-                        schema = Schema(implementation = BalanceHistoryResponse::class),
+                        schema = Schema(implementation = BalanceResponse.Histories::class),
                         examples = [ExampleObject(
                             value = """
                             [
@@ -86,7 +85,7 @@ interface CustomerApi {
         ]
     )
     @GetMapping("/{id}/balance-histories")
-    fun getBalanceHistories(@PathVariable id: Long): ResponseEntity<List<BalanceHistoryResponse>>
+    fun getBalanceHistories(@PathVariable id: Long): ResponseEntity<List<BalanceResponse.Histories>>
 
     @Operation(summary = "사용자 잔액 충전")
     @ApiResponses(
@@ -135,15 +134,15 @@ interface CustomerApi {
             content = [
                 Content(
                     mediaType = "application/json",
-                    schema = Schema(implementation = BalanceChargeRequest::class),
+                    schema = Schema(implementation = BalanceRequest.Charge::class),
                     examples = [ExampleObject(
                         value = """{"amount":50000}"""
                     )]
                 )
             ]
         )
-        request: BalanceChargeRequest,
-    ): ResponseEntity<BalanceResponse>
+        request: BalanceRequest.Charge,
+    ): ResponseEntity<BalanceResponse.Summary>
 
     @Operation(summary = "사용자 보유 쿠폰 조회")
     @ApiResponses(
@@ -154,7 +153,7 @@ interface CustomerApi {
                 content = [
                     Content(
                         mediaType = "application/json",
-                        schema = Schema(implementation = CustomerCouponResponse::class),
+                        schema = Schema(implementation = CouponResponse.Owned::class),
                         examples = [ExampleObject(
                             value = """
                             [
@@ -193,5 +192,5 @@ interface CustomerApi {
         ]
     )
     @GetMapping("/{id}/coupons")
-    fun getCustomerCoupons(@PathVariable id: Long): ResponseEntity<List<CustomerCouponResponse>>
+    fun getCustomerCoupons(@PathVariable id: Long): ResponseEntity<List<CouponResponse.Owned>>
 }

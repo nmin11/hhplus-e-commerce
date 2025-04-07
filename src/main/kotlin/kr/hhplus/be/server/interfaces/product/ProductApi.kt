@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.interfaces.api
+package kr.hhplus.be.server.interfaces.product
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -8,9 +8,6 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
-import kr.hhplus.be.server.interfaces.dto.response.PopularProductResponse
-import kr.hhplus.be.server.interfaces.dto.response.ProductDetailResponse
-import kr.hhplus.be.server.interfaces.dto.response.ProductListResponse
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -30,7 +27,7 @@ interface ProductApi {
                 content = [
                     Content(
                         mediaType = "application/json",
-                        schema = Schema(implementation = ProductListResponse::class),
+                        schema = Schema(implementation = ProductResponse.Summary::class),
                         examples = [ExampleObject(
                             value = """
                             [
@@ -46,7 +43,7 @@ interface ProductApi {
         ]
     )
     @GetMapping
-    fun getAllProduct(): ResponseEntity<List<ProductListResponse>>
+    fun getAllProduct(): ResponseEntity<List<ProductResponse.Summary>>
 
     @Operation(summary = "상품 상세 조회")
     @ApiResponses(
@@ -56,7 +53,7 @@ interface ProductApi {
             content = [
                 Content(
                     mediaType = "application/json",
-                    schema = Schema(implementation = ProductDetailResponse::class),
+                    schema = Schema(implementation = ProductResponse.Detail::class),
                     examples = [ExampleObject(
                         value = """
                         {
@@ -86,7 +83,7 @@ interface ProductApi {
         )
     )
     @GetMapping("/{id}")
-    fun getProductDetail(@PathVariable id: Long): ResponseEntity<ProductDetailResponse>
+    fun getProductDetail(@PathVariable id: Long): ResponseEntity<ProductResponse.Detail>
 
     @Operation(summary = "인기 상품 조회")
     @ApiResponses(
@@ -96,7 +93,7 @@ interface ProductApi {
             content = [
                 Content(
                     mediaType = "application/json",
-                    schema = Schema(implementation = PopularProductResponse::class),
+                    schema = Schema(implementation = ProductResponse.Popular::class),
                     examples = [ExampleObject(
                         value = """
                     [
@@ -154,5 +151,5 @@ interface ProductApi {
         @Parameter(description = "일 단위", example = "7") @RequestParam(required = false) days: Int?,
         @Parameter(description = "주 단위", example = "4") @RequestParam(required = false) weeks: Int?,
         @Parameter(description = "월 단위", example = "1") @RequestParam(required = false) months: Int?
-    ): ResponseEntity<List<PopularProductResponse>>
+    ): ResponseEntity<List<ProductResponse.Popular>>
 }

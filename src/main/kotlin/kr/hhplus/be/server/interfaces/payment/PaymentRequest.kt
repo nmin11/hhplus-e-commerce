@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.interfaces.dto.request
+package kr.hhplus.be.server.interfaces.payment
 
 data class PaymentRequest(
     val orderId: Long,

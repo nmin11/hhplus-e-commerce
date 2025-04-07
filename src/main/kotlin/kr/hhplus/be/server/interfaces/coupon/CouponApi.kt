@@ -1,54 +1,37 @@
-package kr.hhplus.be.server.interfaces.api
+package kr.hhplus.be.server.interfaces.coupon
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.ExampleObject
 import io.swagger.v3.oas.annotations.media.Schema
-import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
-import kr.hhplus.be.server.interfaces.dto.request.OrderRequest
-import kr.hhplus.be.server.interfaces.dto.response.OrderResponse
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 
-@Tag(name = "Order", description = "주문 관련 API")
-@RequestMapping("/orders")
-interface OrderApi {
-
-    @Operation(summary = "주문 생성")
+@Tag(name = "Coupon", description = "쿠폰 관련 API")
+@RequestMapping("/coupons")
+interface CouponApi {
+    @Operation(summary = "쿠폰 발급")
     @ApiResponses(
         value = [
             ApiResponse(
                 responseCode = "201",
-                description = "주문 생성 완료",
+                description = "쿠폰 발급 성공",
                 content = [
                     Content(
                         mediaType = "application/json",
-                        schema = Schema(implementation = OrderResponse::class),
+                        schema = Schema(implementation = CouponResponse.Issue::class),
                         examples = [ExampleObject(
                             value = """
                     {
-                      "orderId": 1,
+                      "couponId": 2001,
                       "customerId": 1,
-                      "totalPrice": 87000,
-                      "createdAt": "2025-04-02T13:15:00Z",
-                      "items": [
-                        {
-                          "productName": "청바지",
-                          "optionName": "M",
-                          "quantity": 1,
-                          "subtotalPrice": 39000
-                        },
-                        {
-                          "productName": "후드티",
-                          "optionName": "L",
-                          "quantity": 1,
-                          "subtotalPrice": 48000
-                        }
-                      ]
+                      "status": "ISSUED",
+                      "issuedAt": "2025-04-02T15:00:00Z"
                     }
                     """
                         )]
@@ -77,31 +60,26 @@ interface OrderApi {
             )
         ]
     )
-    @PostMapping
-    fun create(
-        @RequestBody(
+    @PostMapping("/{id}/issue")
+    fun issue(
+        @PathVariable id: Long,
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "쿠폰 발급 요청 정보",
             required = true,
-            description = "주문 요청 정보",
             content = [
                 Content(
                     mediaType = "application/json",
-                    schema = Schema(implementation = OrderRequest::class),
+                    schema = Schema(implementation = CouponRequest.Issue::class),
                     examples = [ExampleObject(
-                        name = "기본 주문 예시",
-                        summary = "청바지 + 후드티 주문",
                         value = """
                         {
-                          "customerId": 1,
-                          "items": [
-                            { "productId": 1, "productOptionId": 2, "quantity": 1 },
-                            { "productId": 2, "productOptionId": 3, "quantity": 1 }
-                          ]
+                          "customerId": 1
                         }
                         """
                     )]
                 )
             ]
         )
-        request: OrderRequest
-    ): ResponseEntity<OrderResponse>
+        request: CouponRequest.Issue
+    ): ResponseEntity<CouponResponse.Issue>
 }

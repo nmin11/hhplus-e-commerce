@@ -6,10 +6,9 @@ import io.mockk.every
 import kr.hhplus.be.server.domain.balance.Balance
 import kr.hhplus.be.server.domain.balance.BalanceRepository
 import kr.hhplus.be.server.domain.customer.CustomerRepository
-import kr.hhplus.be.server.interfaces.dto.request.CouponIssueRequest
-import kr.hhplus.be.server.interfaces.dto.request.OrderItemRequest
-import kr.hhplus.be.server.interfaces.dto.request.OrderRequest
-import kr.hhplus.be.server.interfaces.dto.request.PaymentRequest
+import kr.hhplus.be.server.interfaces.coupon.CouponRequest
+import kr.hhplus.be.server.interfaces.order.OrderRequest
+import kr.hhplus.be.server.interfaces.payment.PaymentRequest
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -61,11 +60,11 @@ class ApiE2ETest {
             .andExpect(status().isOk)
 
         // 5. 주문 생성
-        val orderRequest = OrderRequest(
+        val orderRequest = OrderRequest.Create(
             customerId = 1,
             items = listOf(
-                OrderItemRequest(productId = 1, productOptionId = 2, quantity = 1),
-                OrderItemRequest(productId = 2, productOptionId = 3, quantity = 1)
+                OrderRequest.OrderItem(productId = 1, productOptionId = 2, quantity = 1),
+                OrderRequest.OrderItem(productId = 2, productOptionId = 3, quantity = 1)
             )
         )
 
@@ -92,7 +91,7 @@ class ApiE2ETest {
             .andExpect(status().isOk)
 
         // 8. 쿠폰 발급
-        val couponRequest = CouponIssueRequest(customerId = 1L)
+        val couponRequest = CouponRequest.Issue(customerId = 1L)
 
         mockMvc.perform(
             post("/coupons/1/issue")
