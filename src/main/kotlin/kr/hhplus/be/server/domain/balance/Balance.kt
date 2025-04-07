@@ -4,8 +4,8 @@ import java.time.LocalDateTime
 
 class Balance(
     val customerId: Long,
-    val amount: Int
+    var amount: Int
 ) {
     val id: Long? = null
-    val updatedAt: LocalDateTime = LocalDateTime.now()
+    var updatedAt: LocalDateTime = LocalDateTime.now()
 }

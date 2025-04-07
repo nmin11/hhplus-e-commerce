@@ -1,9 +1,6 @@
 package kr.hhplus.be.server.application.balance
 
-import kr.hhplus.be.server.domain.balance.Balance
-import kr.hhplus.be.server.domain.balance.BalanceHistory
-import kr.hhplus.be.server.domain.balance.BalanceHistoryService
-import kr.hhplus.be.server.domain.balance.BalanceService
+import kr.hhplus.be.server.domain.balance.*
 import kr.hhplus.be.server.domain.customer.CustomerService
 import org.springframework.stereotype.Component
 
@@ -21,5 +18,20 @@ class BalanceFacade(
     fun getHistories(customerId: Long): List<BalanceHistory> {
         customerService.validateCustomerExistence(customerId)
         return balanceHistoryService.getAllByCustomerId(customerId)
+    }
+
+    fun charge(customerId: Long, amount: Int): Balance {
+        customerService.validateCustomerExistence(customerId)
+        val updatedBalance = balanceService.charge(customerId, amount)
+        balanceHistoryService.create(
+            BalanceHistory(
+                customerId,
+                changeType = BalanceChangeType.CHARGE,
+                changeAmount = amount,
+                totalAmount = updatedBalance.amount
+            )
+        )
+
+        return updatedBalance
     }
 }

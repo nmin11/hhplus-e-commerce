@@ -26,7 +26,8 @@ class CustomerController(
         id: Long,
         @RequestBody request: BalanceRequest.Charge
     ): ResponseEntity<BalanceResponse.Summary> {
-        return ResponseEntity.ok(BalanceResponse.Summary(id, 150000))
+        val updatedBalance = balanceFacade.charge(id, request.amount)
+        return ResponseEntity.ok(BalanceResponse.from(updatedBalance))
     }
 
     /* TODO STEP 6 쿠폰 기능 구현 시 수정 */

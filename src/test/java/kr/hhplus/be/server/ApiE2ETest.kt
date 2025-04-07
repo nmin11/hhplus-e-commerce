@@ -50,6 +50,14 @@ class ApiE2ETest {
                     6000
                 )
             )
+        every { balanceRepository.save(any()) } returns Balance(1L, 100000)
+        every { balanceHistoryRepository.save(any()) } returns
+            BalanceHistory(
+                1L,
+                BalanceChangeType.CHARGE,
+                100000,
+                150000
+            )
 
         // 1. 고객 잔액 충전
         mockMvc.perform(
