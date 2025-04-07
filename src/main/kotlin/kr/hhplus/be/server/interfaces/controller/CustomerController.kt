@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.interfaces.controller
 
+import kr.hhplus.be.server.application.balance.BalanceFacade
 import kr.hhplus.be.server.interfaces.api.CustomerApi
 import kr.hhplus.be.server.interfaces.dto.request.BalanceChargeRequest
 import kr.hhplus.be.server.interfaces.dto.response.BalanceHistoryResponse
@@ -10,9 +11,12 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class CustomerController : CustomerApi {
+class CustomerController(
+    private val balanceFacade: BalanceFacade
+) : CustomerApi {
     override fun getBalance(id: Long): ResponseEntity<BalanceResponse> {
-        return ResponseEntity.ok(BalanceResponse(id, 100000))
+        val balance = balanceFacade.getByCustomerId(id)
+        return ResponseEntity.ok(BalanceResponse.from(balance))
     }
 
     override fun getBalanceHistories(id: Long): ResponseEntity<List<BalanceHistoryResponse>> {
