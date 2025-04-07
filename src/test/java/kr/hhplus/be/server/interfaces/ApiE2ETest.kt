@@ -1,4 +1,4 @@
-package kr.hhplus.be.server
+package kr.hhplus.be.server.interfaces
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
