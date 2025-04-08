@@ -3,7 +3,6 @@ package kr.hhplus.be.server
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
-import io.mockk.spyk
 import kr.hhplus.be.server.domain.balance.*
 import kr.hhplus.be.server.domain.customer.CustomerRepository
 import kr.hhplus.be.server.domain.product.*
@@ -53,57 +52,60 @@ class ApiE2ETest {
     fun allApiSuccessFlow() {
         every { customerRepository.existsById(1L) } returns true
 
-        every { balanceRepository.findByCustomerId(1L) } returns Balance(1L, 150000)
-        every { balanceHistoryRepository.findAllByCustomerId(1L) } returns
-            listOf(
-                BalanceHistory(
-                    1L,
-                    BalanceChangeType.CHARGE,
-                    1000,
-                    6000
-                )
-            )
-
-        every { balanceRepository.save(any()) } returns Balance(1L, 100000)
-        every { balanceHistoryRepository.save(any()) } returns
+        every { balanceRepository.findByCustomerId(1L) } returns Balance(1L, 150000).apply {
+            id = 1L
+        }
+        every { balanceHistoryRepository.findAllByCustomerId(1L) } returns listOf(
             BalanceHistory(
-                1L,
-                BalanceChangeType.CHARGE,
-                100000,
-                150000
-            )
+                customerId = 1L,
+                changeType = BalanceChangeType.CHARGE,
+                changeAmount = 1000,
+                totalAmount = 6000
+            ).apply {
+                id = 1L
+            }
+        )
+        every { balanceRepository.save(any()) } answers { firstArg() }
+        every { balanceHistoryRepository.save(any()) } answers { firstArg() }
 
-        val product1 = spyk(Product(name = "청바지", basePrice = 39000))
-        every { product1.id } returns 1L
-        val product2 = spyk(Product(name = "후드티", basePrice = 29000))
-        every { product2.id } returns 2L
-        val product3 = spyk(Product(name = "운동화", basePrice = 59000))
-        every { product3.id } returns 3L
-        val product4 = spyk(Product(name = "잠바", basePrice = 79000))
-        every { product4.id } returns 4L
-        val product5 = spyk(Product(name = "실내화", basePrice = 15000))
-        every { product5.id } returns 5L
+        val product1 = Product(name = "청바지", basePrice = 39000).apply { id = 1L }
+        val product2 = Product(name = "후드티", basePrice = 29000).apply { id = 2L }
+        val product3 = Product(name = "운동화", basePrice = 59000).apply { id = 3L }
+        val product4 = Product(name = "잠바", basePrice = 79000).apply { id = 4L }
+        val product5 = Product(name = "실내화", basePrice = 15000).apply { id = 5L }
+
         every { productRepository.findAll() } returns listOf(product1, product2, product3)
         every { productRepository.findById(1L) } returns product1
-        every { productOptionRepository.findAllByProductId(1L) } returns
-            listOf(
-                ProductOption(productId = 1L, optionName = "S", extraPrice = 0),
-                ProductOption(productId = 2L, optionName = "M", extraPrice = 1000),
-                ProductOption(productId = 3L, optionName = "L", extraPrice = 2000)
-            )
+        every { productOptionRepository.findAllByProductId(1L) } returns listOf(
+            ProductOption(productId = 1L, optionName = "S", extraPrice = 0).apply { id = 1L },
+            ProductOption(productId = 1L, optionName = "M", extraPrice = 1000).apply { id = 2L },
+            ProductOption(productId = 1L, optionName = "L", extraPrice = 2000).apply { id = 3L }
+        )
 
         every { productRepository.findAllByIds(listOf(1L, 2L, 3L, 4L, 5L)) } returns
             listOf(product1, product2, product3, product4, product5)
-        val stat1 = spyk(Statistic(productId = 1L, salesCount = 12))
-        every { stat1.soldAt } returns LocalDateTime.now().minusDays(1)
-        val stat2 = spyk(Statistic(productId = 2L, salesCount = 9))
-        every { stat2.soldAt } returns LocalDateTime.now().minusDays(2)
-        val stat3 = spyk(Statistic(productId = 3L, salesCount = 7))
-        every { stat3.soldAt } returns LocalDateTime.now().minusDays(3)
-        val stat4 = spyk(Statistic(productId = 4L, salesCount = 5))
-        every { stat4.soldAt } returns LocalDateTime.now().minusDays(1)
-        val stat5 = spyk(Statistic(productId = 5L, salesCount = 3))
-        every { stat5.soldAt } returns LocalDateTime.now().minusDays(2)
+
+        val stat1 = Statistic(productId = 1L, salesCount = 12).apply {
+            id = 1L
+            soldAt = LocalDateTime.now().minusDays(1)
+        }
+        val stat2 = Statistic(productId = 2L, salesCount = 9).apply {
+            id = 2L
+            soldAt = LocalDateTime.now().minusDays(2)
+        }
+        val stat3 = Statistic(productId = 3L, salesCount = 7).apply {
+            id = 3L
+            soldAt = LocalDateTime.now().minusDays(3)
+        }
+        val stat4 = Statistic(productId = 4L, salesCount = 5).apply {
+            id = 4L
+            soldAt = LocalDateTime.now().minusDays(1)
+        }
+        val stat5 = Statistic(productId = 5L, salesCount = 3).apply {
+            id = 5L
+            soldAt = LocalDateTime.now().minusDays(2)
+        }
+
         every { statisticRepository.findTop5BySoldAtAfterOrderBySalesCountDesc(any()) } returns
             listOf(stat1, stat2, stat3, stat4, stat5)
 

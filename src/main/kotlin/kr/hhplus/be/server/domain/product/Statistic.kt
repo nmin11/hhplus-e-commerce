@@ -7,5 +7,5 @@ class Statistic(
     val salesCount: Int,
 ) {
     var id: Long? = null
-    val soldAt: LocalDateTime = LocalDateTime.now()
+    var soldAt: LocalDateTime = LocalDateTime.now()
 }
