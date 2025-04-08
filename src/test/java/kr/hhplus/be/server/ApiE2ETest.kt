@@ -1,10 +1,15 @@
-package kr.hhplus.be.server.interfaces
+package kr.hhplus.be.server
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
+import io.mockk.spyk
 import kr.hhplus.be.server.domain.balance.*
 import kr.hhplus.be.server.domain.customer.CustomerRepository
+import kr.hhplus.be.server.domain.product.Product
+import kr.hhplus.be.server.domain.product.ProductOption
+import kr.hhplus.be.server.domain.product.ProductOptionRepository
+import kr.hhplus.be.server.domain.product.ProductRepository
 import kr.hhplus.be.server.interfaces.coupon.CouponRequest
 import kr.hhplus.be.server.interfaces.order.OrderRequest
 import kr.hhplus.be.server.interfaces.payment.PaymentRequest
@@ -36,6 +41,12 @@ class ApiE2ETest {
     @MockkBean
     lateinit var balanceHistoryRepository: BalanceHistoryRepository
 
+    @MockkBean
+    lateinit var productRepository: ProductRepository
+
+    @MockkBean
+    lateinit var productOptionRepository: ProductOptionRepository
+
     @Test
     @DisplayName("전체 API 성공 흐름 테스트")
     fun allApiSuccessFlow() {
@@ -57,6 +68,20 @@ class ApiE2ETest {
                 BalanceChangeType.CHARGE,
                 100000,
                 150000
+            )
+        val product1 = spyk(Product(name = "청바지", basePrice = 39000))
+        every { product1.id } returns 1L
+        val product2 = spyk(Product(name = "후드티", basePrice = 29000))
+        every { product2.id } returns 2L
+        val product3 = spyk(Product(name = "운동화", basePrice = 59000))
+        every { product3.id } returns 3L
+        every { productRepository.findAll() } returns listOf(product1, product2, product3)
+        every { productRepository.findById(1L) } returns product1
+        every { productOptionRepository.findAllByProductId(1L) } returns
+            listOf(
+                ProductOption(productId = 1L, optionName = "S", extraPrice = 0),
+                ProductOption(productId = 2L, optionName = "M", extraPrice = 1000),
+                ProductOption(productId = 3L, optionName = "L", extraPrice = 2000)
             )
 
         // 1. 고객 잔액 충전
