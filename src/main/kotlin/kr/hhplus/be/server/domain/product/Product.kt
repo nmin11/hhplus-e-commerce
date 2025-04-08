@@ -6,7 +6,7 @@ class Product(
     val name: String,
     val basePrice: Int
 ) {
-    val id: Long? = null
+    var id: Long? = null
     val createdAt: LocalDateTime = LocalDateTime.now()
     val updatedAt: LocalDateTime = LocalDateTime.now()
 }

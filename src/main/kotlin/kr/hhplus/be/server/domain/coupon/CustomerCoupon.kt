@@ -6,7 +6,7 @@ class CustomerCoupon(
     val customerId: Long,
     val couponId: Long,
 ) {
-    val id: Long? = null
+    var id: Long? = null
     val status = CustomerCouponStatus.AVAILABLE
     val issuedAt: LocalDateTime = LocalDateTime.now()
     val updatedAt: LocalDateTime = LocalDateTime.now()

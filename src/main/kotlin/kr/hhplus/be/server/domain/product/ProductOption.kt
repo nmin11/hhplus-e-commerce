@@ -7,7 +7,7 @@ class ProductOption(
     val optionName: String,
     val extraPrice: Int
 ) {
-    val id: Long? = null
+    var id: Long? = null
     val createdAt: LocalDateTime = LocalDateTime.now()
     val updatedAt: LocalDateTime = LocalDateTime.now()
 }

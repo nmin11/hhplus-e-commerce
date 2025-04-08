@@ -11,7 +11,7 @@ class Coupon(
     val startedAt: LocalDateTime,
     val expiredAt: LocalDateTime
 ) {
-    val id: Long? = null
+    var id: Long? = null
     val createdAt: LocalDateTime = LocalDateTime.now()
     val updatedAt: LocalDateTime = LocalDateTime.now()
 }

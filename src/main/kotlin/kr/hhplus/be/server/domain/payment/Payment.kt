@@ -10,6 +10,6 @@ class Payment(
     val discountAmount: Int,
     val discountedPrice: Int
 ) {
-    val id: Long? = null
+    var id: Long? = null
     val paidAt: LocalDateTime = LocalDateTime.now()
 }

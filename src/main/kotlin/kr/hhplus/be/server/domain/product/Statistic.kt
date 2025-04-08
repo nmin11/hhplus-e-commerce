@@ -6,6 +6,6 @@ class Statistic(
     val productId: Long,
     val salesCount: Int,
 ) {
-    val id: Long? = null
+    var id: Long? = null
     val soldAt: LocalDateTime = LocalDateTime.now()
 }

@@ -6,7 +6,7 @@ class Order(
     val customerId: Long,
     val totalPrice: Int,
 ) {
-    val id: Long? = null
+    var id: Long? = null
     val status = OrderStatus.CREATED
     val createdAt: LocalDateTime = LocalDateTime.now()
     val updatedAt: LocalDateTime = LocalDateTime.now()

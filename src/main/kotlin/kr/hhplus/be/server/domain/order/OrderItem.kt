@@ -6,5 +6,5 @@ class OrderItem(
     val quantity: Int,
     val subtotalPrice: Int
 ) {
-    val id: Long? = null
+    var id: Long? = null
 }

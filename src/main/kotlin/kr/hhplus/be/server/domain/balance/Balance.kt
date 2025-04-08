@@ -6,6 +6,6 @@ class Balance(
     val customerId: Long,
     var amount: Int
 ) {
-    val id: Long? = null
+    var id: Long? = null
     var updatedAt: LocalDateTime = LocalDateTime.now()
 }

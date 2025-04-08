@@ -8,6 +8,6 @@ class BalanceHistory(
     val changeAmount: Int,
     val totalAmount: Int
 ) {
-    val id: Long? = null
+    var id: Long? = null
     val createdAt: LocalDateTime = LocalDateTime.now()
 }

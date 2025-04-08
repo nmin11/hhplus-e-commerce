@@ -6,6 +6,6 @@ class Stock(
     val productOptionId: Long,
     val quantity: Int
 ) {
-    val id: Long? = null
+    var id: Long? = null
     val updatedAt: LocalDateTime = LocalDateTime.now()
 }
