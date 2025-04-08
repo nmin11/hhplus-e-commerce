@@ -18,8 +18,8 @@ class ProductController(
     }
 
     override fun getProductDetail(id: Long): ResponseEntity<ProductResponse.Detail> {
-        val productDetail = productFacade.getProductDetail(id)
-        val response = ProductResponse.from(productDetail.first, productDetail.second)
+        val result = productFacade.getProductDetail(id)
+        val response = ProductResponse.from(result.product, result.options)
         return ResponseEntity.ok(response)
     }
 

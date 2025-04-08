@@ -9,10 +9,10 @@ class ProductFacade(
     private val productOptionService: ProductOptionService,
     private val statisticService: StatisticService
 ) {
-    fun getProductDetail(productId: Long): Pair<Product, List<ProductOption>> {
+    fun getProductDetail(productId: Long): ProductResult.Detail {
         val product = productService.getById(productId)
         val options = productOptionService.getByProductId(productId)
-        return Pair(product, options)
+        return ProductResult.Detail(product, options)
     }
 
     fun getPopularProducts(condition: ProductCriteria.PeriodCondition): List<ProductResult.Popular> {
