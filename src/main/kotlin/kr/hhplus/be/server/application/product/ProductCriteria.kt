@@ -8,6 +8,13 @@ sealed class ProductCriteria {
         val weeks: Int? = null,
         val months: Int? = null
     ) {
+        init {
+            val nonNullCount = listOf(days, weeks, months).count { it != null }
+            require(nonNullCount == 1) {
+                "days, weeks, months 중 하나만 지정해야 합니다."
+            }
+        }
+
         fun toStartDate(): LocalDate {
             val now = LocalDate.now()
             return when {

@@ -28,8 +28,13 @@ class ProductController(
         @RequestParam(required = false) weeks: Int?,
         @RequestParam(required = false) months: Int?
     ): ResponseEntity<List<ProductResponse.Popular>> {
-        val result = productFacade.getPopularProducts(ProductCriteria.PeriodCondition(days, weeks, months))
-        val response = result.map { ProductResponse.from(it) }
-        return ResponseEntity.ok(response)
+        return try {
+            val result = productFacade.getPopularProducts(ProductCriteria.PeriodCondition(days, weeks, months))
+            val response = result.map { ProductResponse.from(it) }
+            return ResponseEntity.ok(response)
+        } catch (e: IllegalArgumentException) {
+            /* TODO 에러 객체 정의 필요 */
+            ResponseEntity.badRequest().body(emptyList())
+        }
     }
 }
