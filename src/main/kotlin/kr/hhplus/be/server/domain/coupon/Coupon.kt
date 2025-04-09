@@ -3,15 +3,16 @@ package kr.hhplus.be.server.domain.coupon
 import java.time.LocalDateTime
 
 class Coupon(
-    val name: String,
-    val discountType: DiscountType,
-    val discountAmount: Int,
-    val currentQuantity: Int,
-    val totalQuantity: Int,
-    val startedAt: LocalDateTime,
-    val expiredAt: LocalDateTime
+    var name: String,
+    var discountType: DiscountType,
+    var discountAmount: Int,
+    var currentQuantity: Int,
+    var totalQuantity: Int,
+    var startedAt: LocalDateTime,
+    var expiredAt: LocalDateTime
 ) {
     var id: Long? = null
     val createdAt: LocalDateTime = LocalDateTime.now()
-    val updatedAt: LocalDateTime = LocalDateTime.now()
+    var updatedAt: LocalDateTime = LocalDateTime.now()
+    var customerCoupons: MutableList<CustomerCoupon> = mutableListOf()
 }

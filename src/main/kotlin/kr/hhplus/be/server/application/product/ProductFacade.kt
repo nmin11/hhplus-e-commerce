@@ -18,13 +18,9 @@ class ProductFacade(
     fun getPopularProducts(condition: ProductCriteria.PeriodCondition): List<ProductResult.Popular> {
         val since = condition.toStartDate()
         val statistics = statisticService.getTop5PopularProductStatistics(since)
-        val productIds = statistics.map { it.productId }
-        val products = productService.getAllByIds(productIds)
-        val productMap = products.associateBy { it.id }
 
         return statistics.map { stat ->
-            val product = productMap[stat.productId]
-                ?: throw IllegalStateException("통계에 포함된 상품이 존재하지 않습니다.")
+            val product = stat.product
 
             ProductResult.Popular(
                 productId = product.id!!,

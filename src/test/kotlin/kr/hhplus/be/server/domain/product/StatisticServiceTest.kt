@@ -17,12 +17,13 @@ class StatisticServiceTest {
     fun returnTop5StatisticsSinceDate() {
         // given
         val since = LocalDate.now().minusDays(3)
+        val product = Product(name = "청바지", basePrice = 10_000).apply { id = 1L }
         val statistics = listOf(
-            Statistic(productId = 1L, salesCount = 12).apply {
+            Statistic(product, salesCount = 12).apply {
                 id = 1L
                 soldAt = LocalDateTime.now().minusDays(1)
             },
-            Statistic(productId = 2L, salesCount = 9).apply {
+            Statistic(product, salesCount = 9).apply {
                 id = 2L
                 soldAt = LocalDateTime.now().minusDays(2)
             }

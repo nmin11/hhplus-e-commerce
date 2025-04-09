@@ -11,4 +11,9 @@ class CustomerService(
             throw IllegalArgumentException("사용자를 찾을 수 없습니다.")
         }
     }
+
+    fun getById(id: Long): Customer {
+        return customerRepository.findById(id)
+            ?: throw IllegalArgumentException("사용자를 찾을 수 없습니다.")
+    }
 }

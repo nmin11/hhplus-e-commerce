@@ -19,7 +19,7 @@ sealed class BalanceResponse {
     companion object {
         fun from(balance: Balance): Summary {
             return Summary(
-                customerId = balance.customerId,
+                customerId = balance.customer.id!!,
                 amount = balance.amount
             )
         }

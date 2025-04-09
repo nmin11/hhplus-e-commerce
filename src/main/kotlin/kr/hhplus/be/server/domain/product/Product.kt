@@ -9,4 +9,6 @@ class Product(
     var id: Long? = null
     val createdAt: LocalDateTime = LocalDateTime.now()
     val updatedAt: LocalDateTime = LocalDateTime.now()
+    var productOptions: MutableList<ProductOption> = mutableListOf()
+    var statistics: MutableList<Statistic> = mutableListOf()
 }

@@ -1,9 +1,10 @@
 package kr.hhplus.be.server.domain.balance
 
+import kr.hhplus.be.server.domain.customer.Customer
 import java.time.LocalDateTime
 
 class BalanceHistory(
-    val customerId: Long,
+    val customer: Customer,
     val changeType: BalanceChangeType,
     val changeAmount: Int,
     val totalAmount: Int

@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import kr.hhplus.be.server.domain.balance.*
+import kr.hhplus.be.server.domain.customer.Customer
 import kr.hhplus.be.server.domain.customer.CustomerRepository
+import kr.hhplus.be.server.domain.order.OrderRepository
 import kr.hhplus.be.server.domain.product.*
 import kr.hhplus.be.server.interfaces.coupon.CouponRequest
 import kr.hhplus.be.server.interfaces.order.OrderRequest
@@ -47,24 +49,33 @@ class ApiE2ETest {
     @MockkBean
     lateinit var statisticRepository: StatisticRepository
 
+    @MockkBean
+    lateinit var stockRepository: StockRepository
+
+    @MockkBean
+    lateinit var orderRepository: OrderRepository
+
     @Test
     @DisplayName("전체 API 성공 흐름 테스트")
     fun allApiSuccessFlow() {
+        val customer = Customer(username = "tester").apply { id = 1L }
+
         every { customerRepository.existsById(1L) } returns true
 
-        every { balanceRepository.findByCustomerId(1L) } returns Balance(1L, 150000).apply {
-            id = 1L
-        }
-        every { balanceHistoryRepository.findAllByCustomerId(1L) } returns listOf(
-            BalanceHistory(
-                customerId = 1L,
-                changeType = BalanceChangeType.CHARGE,
-                changeAmount = 1000,
-                totalAmount = 6000
-            ).apply {
-                id = 1L
-            }
-        )
+        every { customerRepository.findById(1L) } returns customer
+
+        val balance = Balance(customer = customer, amount = 150000).apply { id = 1L }
+        every { balanceRepository.findByCustomerId(1L) } returns balance
+
+        val history = BalanceHistory(
+            customer = customer,
+            changeType = BalanceChangeType.CHARGE,
+            changeAmount = 1000,
+            totalAmount = 6000
+        ).apply { id = 1L }
+
+        every { balanceHistoryRepository.findAllByCustomerId(1L) } returns listOf(history)
+
         every { balanceRepository.save(any()) } answers { firstArg() }
         every { balanceHistoryRepository.save(any()) } answers { firstArg() }
 
@@ -76,38 +87,41 @@ class ApiE2ETest {
 
         every { productRepository.findAll() } returns listOf(product1, product2, product3)
         every { productRepository.findById(1L) } returns product1
+
         every { productOptionRepository.findAllByProductId(1L) } returns listOf(
-            ProductOption(productId = 1L, optionName = "S", extraPrice = 0).apply { id = 1L },
-            ProductOption(productId = 1L, optionName = "M", extraPrice = 1000).apply { id = 2L },
-            ProductOption(productId = 1L, optionName = "L", extraPrice = 2000).apply { id = 3L }
+            ProductOption(product = product1, optionName = "S", extraPrice = 0).apply { id = 1L },
+            ProductOption(product = product1, optionName = "M", extraPrice = 1000).apply { id = 2L },
+            ProductOption(product = product1, optionName = "L", extraPrice = 2000).apply { id = 3L }
         )
 
-        every { productRepository.findAllByIds(listOf(1L, 2L, 3L, 4L, 5L)) } returns
-            listOf(product1, product2, product3, product4, product5)
+        every {
+            productRepository.findAllByIds(listOf(1L, 2L, 3L, 4L, 5L))
+        } returns listOf(product1, product2, product3, product4, product5)
 
-        val stat1 = Statistic(productId = 1L, salesCount = 12).apply {
+        val stat1 = Statistic(product = product1, salesCount = 12).apply {
             id = 1L
             soldAt = LocalDateTime.now().minusDays(1)
         }
-        val stat2 = Statistic(productId = 2L, salesCount = 9).apply {
+        val stat2 = Statistic(product = product2, salesCount = 9).apply {
             id = 2L
             soldAt = LocalDateTime.now().minusDays(2)
         }
-        val stat3 = Statistic(productId = 3L, salesCount = 7).apply {
+        val stat3 = Statistic(product = product3, salesCount = 7).apply {
             id = 3L
             soldAt = LocalDateTime.now().minusDays(3)
         }
-        val stat4 = Statistic(productId = 4L, salesCount = 5).apply {
+        val stat4 = Statistic(product = product4, salesCount = 5).apply {
             id = 4L
             soldAt = LocalDateTime.now().minusDays(1)
         }
-        val stat5 = Statistic(productId = 5L, salesCount = 3).apply {
+        val stat5 = Statistic(product = product5, salesCount = 3).apply {
             id = 5L
             soldAt = LocalDateTime.now().minusDays(2)
         }
 
-        every { statisticRepository.findTop5BySoldAtAfterOrderBySalesCountDesc(any()) } returns
-            listOf(stat1, stat2, stat3, stat4, stat5)
+        every {
+            statisticRepository.findTop5BySoldAtAfterOrderBySalesCountDesc(any())
+        } returns listOf(stat1, stat2, stat3, stat4, stat5)
 
         // 1. 고객 잔액 충전
         mockMvc.perform(

@@ -21,11 +21,11 @@ class BalanceFacade(
     }
 
     fun charge(customerId: Long, amount: Int): Balance {
-        customerService.validateCustomerExistence(customerId)
+        val customer = customerService.getById(customerId)
         val updatedBalance = balanceService.charge(customerId, amount)
         balanceHistoryService.create(
             BalanceHistory(
-                customerId,
+                customer,
                 changeType = BalanceChangeType.CHARGE,
                 changeAmount = amount,
                 totalAmount = updatedBalance.amount

@@ -13,10 +13,11 @@ class ProductOptionServiceTest {
     fun getByProductId_shouldReturnProductOptions() {
         // given
         val productId = 1L
+        val product = Product(name = "청바지", basePrice = 10_000).apply { id = productId }
         val expectedOptions = listOf(
-            ProductOption(productId = productId, optionName = "S", extraPrice = 0).apply { id = 1L },
-            ProductOption(productId = productId, optionName = "M", extraPrice = 1000).apply { id = 2L },
-            ProductOption(productId = productId, optionName = "L", extraPrice = 2000).apply { id = 3L }
+            ProductOption(product, optionName = "S", extraPrice = 0).apply { id = 1L },
+            ProductOption(product, optionName = "M", extraPrice = 1000).apply { id = 2L },
+            ProductOption(product, optionName = "L", extraPrice = 2000).apply { id = 3L }
         )
         every { productOptionRepository.findAllByProductId(productId) } returns expectedOptions
 

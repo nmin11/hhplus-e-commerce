@@ -18,7 +18,8 @@ class BalanceServiceTest {
         @DisplayName("잔액 정보가 존재할 경우 잔액 반환")
         fun whenExists_thenReturnBalance() {
             // given
-            val expectedBalance = Balance(customerId = customerId, amount = 100_000)
+            val customer = Customer(username = "tester").apply { id = 1L }
+            val expectedBalance = Balance(customer, amount = 100_000)
             every { balanceRepository.findByCustomerId(customerId) } returns expectedBalance
 
             // when
@@ -52,11 +53,8 @@ class BalanceServiceTest {
         @DisplayName("충전 시 기존 잔액에 금액이 더해짐")
         fun shouldAddAmountToBalance() {
             // given
-            val customer = mockk<Customer>()
-            every { customer.id } returns 1L
-            every { customer.username } returns "tester"
-
-            val balance = Balance(customerId = 1L, amount = 100_000)
+            val customer = Customer(username = "tester").apply { id = 1L }
+            val balance = Balance(customer, amount = 100_000)
             every { balanceRepository.findByCustomerId(1L) } returns balance
             every { balanceRepository.save(any()) } answers { firstArg() }
 

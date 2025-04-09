@@ -1,13 +1,14 @@
 package kr.hhplus.be.server.domain.coupon
 
+import kr.hhplus.be.server.domain.customer.Customer
 import java.time.LocalDateTime
 
 class CustomerCoupon(
-    val customerId: Long,
-    val couponId: Long,
+    val customer: Customer,
+    val coupon: Coupon
 ) {
     var id: Long? = null
-    val status = CustomerCouponStatus.AVAILABLE
+    var status = CustomerCouponStatus.AVAILABLE
     val issuedAt: LocalDateTime = LocalDateTime.now()
-    val updatedAt: LocalDateTime = LocalDateTime.now()
+    var updatedAt: LocalDateTime = LocalDateTime.now()
 }
