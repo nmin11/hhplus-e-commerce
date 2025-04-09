@@ -14,11 +14,11 @@ class CustomerController(
 ) : CustomerApi {
     override fun getBalance(id: Long): ResponseEntity<BalanceResponse.Summary> {
         val balance = balanceFacade.getBalance(id)
-        return ResponseEntity.ok(BalanceResponse.from(balance))
+        return ResponseEntity.ok(BalanceResponse.Summary.from(balance))
     }
 
     override fun getBalanceHistories(id: Long): ResponseEntity<List<BalanceResponse.History>> {
-        val balanceHistories = balanceFacade.getHistories(id).map { BalanceResponse.from(it) }
+        val balanceHistories = balanceFacade.getHistories(id).map { BalanceResponse.History.from(it) }
         return ResponseEntity.ok(balanceHistories)
     }
 
@@ -27,7 +27,7 @@ class CustomerController(
         @RequestBody request: BalanceRequest.Charge
     ): ResponseEntity<BalanceResponse.Summary> {
         val updatedBalance = balanceFacade.charge(id, request.amount)
-        return ResponseEntity.ok(BalanceResponse.from(updatedBalance))
+        return ResponseEntity.ok(BalanceResponse.Summary.from(updatedBalance))
     }
 
     /* TODO STEP 6 쿠폰 기능 구현 시 수정 */

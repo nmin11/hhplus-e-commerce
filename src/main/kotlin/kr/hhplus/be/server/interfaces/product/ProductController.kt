@@ -13,13 +13,13 @@ class ProductController(
     private val productService: ProductService
 ) : ProductApi {
     override fun getAllProduct(): ResponseEntity<List<ProductResponse.Summary>> {
-        val response = productService.getAll().map { ProductResponse.from(it) }
+        val response = productService.getAll().map { ProductResponse.Summary.from(it) }
         return ResponseEntity.ok(response)
     }
 
     override fun getProductDetail(id: Long): ResponseEntity<ProductResponse.Detail> {
         val result = productFacade.getProductDetail(id)
-        val response = ProductResponse.from(result.product, result.options)
+        val response = ProductResponse.Detail.from(result.product, result.options)
         return ResponseEntity.ok(response)
     }
 
@@ -30,7 +30,7 @@ class ProductController(
     ): ResponseEntity<List<ProductResponse.Popular>> {
         return try {
             val result = productFacade.getPopularProducts(ProductCriteria.PeriodCondition(days, weeks, months))
-            val response = result.map { ProductResponse.from(it) }
+            val response = result.map { ProductResponse.Popular.from(it) }
             return ResponseEntity.ok(response)
         } catch (e: IllegalArgumentException) {
             /* TODO 에러 객체 정의 필요 */

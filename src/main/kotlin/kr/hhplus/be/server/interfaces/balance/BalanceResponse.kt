@@ -7,30 +7,32 @@ sealed class BalanceResponse {
     data class Summary(
         val customerId: Long,
         val amount: Int
-    )
+    ) {
+        companion object {
+            fun from(balance: Balance): Summary {
+                return Summary(
+                    customerId = balance.customer.id!!,
+                    amount = balance.amount
+                )
+            }
+        }
+    }
 
     data class History(
         val changeType: String,
         val changeAmount: Int,
         val totalAmount: Int,
         val createdAt: String
-    )
-
-    companion object {
-        fun from(balance: Balance): Summary {
-            return Summary(
-                customerId = balance.customer.id!!,
-                amount = balance.amount
-            )
-        }
-
-        fun from(balanceHistory: BalanceHistory): History {
-            return History(
-                changeType = balanceHistory.changeType.name,
-                changeAmount = balanceHistory.changeAmount,
-                totalAmount = balanceHistory.totalAmount,
-                createdAt = balanceHistory.createdAt.toString()
-            )
+    ) {
+        companion object {
+            fun from(balanceHistory: BalanceHistory): History {
+                return History(
+                    changeType = balanceHistory.changeType.name,
+                    changeAmount = balanceHistory.changeAmount,
+                    totalAmount = balanceHistory.totalAmount,
+                    createdAt = balanceHistory.createdAt.toString()
+                )
+            }
         }
     }
 }
