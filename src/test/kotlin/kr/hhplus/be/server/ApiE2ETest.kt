@@ -6,6 +6,8 @@ import io.mockk.every
 import kr.hhplus.be.server.domain.balance.*
 import kr.hhplus.be.server.domain.customer.Customer
 import kr.hhplus.be.server.domain.customer.CustomerRepository
+import kr.hhplus.be.server.domain.order.Order
+import kr.hhplus.be.server.domain.order.OrderItem
 import kr.hhplus.be.server.domain.order.OrderRepository
 import kr.hhplus.be.server.domain.product.*
 import kr.hhplus.be.server.interfaces.coupon.CouponRequest
@@ -87,6 +89,7 @@ class ApiE2ETest {
 
         every { productRepository.findAll() } returns listOf(product1, product2, product3)
         every { productRepository.findById(1L) } returns product1
+        every { productRepository.findById(2L) } returns product2
 
         every { productOptionRepository.findAllByProductId(1L) } returns listOf(
             ProductOption(product = product1, optionName = "S", extraPrice = 0).apply { id = 1L },
@@ -122,6 +125,33 @@ class ApiE2ETest {
         every {
             statisticRepository.findTop5BySoldAtAfterOrderBySalesCountDesc(any())
         } returns listOf(stat1, stat2, stat3, stat4, stat5)
+
+        val optionM = ProductOption(product = product1, optionName = "M", extraPrice = 1000).apply { id = 2L }
+        val optionL = ProductOption(product = product2, optionName = "L", extraPrice = 2000).apply { id = 3L }
+
+        every { productOptionRepository.findById(2L) } returns optionM
+        every { productOptionRepository.findById(3L) } returns optionL
+
+        val stockOptionM = Stock(productOption = optionM, quantity = 10).apply { id = 2L }
+        val stockOptionL = Stock(productOption = optionL, quantity = 10).apply { id = 3L }
+
+        every { stockRepository.findByProductOptionId(optionM.id!!) } returns stockOptionM
+        every { stockRepository.findByProductOptionId(optionL.id!!) } returns stockOptionL
+
+        val order = Order(
+            customer = customer,
+            totalPrice = 40000 + 31000
+        ).apply {
+            id = 1L
+            orderItems.addAll(
+                listOf(
+                    OrderItem(order = this, productOption = optionM, quantity = 1, subtotalPrice = 40000),
+                    OrderItem(order = this, productOption = optionL, quantity = 1, subtotalPrice = 31000)
+                )
+            )
+        }
+
+        every { orderRepository.save(any()) } returns order
 
         // 1. 고객 잔액 충전
         mockMvc.perform(
