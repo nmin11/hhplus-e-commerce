@@ -20,8 +20,10 @@ class OrderFacade(
 ) {
 
     fun createOrder(request: OrderRequest.Create): Order {
+        // 1.사용자 조회
         val customer = customerService.getById(request.customerId)
 
+        // 2. 객체 생성 작업
         val order = Order(
             customer = customer,
             totalPrice = 0
@@ -31,12 +33,11 @@ class OrderFacade(
             val product = productService.getById(item.productId)
             val option = productOptionService.getById(item.productOptionId)
 
-            require(option.product.id == product.id) {
-                "상품 ID와 옵션 ID가 일치하지 않습니다."
-            }
-
+            // 2-1. 상품 옵션 및 재고 확인
+            productOptionService.validateOptionBelongsToProduct(optionId = option.id, productId = product.id)
             stockService.validate(item.productOptionId, item.quantity)
 
+            // 2-2. 주문 총액 계산
             val subtotal = (product.basePrice + option.extraPrice) * item.quantity
 
             OrderItem(
@@ -50,6 +51,7 @@ class OrderFacade(
         order.orderItems.addAll(orderItems)
         order.totalPrice = orderItems.sumOf { it.subtotalPrice }
 
+        // 3. 주문 생성
         return orderService.create(order)
     }
 }
