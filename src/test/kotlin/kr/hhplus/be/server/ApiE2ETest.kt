@@ -179,9 +179,9 @@ class ApiE2ETest {
 
         // 1. 고객 잔액 충전
         mockMvc.perform(
-            patch("/customers/1/balance/charge")
+            patch("/balances/charge")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("""{ "amount": 100000 }""")
+                .content("""{ "customerId": 1, "amount": 100000 }""")
         ).andExpect(status().isOk)
 
         // 2. 상품 목록 조회
@@ -224,7 +224,7 @@ class ApiE2ETest {
         ).andExpect(status().isCreated)
 
         // 7. 보유 쿠폰 목록
-        mockMvc.perform(get("/customers/1/coupons"))
+        mockMvc.perform(get("/coupons/customer/1"))
             .andExpect(status().isOk)
 
         // 8. 쿠폰 발급
@@ -237,11 +237,11 @@ class ApiE2ETest {
         ).andExpect(status().isCreated)
 
         // 9. 잔액 조회
-        mockMvc.perform(get("/customers/1/balance"))
+        mockMvc.perform(get("/balances/1"))
             .andExpect(status().isOk)
 
         // 10. 잔액 히스토리 조회
-        mockMvc.perform(get("/customers/1/balance-histories"))
+        mockMvc.perform(get("/balances/1/balance-histories"))
             .andExpect(status().isOk)
     }
 }
