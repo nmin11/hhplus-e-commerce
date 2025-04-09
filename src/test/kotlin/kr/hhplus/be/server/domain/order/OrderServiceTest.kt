@@ -74,4 +74,68 @@ class OrderServiceTest {
                 .hasMessage("주문 정보를 찾을 수 없습니다.")
         }
     }
+
+    @Nested
+    inner class GetValidOrderForPayment {
+
+        @Test
+        @DisplayName("주문 상태가 CREATED 이면 주문을 반환")
+        fun returnOrder_whenStatusIsCreated() {
+            // given
+            val orderId = 1L
+            val customer = Customer("tester").apply { id = 1L }
+            val order = Order(customer = customer, totalPrice = 10000).apply {
+                id = orderId
+                status = OrderStatus.CREATED
+            }
+
+            every { orderRepository.findById(orderId) } returns order
+
+            // when
+            val result = orderService.getValidOrderForPayment(orderId)
+
+            // then
+            assertThat(result).isEqualTo(order)
+        }
+
+        @Test
+        @DisplayName("주문 상태가 CREATED 가 아니면 예외 발생")
+        fun throwException_whenStatusIsNotCreated() {
+            // given
+            val orderId = 1L
+            val customer = Customer("tester").apply { id = 1L }
+            val order = Order(customer = customer, totalPrice = 10000).apply {
+                id = orderId
+                status = OrderStatus.PAID
+            }
+
+            every { orderRepository.findById(orderId) } returns order
+
+            // when
+            val exception = assertThrows<IllegalStateException> {
+                orderService.getValidOrderForPayment(orderId)
+            }
+
+            // then
+            assertThat(exception)
+                .hasMessage("결제 가능한 주문이 아닙니다. (현재 상태: ${order.status})")
+        }
+
+        @Test
+        @DisplayName("주문이 존재하지 않으면 예외 발생")
+        fun throwException_whenOrderNotFound() {
+            // given
+            val orderId = 1L
+            every { orderRepository.findById(orderId) } returns null
+
+            // when
+            val exception = assertThrows<IllegalArgumentException> {
+                orderService.getValidOrderForPayment(orderId)
+            }
+
+            // then
+            assertThat(exception)
+                .hasMessage("주문 정보를 찾을 수 없습니다.")
+        }
+    }
 }

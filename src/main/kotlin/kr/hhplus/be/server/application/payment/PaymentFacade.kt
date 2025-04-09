@@ -7,7 +7,6 @@ import kr.hhplus.be.server.domain.balance.BalanceHistory
 import kr.hhplus.be.server.domain.balance.BalanceHistoryService
 import kr.hhplus.be.server.domain.coupon.CouponService
 import kr.hhplus.be.server.domain.order.OrderService
-import kr.hhplus.be.server.domain.order.OrderStatus
 import kr.hhplus.be.server.domain.payment.Payment
 import kr.hhplus.be.server.domain.payment.PaymentService
 import kr.hhplus.be.server.domain.product.Statistic
@@ -26,15 +25,9 @@ class PaymentFacade(
     private val stockService: StockService,
     private val dataPlatformSender: DataPlatformSender
 ) {
-
     fun pay(orderId: Long, couponId: Long?): Payment {
         // 1. 주문 조회 및 상태 확인
-        val order = orderService.getById(orderId)
-
-        require(order.status == OrderStatus.CREATED) {
-            "결제 가능한 주문이 아닙니다. (현재 상태: ${order.status})"
-        }
-
+        val order = orderService.getValidOrderForPayment(orderId)
         val customer = order.customer
         val customerId = customer.id ?: throw IllegalStateException("고객 ID가 존재하지 않습니다.")
 
