@@ -2,6 +2,7 @@ package kr.hhplus.be.server.domain.product
 
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -11,6 +12,23 @@ import java.time.LocalDateTime
 class StatisticServiceTest {
     private val statisticRepository = mockk<StatisticRepository>()
     private val statisticService = StatisticService(statisticRepository)
+
+    @Test
+    @DisplayName("통계 정보를 저장하고 반환")
+    fun record_shouldSaveAndReturnStatistic() {
+        // given
+        val product = Product(name = "청바지", basePrice = 39000).apply { id = 1L }
+        val statistic = Statistic(product = product, salesCount = 10).apply { id = 1L }
+
+        every { statisticRepository.save(statistic) } returns statistic
+
+        // when
+        val result = statisticService.record(statistic)
+
+        // then
+        assertThat(result).isEqualTo(statistic)
+        verify(exactly = 1) { statisticRepository.save(statistic) }
+    }
 
     @Test
     @DisplayName("지정된 날짜 이후의 판매량 상위 5개 상품 통계 반환")

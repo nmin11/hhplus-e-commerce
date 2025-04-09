@@ -4,11 +4,15 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import kr.hhplus.be.server.domain.balance.*
+import kr.hhplus.be.server.domain.coupon.CouponRepository
+import kr.hhplus.be.server.domain.coupon.CustomerCouponRepository
 import kr.hhplus.be.server.domain.customer.Customer
 import kr.hhplus.be.server.domain.customer.CustomerRepository
 import kr.hhplus.be.server.domain.order.Order
 import kr.hhplus.be.server.domain.order.OrderItem
 import kr.hhplus.be.server.domain.order.OrderRepository
+import kr.hhplus.be.server.domain.payment.Payment
+import kr.hhplus.be.server.domain.payment.PaymentRepository
 import kr.hhplus.be.server.domain.product.*
 import kr.hhplus.be.server.interfaces.coupon.CouponRequest
 import kr.hhplus.be.server.interfaces.order.OrderRequest
@@ -18,6 +22,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.data.jpa.domain.AbstractPersistable_.id
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
@@ -56,6 +61,15 @@ class ApiE2ETest {
 
     @MockkBean
     lateinit var orderRepository: OrderRepository
+
+    @MockkBean
+    lateinit var paymentRepository: PaymentRepository
+
+    @MockkBean
+    lateinit var couponRepository: CouponRepository
+
+    @MockkBean
+    lateinit var customerCouponRepository: CustomerCouponRepository
 
     @Test
     @DisplayName("전체 API 성공 흐름 테스트")
@@ -152,6 +166,16 @@ class ApiE2ETest {
         }
 
         every { orderRepository.save(any()) } returns order
+
+        every { orderRepository.findById(1L) } returns order
+
+        every { statisticRepository.save(any()) } answers { firstArg() }
+
+        every { paymentRepository.save(any()) } answers {
+            val payment = firstArg<Payment>()
+            payment.id = 1L
+            payment
+        }
 
         // 1. 고객 잔액 충전
         mockMvc.perform(
