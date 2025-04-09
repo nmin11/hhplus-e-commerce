@@ -7,6 +7,10 @@ import java.time.LocalDate
 class StatisticService(
     private val statisticRepository: StatisticRepository
 ) {
+    fun record(statistic: Statistic): Statistic {
+        return statisticRepository.save(statistic)
+    }
+
     fun getTop5PopularProductStatistics(since: LocalDate): List<Statistic> {
         return statisticRepository.findTop5BySoldAtAfterOrderBySalesCountDesc(since)
     }

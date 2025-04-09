@@ -23,7 +23,7 @@ class ProductFacade(
             val product = stat.product
 
             ProductResult.Popular(
-                productId = product.id!!,
+                productId = product.id ?: throw IllegalStateException("상품 ID가 없습니다."),
                 name = product.name,
                 basePrice = product.basePrice,
                 salesCount = stat.salesCount

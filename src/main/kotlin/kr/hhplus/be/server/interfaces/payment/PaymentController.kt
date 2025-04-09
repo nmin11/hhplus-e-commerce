@@ -1,23 +1,17 @@
 package kr.hhplus.be.server.interfaces.payment
 
+import kr.hhplus.be.server.application.payment.PaymentFacade
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
-import java.time.Instant
 
 @RestController
-class PaymentController : PaymentApi {
+class PaymentController(
+    private val paymentFacade: PaymentFacade
+) : PaymentApi {
     override fun pay(@RequestBody request: PaymentRequest): ResponseEntity<PaymentResponse> {
-        val response = PaymentResponse(
-            paymentId = 1001,
-            orderId = request.orderId,
-            customerId = 1,
-            originalPrice = 87000,
-            discountAmount = 5000,
-            discountedPrice = 82000,
-            paidAt = Instant.now().toString()
-        )
-
+        val result = paymentFacade.pay(request.orderId, request.couponId)
+        val response = PaymentResponse.from(result)
         return ResponseEntity.status(201).body(response)
     }
 }

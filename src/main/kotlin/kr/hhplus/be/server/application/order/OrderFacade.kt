@@ -4,7 +4,6 @@ import kr.hhplus.be.server.domain.customer.CustomerService
 import kr.hhplus.be.server.domain.order.Order
 import kr.hhplus.be.server.domain.order.OrderItem
 import kr.hhplus.be.server.domain.order.OrderService
-import kr.hhplus.be.server.domain.order.OrderStatus
 import kr.hhplus.be.server.domain.product.ProductOptionService
 import kr.hhplus.be.server.domain.product.ProductService
 import kr.hhplus.be.server.domain.product.StockService
@@ -36,7 +35,7 @@ class OrderFacade(
                 "상품 ID와 옵션 ID가 일치하지 않습니다."
             }
 
-            stockService.validate(option.id!!, item.quantity)
+            stockService.validate(item.productOptionId, item.quantity)
 
             val subtotal = (product.basePrice + option.extraPrice) * item.quantity
 
