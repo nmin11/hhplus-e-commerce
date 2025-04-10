@@ -2,7 +2,9 @@ package kr.hhplus.be.server.interfaces.order
 
 import io.mockk.every
 import io.mockk.mockk
+import kr.hhplus.be.server.application.order.OrderCommand
 import kr.hhplus.be.server.application.order.OrderFacade
+import kr.hhplus.be.server.application.order.OrderResult
 import kr.hhplus.be.server.domain.customer.Customer
 import kr.hhplus.be.server.domain.order.Order
 import kr.hhplus.be.server.domain.order.OrderItem
@@ -48,13 +50,15 @@ class OrderControllerTest {
             )
         }
 
-        every { orderFacade.createOrder(request) } returns order
+        val command = OrderCommand.Create.from(request)
+        val result = OrderResult.Create.from(order)
+        every { orderFacade.createOrder(command) } returns result
 
         // when
         val response = orderController.create(request)
 
         // then
         assertThat(response.statusCode).isEqualTo(HttpStatus.CREATED)
-        assertThat(response.body).isEqualTo(OrderResponse.Create.from(order))
+        assertThat(response.body).isEqualTo(OrderResponse.Create.from(result))
     }
 }

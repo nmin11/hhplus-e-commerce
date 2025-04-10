@@ -7,7 +7,6 @@ import kr.hhplus.be.server.domain.order.OrderService
 import kr.hhplus.be.server.domain.product.ProductOptionService
 import kr.hhplus.be.server.domain.product.ProductService
 import kr.hhplus.be.server.domain.product.StockService
-import kr.hhplus.be.server.interfaces.order.OrderRequest
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
@@ -20,17 +19,17 @@ class OrderFacade(
     private val orderService: OrderService
 ) {
     @Transactional
-    fun createOrder(request: OrderRequest.Create): Order {
+    fun createOrder(command: OrderCommand.Create): OrderResult.Create {
         // 1.사용자 조회
-        val customer = customerService.getById(request.customerId)
+        val customer = customerService.getById(command.customerId)
 
         // 2. 객체 생성 작업
-        val order = Order(
+        var order = Order(
             customer = customer,
             totalPrice = 0
         )
 
-        val orderItems = request.items.map { item ->
+        val orderItems = command.items.map { item ->
             val product = productService.getById(item.productId)
             val option = productOptionService.getById(item.productOptionId)
 
@@ -53,6 +52,7 @@ class OrderFacade(
         order.totalPrice = orderItems.sumOf { it.subtotalPrice }
 
         // 3. 주문 생성
-        return orderService.create(order)
+        order = orderService.create(order)
+        return OrderResult.Create.from(order)
     }
 }

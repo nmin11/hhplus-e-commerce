@@ -1,8 +1,8 @@
-package kr.hhplus.be.server.interfaces.order
+package kr.hhplus.be.server.application.order
 
-import kr.hhplus.be.server.application.order.OrderResult
+import kr.hhplus.be.server.domain.order.Order
 
-sealed class OrderResponse {
+sealed class OrderResult {
     data class Create(
         val orderId: Long,
         val customerId: Long,
@@ -11,16 +11,16 @@ sealed class OrderResponse {
         val items: List<OrderItem>
     ) {
         companion object {
-            fun from(result: OrderResult.Create): Create {
+            fun from(order: Order): Create {
                 return Create(
-                    orderId = result.orderId,
-                    customerId = result.customerId,
-                    totalPrice = result.totalPrice,
-                    createdAt = result.createdAt,
-                    items = result.items.map {
+                    orderId = order.requireSavedId(),
+                    customerId = order.customer.requireSavedId(),
+                    totalPrice = order.totalPrice,
+                    createdAt = order.createdAt.toString(),
+                    items = order.orderItems.map {
                         OrderItem(
-                            productName = it.productName,
-                            optionName = it.optionName,
+                            productName = it.productOption.product.name,
+                            optionName = it.productOption.optionName,
                             quantity = it.quantity,
                             subtotalPrice = it.subtotalPrice
                         )
