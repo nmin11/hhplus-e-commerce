@@ -13,8 +13,8 @@ sealed class OrderResponse {
         companion object {
             fun from(order: Order): Create {
                 return Create(
-                    orderId = order.id ?: throw IllegalStateException("주문 ID가 없습니다."),
-                    customerId = order.customer.id ?: throw IllegalStateException("고객 ID가 없습니다."),
+                    orderId = order.requireSavedId(),
+                    customerId = order.customer.requireSavedId(),
                     totalPrice = order.totalPrice,
                     createdAt = order.createdAt.toString(),
                     items = order.orderItems.map {

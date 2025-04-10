@@ -9,4 +9,7 @@ class Balance(
 ) {
     var id: Long? = null
     var updatedAt: LocalDateTime = LocalDateTime.now()
+
+    fun requireSavedId(): Long =
+        id ?: throw IllegalStateException("Balance 객체가 저장되지 않았습니다.")
 }

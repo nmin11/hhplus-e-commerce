@@ -14,9 +14,9 @@ data class PaymentResponse(
     companion object {
         fun from(payment: Payment): PaymentResponse {
             return PaymentResponse(
-                paymentId = payment.id ?: throw IllegalStateException("결제 ID가 없습니다."),
-                orderId = payment.order.id ?: throw IllegalStateException("주문 ID가 없습니다."),
-                customerId = payment.customer.id ?: throw IllegalStateException("고객 ID가 없습니다."),
+                paymentId = payment.requireSavedId(),
+                orderId = payment.order.requireSavedId(),
+                customerId = payment.customer.requireSavedId(),
                 originalPrice = payment.originalPrice,
                 discountAmount = payment.discountAmount,
                 discountedPrice = payment.discountedPrice,

@@ -11,4 +11,7 @@ class BalanceHistory(
 ) {
     var id: Long? = null
     val createdAt: LocalDateTime = LocalDateTime.now()
+
+    fun requireSavedId(): Long =
+        id ?: throw IllegalStateException("BalanceHistory 객체가 저장되지 않았습니다.")
 }

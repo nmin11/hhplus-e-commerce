@@ -15,4 +15,7 @@ class Payment(
 ) {
     var id: Long? = null
     val paidAt: LocalDateTime = LocalDateTime.now()
+
+    fun requireSavedId(): Long =
+        id ?: throw IllegalStateException("Payment 객체가 저장되지 않았습니다.")
 }

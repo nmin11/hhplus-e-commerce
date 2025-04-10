@@ -14,4 +14,7 @@ class Order(
     var updatedAt: LocalDateTime = LocalDateTime.now()
     var payment: Payment? = null
     var orderItems: MutableList<OrderItem> = mutableListOf()
+
+    fun requireSavedId(): Long =
+        id ?: throw IllegalStateException("Order 객체가 저장되지 않았습니다.")
 }

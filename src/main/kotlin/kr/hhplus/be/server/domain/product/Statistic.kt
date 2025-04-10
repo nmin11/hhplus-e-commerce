@@ -8,4 +8,7 @@ class Statistic(
 ) {
     var id: Long? = null
     var soldAt: LocalDateTime = LocalDateTime.now()
+
+    fun requireSavedId(): Long =
+        id ?: throw IllegalStateException("Statistic 객체가 저장되지 않았습니다.")
 }

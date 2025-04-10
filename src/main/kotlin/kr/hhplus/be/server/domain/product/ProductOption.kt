@@ -13,4 +13,7 @@ class ProductOption(
     var updatedAt: LocalDateTime = LocalDateTime.now()
     var stock: Stock? = null
     var orderItems: MutableList<OrderItem> = mutableListOf()
+
+    fun requireSavedId(): Long =
+        id ?: throw IllegalStateException("ProductOption 객체가 저장되지 않았습니다.")
 }

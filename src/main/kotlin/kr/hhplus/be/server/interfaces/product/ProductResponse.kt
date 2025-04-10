@@ -13,7 +13,7 @@ sealed class ProductResponse {
         companion object {
             fun from(product: Product): Summary {
                 return Summary(
-                    id = product.id ?: throw IllegalStateException("상품 ID가 없습니다."),
+                    id = product.requireSavedId(),
                     name = product.name,
                     basePrice = product.basePrice
                 )
@@ -31,7 +31,7 @@ sealed class ProductResponse {
             fun from(product: Product, options: List<ProductOption>): Detail {
                 val mappedOptions = options.map { Option(it.optionName, it.extraPrice) }
                 return Detail(
-                    id = product.id ?: throw IllegalStateException("상품 ID가 없습니다."),
+                    id = product.requireSavedId(),
                     name = product.name,
                     basePrice = product.basePrice,
                     options = mappedOptions

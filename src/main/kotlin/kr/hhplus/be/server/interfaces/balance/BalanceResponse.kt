@@ -11,7 +11,7 @@ sealed class BalanceResponse {
         companion object {
             fun from(balance: Balance): Summary {
                 return Summary(
-                    customerId = balance.customer.id ?: throw IllegalStateException("고객 ID가 없습니다."),
+                    customerId = balance.customer.requireSavedId(),
                     amount = balance.amount
                 )
             }

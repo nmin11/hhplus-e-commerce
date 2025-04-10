@@ -11,4 +11,7 @@ class Product(
     val updatedAt: LocalDateTime = LocalDateTime.now()
     var productOptions: MutableList<ProductOption> = mutableListOf()
     var statistics: MutableList<Statistic> = mutableListOf()
+
+    fun requireSavedId(): Long =
+        id ?: throw IllegalStateException("Product 객체가 저장되지 않았습니다.")
 }

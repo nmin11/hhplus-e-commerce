@@ -31,12 +31,11 @@ class PaymentFacade(
         // 1. 주문 조회 및 상태 확인
         val order = orderService.getValidOrderForPayment(orderId)
         val customer = order.customer
-        val customerId = customer.id ?: throw IllegalStateException("고객 ID가 존재하지 않습니다.")
+        val customerId = customer.requireSavedId()
 
         // 2. 재고 검증
         order.orderItems.forEach { item ->
-            val optionId = item.productOption.id
-                ?: throw IllegalStateException("상품 옵션 ID가 존재하지 않습니다.")
+            val optionId = item.productOption.requireSavedId()
             stockService.validate(optionId, item.quantity)
         }
 

@@ -18,4 +18,7 @@ class Customer(
     var customerCoupons: MutableList<CustomerCoupon> = mutableListOf()
     var orders: MutableList<Order> = mutableListOf()
     var payments: MutableList<Payment> = mutableListOf()
+
+    fun requireSavedId(): Long =
+        id ?: throw IllegalStateException("Customer 객체가 저장되지 않았습니다.")
 }

@@ -19,7 +19,7 @@ sealed class ProductResult {
         companion object {
             fun from(statistic: Statistic): Popular {
                 return Popular(
-                    productId = statistic.product.id ?: throw IllegalStateException("상품 ID가 없습니다."),
+                    productId = statistic.product.requireSavedId(),
                     name = statistic.product.name,
                     basePrice = statistic.product.basePrice,
                     salesCount = statistic.salesCount
