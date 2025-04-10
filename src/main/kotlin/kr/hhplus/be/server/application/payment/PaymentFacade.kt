@@ -26,6 +26,7 @@ class PaymentFacade(
     private val paymentService: PaymentService,
     private val statisticService: StatisticService,
     private val stockService: StockService,
+    private val paymentCommandFactory: PaymentCommandFactory,
     private val dataPlatformSender: DataPlatformSender
 ) {
     @Transactional
@@ -86,7 +87,8 @@ class PaymentFacade(
         }
 
         // 9. 데이터 플랫폼 전송
-        dataPlatformSender.send(order)
+        val command = paymentCommandFactory.from(order)
+        dataPlatformSender.send(command)
 
         return payment
     }
