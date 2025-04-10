@@ -7,6 +7,10 @@ import org.springframework.stereotype.Service
 class CustomerCouponService(
     private val customerCouponRepository: CustomerCouponRepository
 ) {
+    fun getAllByCustomerId(customerId: Long): List<CustomerCoupon> {
+        return customerCouponRepository.findByCustomerId(customerId)
+    }
+
     fun validateIssuedCoupon(customerId: Long, couponId: Long): CustomerCoupon {
         val customerCoupon = customerCouponRepository.findByCustomerIdAndCouponId(customerId, couponId)
             ?: throw IllegalArgumentException("해당 쿠폰은 고객에게 발급되지 않았습니다.")

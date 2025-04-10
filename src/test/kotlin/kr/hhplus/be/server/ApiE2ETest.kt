@@ -4,10 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import kr.hhplus.be.server.domain.balance.*
-import kr.hhplus.be.server.domain.coupon.Coupon
-import kr.hhplus.be.server.domain.coupon.CouponRepository
-import kr.hhplus.be.server.domain.coupon.CustomerCouponRepository
-import kr.hhplus.be.server.domain.coupon.DiscountType
+import kr.hhplus.be.server.domain.coupon.*
 import kr.hhplus.be.server.domain.customer.Customer
 import kr.hhplus.be.server.domain.customer.CustomerRepository
 import kr.hhplus.be.server.domain.order.Order
@@ -195,6 +192,38 @@ class ApiE2ETest {
         every { couponRepository.save(any()) } answers { firstArg() }
 
         every { customerCouponRepository.save(any()) } answers { firstArg() }
+
+        val coupon1 = Coupon(
+            name = "첫 구매 할인",
+            discountType = DiscountType.FIXED,
+            discountAmount = 3000,
+            currentQuantity = 100,
+            totalQuantity = 100,
+            startedAt = LocalDateTime.parse("2025-04-01T00:00:00"),
+            expiredAt = LocalDateTime.parse("2025-04-30T23:59:59")
+        ).apply { id = 1L }
+
+        val coupon2 = Coupon(
+            name = "봄맞이 프로모션",
+            discountType = DiscountType.RATE,
+            discountAmount = 10,
+            currentQuantity = 50,
+            totalQuantity = 50,
+            startedAt = LocalDateTime.parse("2025-03-15T00:00:00"),
+            expiredAt = LocalDateTime.parse("2025-04-10T23:59:59")
+        ).apply { id = 2L }
+
+        val customerCoupon1 = CustomerCoupon(customer, coupon1).apply {
+            id = 1L
+            status = CustomerCouponStatus.AVAILABLE
+        }
+
+        val customerCoupon2 = CustomerCoupon(customer, coupon2).apply {
+            id = 2L
+            status = CustomerCouponStatus.USED
+        }
+
+        every { customerCouponRepository.findByCustomerId(1L) } returns listOf(customerCoupon1, customerCoupon2)
 
         // 1. 고객 잔액 충전
         mockMvc.perform(

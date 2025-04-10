@@ -16,6 +16,51 @@ class CustomerCouponServiceTest {
     private val customerCouponService = CustomerCouponService(customerCouponRepository)
 
     @Nested
+    inner class GetAllByCustomerId {
+        @Test
+        @DisplayName("고객 ID에 해당하는 모든 쿠폰을 반환")
+        fun returnAllCouponsForCustomer() {
+            // given
+            val customerId = 1L
+            val customer = Customer("tester").apply { id = customerId }
+
+            val coupon1 = Coupon(
+                name = "5천원 할인",
+                discountType = DiscountType.FIXED,
+                discountAmount = 5000,
+                currentQuantity = 100,
+                totalQuantity = 100,
+                startedAt = LocalDateTime.now().minusDays(1),
+                expiredAt = LocalDateTime.now().plusDays(5)
+            ).apply { id = 1L }
+
+            val coupon2 = Coupon(
+                name = "1만원 할인",
+                discountType = DiscountType.FIXED,
+                discountAmount = 10000,
+                currentQuantity = 50,
+                totalQuantity = 50,
+                startedAt = LocalDateTime.now().minusDays(2),
+                expiredAt = LocalDateTime.now().plusDays(3)
+            ).apply { id = 2L }
+
+            val expectedCoupons = listOf(
+                CustomerCoupon(customer, coupon1).apply { id = 1L },
+                CustomerCoupon(customer, coupon2).apply { id = 2L }
+            )
+
+            every { customerCouponRepository.findByCustomerId(customerId) } returns expectedCoupons
+
+            // when
+            val result = customerCouponService.getAllByCustomerId(customerId)
+
+            // then
+            assertThat(result).isEqualTo(expectedCoupons)
+            verify(exactly = 1) { customerCouponRepository.findByCustomerId(customerId) }
+        }
+    }
+
+    @Nested
     inner class ValidateIssuedCoupon {
         private val customerId = 1L
         private val couponId = 10L
@@ -120,14 +165,17 @@ class CustomerCouponServiceTest {
         @Test
         @DisplayName("쿠폰이 아직 발급되지 않은 경우 예외 없이 통과")
         fun doesNotThrow_whenCouponNotIssued() {
+            // given
             every { customerCouponRepository.findByCustomerIdAndCouponId(customerId, couponId) } returns null
 
+            // when & then
             customerCouponService.validateNotIssued(customerId, couponId)
         }
 
         @Test
         @DisplayName("쿠폰이 이미 발급된 경우 예외 발생")
         fun throwsException_whenCouponAlreadyIssued() {
+            // given
             val customer = Customer("tester").apply { id = customerId }
             val coupon = Coupon(
                 name = "할인쿠폰",
@@ -143,11 +191,14 @@ class CustomerCouponServiceTest {
 
             every { customerCouponRepository.findByCustomerIdAndCouponId(customerId, couponId) } returns issued
 
+            // when
             val exception = assertThrows<IllegalStateException> {
                 customerCouponService.validateNotIssued(customerId, couponId)
             }
 
-            assertThat(exception).hasMessage("해당 쿠폰은 이미 발급된 쿠폰입니다.")
+            // then
+            assertThat(exception)
+                .hasMessage("해당 쿠폰은 이미 발급된 쿠폰입니다.")
         }
     }
 
@@ -156,6 +207,7 @@ class CustomerCouponServiceTest {
         @Test
         @DisplayName("쿠폰을 발급하고 저장된 객체 반환")
         fun saveAndReturnCustomerCoupon() {
+            // given
             val customer = Customer("tester").apply { id = 1L }
             val coupon = Coupon(
                 name = "웰컴쿠폰",
@@ -171,8 +223,10 @@ class CustomerCouponServiceTest {
 
             every { customerCouponRepository.save(any()) } returns saved
 
+            // when
             val result = customerCouponService.issue(customer, coupon)
 
+            // then
             assertThat(result).isEqualTo(saved)
             verify(exactly = 1) { customerCouponRepository.save(any()) }
         }

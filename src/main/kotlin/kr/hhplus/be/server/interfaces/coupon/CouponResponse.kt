@@ -28,5 +28,19 @@ sealed class CouponResponse {
         val status: String,
         val issuedAt: String,
         val expiredAt: String
-    )
+    ) {
+        companion object {
+            fun from(customerCoupon: CustomerCoupon): Owned {
+                val coupon = customerCoupon.coupon
+                return Owned(
+                    name = coupon.name,
+                    discountType = coupon.discountType.name,
+                    discountAmount = coupon.discountAmount,
+                    status = customerCoupon.status.name,
+                    issuedAt = customerCoupon.issuedAt.toString(),
+                    expiredAt = coupon.expiredAt.toString()
+                )
+            }
+        }
+    }
 }
