@@ -31,17 +31,17 @@ class PaymentFacade(
         val customer = order.customer
         val customerId = customer.id ?: throw IllegalStateException("고객 ID가 존재하지 않습니다.")
 
-        // 2. 쿠폰 유효성 검사 및 할인 금액 계산
-        val discountAmount = couponId?.let {
-            couponService.validateAndGetDiscount(it, customerId)
-        } ?: 0
-
-        // 3. 재고 검증
+        // 2. 재고 검증
         order.orderItems.forEach { item ->
             val optionId = item.productOption.id
                 ?: throw IllegalStateException("상품 옵션 ID가 존재하지 않습니다.")
             stockService.validate(optionId, item.quantity)
         }
+
+        // 3. 쿠폰 유효성 검사 및 할인 금액 계산
+        val discountAmount = couponId?.let {
+            couponService.validateAndCalculateDiscount(it, customerId, order.totalPrice)
+        } ?: 0
 
         // 4. 결제 금액 계산
         val originalPrice = order.totalPrice

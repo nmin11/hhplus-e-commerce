@@ -59,13 +59,13 @@ class CouponServiceTest {
     }
 
     @Nested
-    inner class ValidateAndGetDiscount {
+    inner class ValidateAndCalculateDiscount {
         private val couponId = 1L
         private val customerId = 10L
 
         @Test
-        @DisplayName("고객에게 발급된 유효한 쿠폰일 경우 할인 금액 반환")
-        fun returnDiscountAmount_whenCouponIsValidAndAvailable() {
+        @DisplayName("정액 할인 쿠폰일 경우 지정된 할인 금액 반환")
+        fun returnFixedDiscountAmount_whenCouponIsFixed() {
             // given
             val now = LocalDateTime.now()
             val customer = Customer("tester")
@@ -80,15 +80,41 @@ class CouponServiceTest {
             ).apply { id = couponId }
 
             val customerCoupon = CustomerCoupon(customer, coupon)
-
             every { customerCouponRepository.findByCustomerIdAndCouponId(customerId, couponId) } returns customerCoupon
             every { couponRepository.findById(couponId) } returns coupon
 
             // when
-            val result = couponService.validateAndGetDiscount(couponId, customerId)
+            val result = couponService.validateAndCalculateDiscount(couponId, customerId, totalPrice = 100_000)
 
             // then
             assertThat(result).isEqualTo(5000)
+        }
+
+        @Test
+        @DisplayName("퍼센트 할인 쿠폰일 경우 할인 금액 계산하여 반환")
+        fun returnRateDiscountAmount_whenCouponIsRate() {
+            // given
+            val now = LocalDateTime.now()
+            val customer = Customer("tester")
+            val coupon = Coupon(
+                name = "10% 할인",
+                discountType = DiscountType.RATE,
+                discountAmount = 10,
+                currentQuantity = 20,
+                totalQuantity = 100,
+                startedAt = now.minusDays(1),
+                expiredAt = now.plusDays(1)
+            ).apply { id = couponId }
+
+            val customerCoupon = CustomerCoupon(customer, coupon)
+            every { customerCouponRepository.findByCustomerIdAndCouponId(customerId, couponId) } returns customerCoupon
+            every { couponRepository.findById(couponId) } returns coupon
+
+            // when
+            val result = couponService.validateAndCalculateDiscount(couponId, customerId, totalPrice = 100_000)
+
+            // then
+            assertThat(result).isEqualTo(10_000)
         }
 
         @Test
@@ -99,12 +125,11 @@ class CouponServiceTest {
 
             // when
             val exception = assertThrows<IllegalArgumentException> {
-                couponService.validateAndGetDiscount(couponId, customerId)
+                couponService.validateAndCalculateDiscount(couponId, customerId, totalPrice = 100_000)
             }
 
             // then
-            assertThat(exception)
-                .hasMessage("해당 쿠폰은 고객에게 발급되지 않았습니다.")
+            assertThat(exception).hasMessage("해당 쿠폰은 고객에게 발급되지 않았습니다.")
         }
 
         @Test
@@ -119,7 +144,7 @@ class CouponServiceTest {
                 currentQuantity = 0,
                 totalQuantity = 100,
                 startedAt = LocalDateTime.now().minusDays(5),
-                expiredAt = LocalDateTime.now().minusDays(3)
+                expiredAt = LocalDateTime.now().plusDays(5)
             ).apply { id = couponId }
 
             val customerCoupon = CustomerCoupon(customer, coupon).apply {
@@ -130,12 +155,11 @@ class CouponServiceTest {
 
             // when
             val exception = assertThrows<IllegalStateException> {
-                couponService.validateAndGetDiscount(couponId, customerId)
+                couponService.validateAndCalculateDiscount(couponId, customerId, totalPrice = 100_000)
             }
 
             // then
-            assertThat(exception)
-                .hasMessage("만료되었거나 사용된 쿠폰입니다.")
+            assertThat(exception).hasMessage("만료되었거나 사용된 쿠폰입니다.")
         }
 
         @Test
@@ -155,18 +179,16 @@ class CouponServiceTest {
             ).apply { id = couponId }
 
             val customerCoupon = CustomerCoupon(customer, coupon)
-
             every { customerCouponRepository.findByCustomerIdAndCouponId(customerId, couponId) } returns customerCoupon
             every { couponRepository.findById(couponId) } returns coupon
 
             // when
             val exception = assertThrows<IllegalStateException> {
-                couponService.validateAndGetDiscount(couponId, customerId)
+                couponService.validateAndCalculateDiscount(couponId, customerId, totalPrice = 100_000)
             }
 
             // then
-            assertThat(exception)
-                .hasMessage("유효하지 않은 쿠폰입니다.")
+            assertThat(exception).hasMessage("유효하지 않은 쿠폰입니다.")
         }
     }
 }

@@ -13,7 +13,7 @@ class CouponService(
             ?: throw IllegalArgumentException("쿠폰 정보가 존재하지 않습니다.")
     }
 
-    fun validateAndGetDiscount(couponId: Long, customerId: Long): Int {
+    fun validateAndCalculateDiscount(couponId: Long, customerId: Long, totalPrice: Int): Int {
         val customerCoupon = customerCouponRepository.findByCustomerIdAndCouponId(customerId, couponId)
             ?: throw IllegalArgumentException("해당 쿠폰은 고객에게 발급되지 않았습니다.")
 
@@ -27,6 +27,9 @@ class CouponService(
             throw IllegalStateException("유효하지 않은 쿠폰입니다.")
         }
 
-        return coupon.discountAmount
+        return when (coupon.discountType) {
+            DiscountType.FIXED -> coupon.discountAmount
+            DiscountType.RATE -> (totalPrice * coupon.discountAmount / 100.0).toInt()
+        }
     }
 }
