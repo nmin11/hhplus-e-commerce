@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.interfaces.coupon
 
+import kr.hhplus.be.server.application.coupon.CouponResult
 import kr.hhplus.be.server.domain.coupon.CustomerCoupon
 
 sealed class CouponResponse {
@@ -10,12 +11,12 @@ sealed class CouponResponse {
         val issuedAt: String
     ) {
         companion object {
-            fun from(customerCoupon: CustomerCoupon): Issue {
+            fun from(result: CouponResult.Issue): Issue {
                 return Issue(
-                    couponId = customerCoupon.coupon.requireSavedId(),
-                    customerId = customerCoupon.customer.requireSavedId(),
-                    status = customerCoupon.status.name,
-                    issuedAt = customerCoupon.issuedAt.toString()
+                    couponId = result.couponId,
+                    customerId = result.customerId,
+                    status = result.status,
+                    issuedAt = result.issuedAt
                 )
             }
         }

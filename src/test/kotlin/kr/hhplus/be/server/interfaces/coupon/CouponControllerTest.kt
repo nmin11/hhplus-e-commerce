@@ -2,7 +2,9 @@ package kr.hhplus.be.server.interfaces.coupon
 
 import io.mockk.every
 import io.mockk.mockk
+import kr.hhplus.be.server.application.coupon.CouponCommand
 import kr.hhplus.be.server.application.coupon.CouponFacade
+import kr.hhplus.be.server.application.coupon.CouponResult
 import kr.hhplus.be.server.domain.coupon.*
 import kr.hhplus.be.server.domain.customer.Customer
 import org.assertj.core.api.Assertions.assertThat
@@ -37,14 +39,16 @@ class CouponControllerTest {
             status = CustomerCouponStatus.AVAILABLE
         }
 
-        every { couponFacade.issueCouponToCustomer(1L, 1L) } returns customerCoupon
+        val command = CouponCommand.Issue(1L, 1L)
+        val result = CouponResult.Issue.from(customerCoupon)
+        every { couponFacade.issueCouponToCustomer(command) } returns result
 
         // when
         val response = couponController.issue(request)
 
         // then
         assertThat(response.statusCode).isEqualTo(HttpStatus.CREATED)
-        assertThat(response.body).isEqualTo(CouponResponse.Issue.from(customerCoupon))
+        assertThat(response.body).isEqualTo(CouponResponse.Issue.from(result))
     }
 
     @Test

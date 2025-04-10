@@ -14,17 +14,18 @@ class CouponFacade(
     private val customerCouponService: CustomerCouponService
 ) {
     @Transactional
-    fun issueCouponToCustomer(couponId: Long, customerId: Long): CustomerCoupon {
-        val customer = customerService.getById(customerId)
-        val coupon = couponService.getById(couponId)
+    fun issueCouponToCustomer(command: CouponCommand.Issue): CouponResult.Issue {
+        val customer = customerService.getById(command.customerId)
+        val coupon = couponService.getById(command.couponId)
 
         // 쿠폰 중복 발급 여부 검사
-        customerCouponService.validateNotIssued(customerId, couponId)
+        customerCouponService.validateNotIssued(command.customerId, command.couponId)
 
         // 쿠폰 수량 검사 및 차감
         couponService.decreaseQuantity(coupon)
 
         // 쿠폰 발급
-        return customerCouponService.issue(customer, coupon)
+        val customerCoupon = customerCouponService.issue(customer, coupon)
+        return CouponResult.Issue.from(customerCoupon)
     }
 }
