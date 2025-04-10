@@ -2,6 +2,7 @@ package kr.hhplus.be.server.domain.coupon
 
 import kr.hhplus.be.server.domain.customer.Customer
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class CustomerCouponService(
@@ -36,6 +37,7 @@ class CustomerCouponService(
         return customerCouponRepository.save(customerCoupon)
     }
 
+    @Transactional
     fun updateAsExpired(coupons: List<Coupon>) {
         val expiredCustomerCoupons = customerCouponRepository.findAllByCouponIn(coupons)
         expiredCustomerCoupons.forEach {

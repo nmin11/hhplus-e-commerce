@@ -5,6 +5,7 @@ import kr.hhplus.be.server.domain.coupon.CustomerCoupon
 import kr.hhplus.be.server.domain.coupon.CustomerCouponService
 import kr.hhplus.be.server.domain.customer.CustomerService
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
 
 @Component
 class CouponFacade(
@@ -12,6 +13,7 @@ class CouponFacade(
     private val customerService: CustomerService,
     private val customerCouponService: CustomerCouponService
 ) {
+    @Transactional
     fun issueCouponToCustomer(couponId: Long, customerId: Long): CustomerCoupon {
         val customer = customerService.getById(customerId)
         val coupon = couponService.getById(couponId)
