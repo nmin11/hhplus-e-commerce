@@ -445,33 +445,31 @@ paths:
                     subtotalPrice: 48000
           headers: {}
       security: []
-  /coupons/{id}/issue:
+  /coupons/issue:
     post:
       summary: 쿠폰 발급
       deprecated: false
       description: ''
       tags:
         - Coupons
-      parameters:
-        - name: id
-          in: path
-          description: 쿠폰 ID
-          required: true
-          example: '1'
-          schema:
-            type: string
+      parameters: []
       requestBody:
         content:
           application/json:
             schema:
               type: object
               properties:
+                couponId:
+                  type: integer
+                  description: 쿠폰 ID
                 customerId:
                   type: integer
                   description: 고객 ID
               required:
                 - customerId
+                - couponId
             example:
+              couponId: 1
               customerId: 1
       responses:
         '201':

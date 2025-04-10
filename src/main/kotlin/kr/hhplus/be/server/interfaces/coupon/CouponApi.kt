@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.ExampleObject
 import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -61,10 +62,9 @@ interface CouponApi {
             )
         ]
     )
-    @PostMapping("/{id}/issue")
+    @PostMapping("/issue")
     fun issue(
-        @PathVariable id: Long,
-        @io.swagger.v3.oas.annotations.parameters.RequestBody(
+        @RequestBody(
             description = "쿠폰 발급 요청 정보",
             required = true,
             content = [
@@ -74,6 +74,7 @@ interface CouponApi {
                     examples = [ExampleObject(
                         value = """
                         {
+                          "couponId": 1,
                           "customerId": 1
                         }
                         """
