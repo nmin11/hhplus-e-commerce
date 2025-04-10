@@ -6,6 +6,7 @@ import kr.hhplus.be.server.domain.balance.BalanceChangeType
 import kr.hhplus.be.server.domain.balance.BalanceHistory
 import kr.hhplus.be.server.domain.balance.BalanceHistoryService
 import kr.hhplus.be.server.domain.coupon.CouponService
+import kr.hhplus.be.server.domain.coupon.CustomerCouponService
 import kr.hhplus.be.server.domain.order.OrderService
 import kr.hhplus.be.server.domain.payment.Payment
 import kr.hhplus.be.server.domain.payment.PaymentService
@@ -19,6 +20,7 @@ class PaymentFacade(
     private val balanceFacade: BalanceFacade,
     private val balanceHistoryService: BalanceHistoryService,
     private val couponService: CouponService,
+    private val customerCouponService: CustomerCouponService,
     private val orderService: OrderService,
     private val paymentService: PaymentService,
     private val statisticService: StatisticService,
@@ -40,7 +42,10 @@ class PaymentFacade(
 
         // 3. 쿠폰 유효성 검사 및 할인 금액 계산
         val discountAmount = couponId?.let {
-            couponService.validateAndCalculateDiscount(it, customerId, order.totalPrice)
+            val customerCoupon = customerCouponService.validateIssuedCoupon(customerId, it)
+            val coupon = customerCoupon.coupon
+
+            couponService.calculateDiscount(coupon, order.totalPrice)
         } ?: 0
 
         // 4. 결제 금액 계산
