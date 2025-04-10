@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.coupon
 
+import kr.hhplus.be.server.domain.customer.Customer
 import org.springframework.stereotype.Service
 
 @Service
@@ -17,5 +18,17 @@ class CustomerCouponService(
         }
 
         return customerCoupon
+    }
+
+    fun validateNotIssued(customerId: Long, couponId: Long) {
+        val existing = customerCouponRepository.findByCustomerIdAndCouponId(customerId, couponId)
+        if (existing != null) {
+            throw IllegalStateException("해당 쿠폰은 이미 발급된 쿠폰입니다.")
+        }
+    }
+
+    fun issue(customer: Customer, coupon: Coupon): CustomerCoupon {
+        val customerCoupon = CustomerCoupon(customer, coupon)
+        return customerCouponRepository.save(customerCoupon)
     }
 }

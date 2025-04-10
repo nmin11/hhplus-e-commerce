@@ -23,4 +23,13 @@ class CouponService(
             DiscountType.RATE -> (totalPrice * coupon.discountAmount / 100.0).toInt()
         }
     }
+
+    fun decreaseQuantity(coupon: Coupon) {
+        if (coupon.currentQuantity <= 0) {
+            throw IllegalStateException("쿠폰 수량이 모두 소진되었습니다.")
+        }
+
+        coupon.currentQuantity -= 1
+        couponRepository.save(coupon)
+    }
 }

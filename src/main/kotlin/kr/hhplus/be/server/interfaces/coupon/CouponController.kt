@@ -1,20 +1,17 @@
 package kr.hhplus.be.server.interfaces.coupon
 
+import kr.hhplus.be.server.application.coupon.CouponFacade
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
-import java.time.Instant
 
 @RestController
-class CouponController : CouponApi {
-    override fun issue(id: Long, @RequestBody request: CouponRequest.Issue): ResponseEntity<CouponResponse.Issue> {
-        val response = CouponResponse.Issue(
-            couponId = id,
-            customerId = request.customerId,
-            status = "ISSUED",
-            issuedAt = Instant.now().toString()
-        )
-
+class CouponController(
+    private val couponFacade: CouponFacade
+) : CouponApi {
+    override fun issue(@RequestBody request: CouponRequest.Issue): ResponseEntity<CouponResponse.Issue> {
+        val result = couponFacade.issueCouponToCustomer(request.couponId, request.customerId)
+        val response = CouponResponse.Issue.from(result)
         return ResponseEntity.status(201).body(response)
     }
 
