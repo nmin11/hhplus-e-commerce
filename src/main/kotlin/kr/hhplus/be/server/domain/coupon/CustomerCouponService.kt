@@ -35,4 +35,14 @@ class CustomerCouponService(
         val customerCoupon = CustomerCoupon(customer, coupon)
         return customerCouponRepository.save(customerCoupon)
     }
+
+    fun updateAsExpired(coupons: List<Coupon>) {
+        val expiredCustomerCoupons = customerCouponRepository.findAllByCouponIn(coupons)
+        expiredCustomerCoupons.forEach {
+            if (it.status == CustomerCouponStatus.AVAILABLE) {
+                it.status = CustomerCouponStatus.EXPIRED
+            }
+        }
+        customerCouponRepository.saveAll(expiredCustomerCoupons)
+    }
 }

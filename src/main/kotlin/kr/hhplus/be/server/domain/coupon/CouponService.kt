@@ -32,4 +32,8 @@ class CouponService(
         coupon.currentQuantity -= 1
         couponRepository.save(coupon)
     }
+
+    fun getExpiredCoupons(referenceDate: LocalDate = LocalDate.now()): List<Coupon> {
+        return couponRepository.findAllByExpiredAtBefore(referenceDate)
+    }
 }

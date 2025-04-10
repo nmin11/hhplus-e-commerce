@@ -156,7 +156,7 @@ class CouponServiceTest {
     inner class DecreaseQuantity {
         @Test
         @DisplayName("쿠폰 수량이 남아 있을 경우 쿠폰 수량 1 감소")
-        fun decreaseSuccessfully_whenQuantityIsSufficient() {
+        fun whenQuantityIsSufficient() {
             // given
             val coupon = Coupon(
                 name = "테스트쿠폰",
@@ -201,6 +201,45 @@ class CouponServiceTest {
             assertThat(exception)
                 .hasMessage("쿠폰 수량이 모두 소진되었습니다.")
             verify { couponRepository wasNot Called }
+        }
+    }
+
+    @Nested
+    inner class GetExpiredCoupons {
+        @Test
+        @DisplayName("지정한 기준 날짜 이전에 만료된 쿠폰들을 반환")
+        fun shouldReturnExpiredCoupons() {
+            // given
+            val today = LocalDate.of(2025, 4, 11)
+            val expiredCoupons = listOf(
+                Coupon(
+                    name = "첫 구매 할인",
+                    discountType = DiscountType.FIXED,
+                    discountAmount = 1000,
+                    currentQuantity = 10,
+                    totalQuantity = 100,
+                    startedAt = today.minusDays(10),
+                    expiredAt = today.minusDays(1)
+                ).apply { id = 1L },
+                Coupon(
+                    name = "봄맞이 할인",
+                    discountType = DiscountType.RATE,
+                    discountAmount = 20,
+                    currentQuantity = 5,
+                    totalQuantity = 50,
+                    startedAt = today.minusDays(30),
+                    expiredAt = today.minusDays(5)
+                ).apply { id = 2L }
+            )
+
+            every { couponRepository.findAllByExpiredAtBefore(today) } returns expiredCoupons
+
+            // when
+            val result = couponService.getExpiredCoupons(today)
+
+            // then
+            assertThat(result).isEqualTo(expiredCoupons)
+            verify(exactly = 1) { couponRepository.findAllByExpiredAtBefore(today) }
         }
     }
 }

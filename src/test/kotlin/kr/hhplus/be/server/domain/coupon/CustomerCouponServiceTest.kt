@@ -231,4 +231,63 @@ class CustomerCouponServiceTest {
             verify(exactly = 1) { customerCouponRepository.save(any()) }
         }
     }
+
+    @Nested
+    @DisplayName("만료 쿠폰 상태 갱신")
+    inner class UpdateAsExpired {
+
+        @Test
+        @DisplayName("AVAILABLE 상태인 쿠폰은 EXPIRED 로 갱신된다")
+        fun shouldUpdateAvailableToExpired() {
+            // given
+            val coupon = Coupon("할인", DiscountType.FIXED, 1000, 0, 100, LocalDate.now().minusDays(10), LocalDate.now().minusDays(1)).apply { id = 1L }
+            val customer = Customer("tester").apply { id = 1L }
+
+            val available = CustomerCoupon(customer, coupon).apply {
+                id = 1L
+                status = CustomerCouponStatus.AVAILABLE
+            }
+
+            every { customerCouponRepository.findAllByCouponIn(listOf(coupon)) } returns listOf(available)
+            every { customerCouponRepository.saveAll(any()) } returnsArgument 0
+
+            // when
+            customerCouponService.updateAsExpired(listOf(coupon))
+
+            // then
+            assertThat(available.status).isEqualTo(CustomerCouponStatus.EXPIRED)
+            verify { customerCouponRepository.saveAll(listOf(available)) }
+        }
+
+        @Test
+        @DisplayName("USED 상태인 쿠폰은 변경되지 않는다")
+        fun shouldNotUpdateUsedCoupon() {
+            // given
+            val coupon = Coupon(
+                "이전에 사용한 쿠폰",
+                DiscountType.FIXED,
+                1000,
+                0,
+                100,
+                LocalDate.now().minusDays(10),
+                LocalDate.now().minusDays(1)
+            ).apply { id = 2L }
+            val customer = Customer("tester").apply { id = 2L }
+
+            val used = CustomerCoupon(customer, coupon).apply {
+                id = 2L
+                status = CustomerCouponStatus.USED
+            }
+
+            every { customerCouponRepository.findAllByCouponIn(listOf(coupon)) } returns listOf(used)
+            every { customerCouponRepository.saveAll(any()) } returnsArgument 0
+
+            // when
+            customerCouponService.updateAsExpired(listOf(coupon))
+
+            // then
+            assertThat(used.status).isEqualTo(CustomerCouponStatus.USED)
+            verify { customerCouponRepository.saveAll(listOf(used)) }
+        }
+    }
 }
