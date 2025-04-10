@@ -39,23 +39,4 @@ class BalanceFacade(
 
         return updatedBalance
     }
-
-    fun deduct(customerId: Long, amount: Int): Balance {
-        // 1. 고객 조회
-        val customer = customerService.getById(customerId)
-
-        // 2. 잔액 차감
-        val balance = balanceService.deduct(customerId, amount)
-
-        // 3. 차감 내역 저장
-        val history = BalanceHistory(
-            customer,
-            changeType = BalanceChangeType.USE,
-            changeAmount = amount,
-            totalAmount = balance.amount
-        )
-        balanceHistoryService.create(history)
-
-        return balance
-    }
 }

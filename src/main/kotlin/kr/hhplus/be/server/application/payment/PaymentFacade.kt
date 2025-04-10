@@ -1,10 +1,10 @@
 package kr.hhplus.be.server.application.payment
 
-import kr.hhplus.be.server.application.balance.BalanceFacade
 import kr.hhplus.be.server.application.dataplatform.DataPlatformSender
 import kr.hhplus.be.server.domain.balance.BalanceChangeType
 import kr.hhplus.be.server.domain.balance.BalanceHistory
 import kr.hhplus.be.server.domain.balance.BalanceHistoryService
+import kr.hhplus.be.server.domain.balance.BalanceService
 import kr.hhplus.be.server.domain.coupon.CouponService
 import kr.hhplus.be.server.domain.coupon.CustomerCouponService
 import kr.hhplus.be.server.domain.order.OrderService
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class PaymentFacade(
-    private val balanceFacade: BalanceFacade,
+    private val balanceService: BalanceService,
     private val balanceHistoryService: BalanceHistoryService,
     private val couponService: CouponService,
     private val customerCouponService: CustomerCouponService,
@@ -53,7 +53,7 @@ class PaymentFacade(
         val discountedPrice = originalPrice - discountAmount
 
         // 5. 잔액 차감
-        val balance = balanceFacade.deduct(customerId, discountedPrice)
+        val balance = balanceService.deduct(customerId, discountedPrice)
 
         // 6. 잔액 변경 내역 저장
         val history = BalanceHistory(
