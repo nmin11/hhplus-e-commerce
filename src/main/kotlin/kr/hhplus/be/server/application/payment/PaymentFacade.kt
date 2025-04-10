@@ -64,7 +64,7 @@ class PaymentFacade(
         )
         balanceHistoryService.create(history)
 
-        // 7. 결제 저장
+        // 7. 결제 정보 저장
         val payment = Payment(
             order = order,
             customer = order.customer,
