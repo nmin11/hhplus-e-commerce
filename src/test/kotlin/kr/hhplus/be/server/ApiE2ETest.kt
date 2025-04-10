@@ -25,6 +25,7 @@ import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 @SpringBootTest
@@ -181,8 +182,8 @@ class ApiE2ETest {
             discountAmount = 5000,
             currentQuantity = 100,
             totalQuantity = 100,
-            startedAt = LocalDateTime.now().minusDays(1),
-            expiredAt = LocalDateTime.now().plusDays(1)
+            startedAt = LocalDate.now().minusDays(1),
+            expiredAt = LocalDate.now().plusDays(1)
         ).apply { id = 1L }
 
         every { couponRepository.findById(1L) } returns coupon
@@ -199,8 +200,8 @@ class ApiE2ETest {
             discountAmount = 3000,
             currentQuantity = 100,
             totalQuantity = 100,
-            startedAt = LocalDateTime.parse("2025-04-01T00:00:00"),
-            expiredAt = LocalDateTime.parse("2025-04-30T23:59:59")
+            startedAt = LocalDate.parse("2025-04-01"),
+            expiredAt = LocalDate.parse("2025-04-30")
         ).apply { id = 1L }
 
         val coupon2 = Coupon(
@@ -209,8 +210,8 @@ class ApiE2ETest {
             discountAmount = 10,
             currentQuantity = 50,
             totalQuantity = 50,
-            startedAt = LocalDateTime.parse("2025-03-15T00:00:00"),
-            expiredAt = LocalDateTime.parse("2025-04-10T23:59:59")
+            startedAt = LocalDate.parse("2025-03-15"),
+            expiredAt = LocalDate.parse("2025-04-10")
         ).apply { id = 2L }
 
         val customerCoupon1 = CustomerCoupon(customer, coupon1).apply {
@@ -223,7 +224,8 @@ class ApiE2ETest {
             status = CustomerCouponStatus.USED
         }
 
-        every { customerCouponRepository.findByCustomerId(1L) } returns listOf(customerCoupon1, customerCoupon2)
+        every { customerCouponRepository.findAllByCustomerId(1L) } returns
+            listOf(customerCoupon1, customerCoupon2)
 
         // 1. 고객 잔액 충전
         mockMvc.perform(

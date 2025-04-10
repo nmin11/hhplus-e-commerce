@@ -1,7 +1,7 @@
 package kr.hhplus.be.server.domain.coupon
 
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 @Service
 class CouponService(
@@ -13,7 +13,7 @@ class CouponService(
     }
 
     fun calculateDiscount(coupon: Coupon, totalPrice: Int): Int {
-        val now = LocalDateTime.now()
+        val now = LocalDate.now()
         if (now.isBefore(coupon.startedAt) || now.isAfter(coupon.expiredAt)) {
             throw IllegalStateException("유효하지 않은 쿠폰입니다.")
         }

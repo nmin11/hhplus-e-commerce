@@ -10,7 +10,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 class CouponServiceTest {
     private val couponRepository = mockk<CouponRepository>()
@@ -29,8 +29,8 @@ class CouponServiceTest {
                 discountAmount = 1000,
                 currentQuantity = 10,
                 totalQuantity = 100,
-                startedAt = LocalDateTime.now().minusDays(1),
-                expiredAt = LocalDateTime.now().plusDays(1)
+                startedAt = LocalDate.now().minusDays(1),
+                expiredAt = LocalDate.now().plusDays(1)
             ).apply { id = couponId }
 
             every { couponRepository.findById(couponId) } returns expectedCoupon
@@ -61,7 +61,7 @@ class CouponServiceTest {
 
     @Nested
     inner class CalculateDiscount {
-        private val now = LocalDateTime.now()
+        private val now = LocalDate.now()
 
         @Test
         @DisplayName("정액 할인 쿠폰일 경우 할인 금액 반환")
@@ -164,8 +164,8 @@ class CouponServiceTest {
                 discountAmount = 3000,
                 currentQuantity = 5,
                 totalQuantity = 10,
-                startedAt = LocalDateTime.now().minusDays(1),
-                expiredAt = LocalDateTime.now().plusDays(1)
+                startedAt = LocalDate.now().minusDays(1),
+                expiredAt = LocalDate.now().plusDays(1)
             )
 
             every { couponRepository.save(coupon) } returns coupon
@@ -188,8 +188,8 @@ class CouponServiceTest {
                 discountAmount = 3000,
                 currentQuantity = 0,
                 totalQuantity = 10,
-                startedAt = LocalDateTime.now().minusDays(1),
-                expiredAt = LocalDateTime.now().plusDays(1)
+                startedAt = LocalDate.now().minusDays(1),
+                expiredAt = LocalDate.now().plusDays(1)
             )
 
             // when

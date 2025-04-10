@@ -9,7 +9,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 class CouponControllerTest {
     private val couponFacade = mockk<CouponFacade>()
@@ -28,8 +28,8 @@ class CouponControllerTest {
             discountAmount = 3000,
             currentQuantity = 100,
             totalQuantity = 100,
-            startedAt = LocalDateTime.now().minusDays(1),
-            expiredAt = LocalDateTime.now().plusDays(10)
+            startedAt = LocalDate.now().minusDays(1),
+            expiredAt = LocalDate.now().plusDays(10)
         ).apply { id = 1L }
 
         val customerCoupon = CustomerCoupon(customer, coupon).apply {
@@ -58,8 +58,8 @@ class CouponControllerTest {
             discountAmount = 3000,
             currentQuantity = 10,
             totalQuantity = 100,
-            startedAt = LocalDateTime.now().minusDays(5),
-            expiredAt = LocalDateTime.now().plusDays(5)
+            startedAt = LocalDate.now().minusDays(5),
+            expiredAt = LocalDate.now().plusDays(5)
         ).apply { id = 1L }
         val coupon2 = Coupon(
             name = "봄맞이 프로모션",
@@ -67,8 +67,8 @@ class CouponControllerTest {
             discountAmount = 10,
             currentQuantity = 20,
             totalQuantity = 100,
-            startedAt = LocalDateTime.now().minusDays(15),
-            expiredAt = LocalDateTime.now().plusDays(3)
+            startedAt = LocalDate.now().minusDays(15),
+            expiredAt = LocalDate.now().plusDays(3)
         ).apply { id = 2L }
 
         val customerCoupons = listOf(

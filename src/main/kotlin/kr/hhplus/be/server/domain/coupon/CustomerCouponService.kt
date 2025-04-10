@@ -8,7 +8,7 @@ class CustomerCouponService(
     private val customerCouponRepository: CustomerCouponRepository
 ) {
     fun getAllByCustomerId(customerId: Long): List<CustomerCoupon> {
-        return customerCouponRepository.findByCustomerId(customerId)
+        return customerCouponRepository.findAllByCustomerId(customerId)
     }
 
     fun validateIssuedCoupon(customerId: Long, couponId: Long): CustomerCoupon {

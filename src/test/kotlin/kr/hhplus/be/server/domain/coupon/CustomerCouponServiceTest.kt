@@ -9,7 +9,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 class CustomerCouponServiceTest {
     private val customerCouponRepository = mockk<CustomerCouponRepository>()
@@ -30,8 +30,8 @@ class CustomerCouponServiceTest {
                 discountAmount = 5000,
                 currentQuantity = 100,
                 totalQuantity = 100,
-                startedAt = LocalDateTime.now().minusDays(1),
-                expiredAt = LocalDateTime.now().plusDays(5)
+                startedAt = LocalDate.now().minusDays(1),
+                expiredAt = LocalDate.now().plusDays(5)
             ).apply { id = 1L }
 
             val coupon2 = Coupon(
@@ -40,8 +40,8 @@ class CustomerCouponServiceTest {
                 discountAmount = 10000,
                 currentQuantity = 50,
                 totalQuantity = 50,
-                startedAt = LocalDateTime.now().minusDays(2),
-                expiredAt = LocalDateTime.now().plusDays(3)
+                startedAt = LocalDate.now().minusDays(2),
+                expiredAt = LocalDate.now().plusDays(3)
             ).apply { id = 2L }
 
             val expectedCoupons = listOf(
@@ -49,14 +49,14 @@ class CustomerCouponServiceTest {
                 CustomerCoupon(customer, coupon2).apply { id = 2L }
             )
 
-            every { customerCouponRepository.findByCustomerId(customerId) } returns expectedCoupons
+            every { customerCouponRepository.findAllByCustomerId(customerId) } returns expectedCoupons
 
             // when
             val result = customerCouponService.getAllByCustomerId(customerId)
 
             // then
             assertThat(result).isEqualTo(expectedCoupons)
-            verify(exactly = 1) { customerCouponRepository.findByCustomerId(customerId) }
+            verify(exactly = 1) { customerCouponRepository.findAllByCustomerId(customerId) }
         }
     }
 
@@ -76,8 +76,8 @@ class CustomerCouponServiceTest {
                 discountAmount = 1000,
                 currentQuantity = 10,
                 totalQuantity = 100,
-                startedAt = LocalDateTime.now().minusDays(1),
-                expiredAt = LocalDateTime.now().plusDays(1)
+                startedAt = LocalDate.now().minusDays(1),
+                expiredAt = LocalDate.now().plusDays(1)
             ).apply { id = couponId }
             val customerCoupon = CustomerCoupon(customer, coupon).apply {
                 status = CustomerCouponStatus.AVAILABLE
@@ -114,8 +114,8 @@ class CustomerCouponServiceTest {
                 discountAmount = 1000,
                 currentQuantity = 0,
                 totalQuantity = 100,
-                startedAt = LocalDateTime.now().minusDays(3),
-                expiredAt = LocalDateTime.now().plusDays(2)
+                startedAt = LocalDate.now().minusDays(3),
+                expiredAt = LocalDate.now().plusDays(2)
             ).apply { id = couponId }
             val customerCoupon = CustomerCoupon(customer, coupon).apply {
                 status = CustomerCouponStatus.USED
@@ -140,8 +140,8 @@ class CustomerCouponServiceTest {
                 discountAmount = 1000,
                 currentQuantity = 0,
                 totalQuantity = 100,
-                startedAt = LocalDateTime.now().minusDays(10),
-                expiredAt = LocalDateTime.now().minusDays(1)
+                startedAt = LocalDate.now().minusDays(10),
+                expiredAt = LocalDate.now().minusDays(1)
             ).apply { id = couponId }
             val customerCoupon = CustomerCoupon(customer, coupon).apply {
                 status = CustomerCouponStatus.EXPIRED
@@ -183,8 +183,8 @@ class CustomerCouponServiceTest {
                 discountAmount = 3000,
                 currentQuantity = 100,
                 totalQuantity = 100,
-                startedAt = LocalDateTime.now().minusDays(1),
-                expiredAt = LocalDateTime.now().plusDays(1)
+                startedAt = LocalDate.now().minusDays(1),
+                expiredAt = LocalDate.now().plusDays(1)
             ).apply { id = couponId }
 
             val issued = CustomerCoupon(customer, coupon)
@@ -215,8 +215,8 @@ class CustomerCouponServiceTest {
                 discountAmount = 1000,
                 currentQuantity = 100,
                 totalQuantity = 100,
-                startedAt = LocalDateTime.now().minusDays(1),
-                expiredAt = LocalDateTime.now().plusDays(1)
+                startedAt = LocalDate.now().minusDays(1),
+                expiredAt = LocalDate.now().plusDays(1)
             ).apply { id = 2L }
 
             val saved = CustomerCoupon(customer, coupon).apply { id = 1L }
