@@ -12,8 +12,8 @@ sealed class CouponResponse {
         companion object {
             fun from(customerCoupon: CustomerCoupon): Issue {
                 return Issue(
-                    couponId = customerCoupon.coupon.id ?: throw IllegalStateException("쿠폰 ID가 없습니다."),
-                    customerId = customerCoupon.customer.id ?: throw IllegalStateException("고객 ID가 없습니다."),
+                    couponId = customerCoupon.coupon.requireSavedId(),
+                    customerId = customerCoupon.customer.requireSavedId(),
                     status = customerCoupon.status.name,
                     issuedAt = customerCoupon.issuedAt.toString()
                 )
