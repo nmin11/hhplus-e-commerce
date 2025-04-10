@@ -37,7 +37,7 @@ class OrderFacade(
             productOptionService.validateOptionBelongsToProduct(optionId = option.id, productId = product.id)
             stockService.validate(item.productOptionId, item.quantity)
 
-            // 2-2. 주문 총액 계산
+            // 2-2. 항목별 주문액 계산
             val subtotal = (product.basePrice + option.extraPrice) * item.quantity
 
             OrderItem(
