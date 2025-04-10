@@ -235,12 +235,19 @@ class CustomerCouponServiceTest {
     @Nested
     @DisplayName("만료 쿠폰 상태 갱신")
     inner class UpdateAsExpired {
-
         @Test
         @DisplayName("AVAILABLE 상태인 쿠폰은 EXPIRED 로 갱신된다")
         fun shouldUpdateAvailableToExpired() {
             // given
-            val coupon = Coupon("할인", DiscountType.FIXED, 1000, 0, 100, LocalDate.now().minusDays(10), LocalDate.now().minusDays(1)).apply { id = 1L }
+            val coupon = Coupon(
+                name = "할인 가능 쿠폰",
+                discountType = DiscountType.FIXED,
+                discountAmount = 1000,
+                currentQuantity = 0,
+                totalQuantity = 100,
+                startedAt = LocalDate.now().minusDays(10),
+                expiredAt = LocalDate.now().minusDays(1)
+            ).apply { id = 1L }
             val customer = Customer("tester").apply { id = 1L }
 
             val available = CustomerCoupon(customer, coupon).apply {
@@ -264,13 +271,13 @@ class CustomerCouponServiceTest {
         fun shouldNotUpdateUsedCoupon() {
             // given
             val coupon = Coupon(
-                "이전에 사용한 쿠폰",
-                DiscountType.FIXED,
-                1000,
-                0,
-                100,
-                LocalDate.now().minusDays(10),
-                LocalDate.now().minusDays(1)
+                name = "이전에 사용한 쿠폰",
+                discountType = DiscountType.FIXED,
+                discountAmount = 1000,
+                currentQuantity = 0,
+                totalQuantity = 100,
+                startedAt = LocalDate.now().minusDays(10),
+                expiredAt = LocalDate.now().minusDays(1)
             ).apply { id = 2L }
             val customer = Customer("tester").apply { id = 2L }
 
