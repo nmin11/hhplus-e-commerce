@@ -1,7 +1,6 @@
 package kr.hhplus.be.server.interfaces.balance
 
-import kr.hhplus.be.server.domain.balance.Balance
-import kr.hhplus.be.server.domain.balance.BalanceHistory
+import kr.hhplus.be.server.application.balance.BalanceResult
 
 sealed class BalanceResponse {
     data class Summary(
@@ -9,10 +8,10 @@ sealed class BalanceResponse {
         val amount: Int
     ) {
         companion object {
-            fun from(balance: Balance): Summary {
+            fun from(result: BalanceResult.Summary): Summary {
                 return Summary(
-                    customerId = balance.customer.requireSavedId(),
-                    amount = balance.amount
+                    customerId = result.customerId,
+                    amount = result.amount
                 )
             }
         }
@@ -25,12 +24,12 @@ sealed class BalanceResponse {
         val createdAt: String
     ) {
         companion object {
-            fun from(balanceHistory: BalanceHistory): History {
+            fun from(result: BalanceResult.History): History {
                 return History(
-                    changeType = balanceHistory.changeType.name,
-                    changeAmount = balanceHistory.changeAmount,
-                    totalAmount = balanceHistory.totalAmount,
-                    createdAt = balanceHistory.createdAt.toString()
+                    changeType = result.changeType,
+                    changeAmount = result.changeAmount,
+                    totalAmount = result.totalAmount,
+                    createdAt = result.createdAt
                 )
             }
         }

@@ -11,34 +11,36 @@ class BalanceFacade(
     private val balanceHistoryService: BalanceHistoryService,
     private val customerService: CustomerService,
 ) {
-    fun getBalance(customerId: Long): Balance {
+    fun getBalance(customerId: Long): BalanceResult.Summary {
         customerService.validateCustomerExistence(customerId)
-        return balanceService.getByCustomerId(customerId)
+        val balance = balanceService.getByCustomerId(customerId)
+        return BalanceResult.Summary.from(balance)
     }
 
-    fun getHistories(customerId: Long): List<BalanceHistory> {
+    fun getHistories(customerId: Long): List<BalanceResult.History> {
         customerService.validateCustomerExistence(customerId)
-        return balanceHistoryService.getAllByCustomerId(customerId)
+        val histories = balanceHistoryService.getAllByCustomerId(customerId)
+        return histories.map { BalanceResult.History.from(it) }
     }
 
     @Transactional
-    fun charge(customerId: Long, amount: Int): Balance {
+    fun charge(command: BalanceCommand.Charge): BalanceResult.Summary {
         // 1. 고객 조회
-        val customer = customerService.getById(customerId)
+        val customer = customerService.getById(command.customerId)
 
         // 2. 잔액 충전
-        val updatedBalance = balanceService.charge(customerId, amount)
+        val updatedBalance = balanceService.charge(command.customerId, command.amount)
 
         // 3. 충전 내역 저장
         balanceHistoryService.create(
             BalanceHistory(
                 customer,
                 changeType = BalanceChangeType.CHARGE,
-                changeAmount = amount,
+                changeAmount = command.amount,
                 totalAmount = updatedBalance.amount
             )
         )
 
-        return updatedBalance
+        return BalanceResult.Summary.from(updatedBalance)
     }
 }
