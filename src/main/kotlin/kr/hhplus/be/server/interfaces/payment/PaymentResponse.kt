@@ -1,6 +1,6 @@
 package kr.hhplus.be.server.interfaces.payment
 
-import kr.hhplus.be.server.domain.payment.Payment
+import kr.hhplus.be.server.application.payment.PaymentResult
 
 data class PaymentResponse(
     val paymentId: Long,
@@ -12,15 +12,15 @@ data class PaymentResponse(
     val paidAt: String
 ) {
     companion object {
-        fun from(payment: Payment): PaymentResponse {
+        fun from(result: PaymentResult): PaymentResponse {
             return PaymentResponse(
-                paymentId = payment.requireSavedId(),
-                orderId = payment.order.requireSavedId(),
-                customerId = payment.customer.requireSavedId(),
-                originalPrice = payment.originalPrice,
-                discountAmount = payment.discountAmount,
-                discountedPrice = payment.discountedPrice,
-                paidAt = payment.paidAt.toString()
+                paymentId = result.paymentId,
+                orderId = result.orderId,
+                customerId = result.customerId,
+                originalPrice = result.originalPrice,
+                discountAmount = result.discountAmount,
+                discountedPrice = result.discountedPrice,
+                paidAt = result.paidAt
             )
         }
     }

@@ -2,7 +2,9 @@ package kr.hhplus.be.server.interfaces.payment
 
 import io.mockk.every
 import io.mockk.mockk
+import kr.hhplus.be.server.application.payment.PaymentCommand
 import kr.hhplus.be.server.application.payment.PaymentFacade
+import kr.hhplus.be.server.application.payment.PaymentResult
 import kr.hhplus.be.server.domain.customer.Customer
 import kr.hhplus.be.server.domain.order.Order
 import kr.hhplus.be.server.domain.payment.Payment
@@ -35,13 +37,16 @@ class PaymentControllerTest {
             id = 100L
         }
 
-        every { paymentFacade.pay(request.orderId, request.couponId) } returns payment
+        val command = PaymentCommand.from(request)
+        val result = PaymentResult.from(payment)
+
+        every { paymentFacade.pay(command) } returns result
 
         // when
         val response = paymentController.pay(request)
 
         // then
         assertThat(response.statusCode).isEqualTo(HttpStatus.CREATED)
-        assertThat(response.body).isEqualTo(PaymentResponse.from(payment))
+        assertThat(response.body).isEqualTo(PaymentResponse.from(result))
     }
 }

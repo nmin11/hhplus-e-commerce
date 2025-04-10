@@ -30,9 +30,9 @@ class PaymentFacade(
     private val dataPlatformSender: DataPlatformSender
 ) {
     @Transactional
-    fun pay(orderId: Long, couponId: Long?): Payment {
+    fun pay(command: PaymentCommand): PaymentResult {
         // 1. 주문 조회 및 상태 확인
-        val order = orderService.getValidOrderForPayment(orderId)
+        val order = orderService.getValidOrderForPayment(command.orderId)
         val customer = order.customer
         val customerId = customer.requireSavedId()
 
@@ -43,7 +43,7 @@ class PaymentFacade(
         }
 
         // 3. 쿠폰 유효성 검사 및 할인 금액 계산
-        val discountAmount = couponId?.let {
+        val discountAmount = command.couponId?.let {
             val customerCoupon = customerCouponService.validateIssuedCoupon(customerId, it)
             val coupon = customerCoupon.coupon
 
@@ -70,7 +70,7 @@ class PaymentFacade(
         val payment = Payment(
             order = order,
             customer = order.customer,
-            coupon = couponId?.let { couponService.getById(it) },
+            coupon = command.couponId?.let { couponService.getById(it) },
             originalPrice = originalPrice,
             discountAmount = discountAmount,
             discountedPrice = discountedPrice
@@ -87,9 +87,9 @@ class PaymentFacade(
         }
 
         // 9. 데이터 플랫폼 전송
-        val command = paymentCommandFactory.from(order)
-        dataPlatformSender.send(command)
+        val orderCommand = paymentCommandFactory.from(order)
+        dataPlatformSender.send(orderCommand)
 
-        return payment
+        return PaymentResult.from(payment)
     }
 }
