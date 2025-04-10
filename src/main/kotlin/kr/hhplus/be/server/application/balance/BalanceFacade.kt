@@ -3,6 +3,7 @@ package kr.hhplus.be.server.application.balance
 import kr.hhplus.be.server.domain.balance.*
 import kr.hhplus.be.server.domain.customer.CustomerService
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
 
 @Component
 class BalanceFacade(
@@ -20,6 +21,7 @@ class BalanceFacade(
         return balanceHistoryService.getAllByCustomerId(customerId)
     }
 
+    @Transactional
     fun charge(customerId: Long, amount: Int): Balance {
         // 1. 고객 조회
         val customer = customerService.getById(customerId)

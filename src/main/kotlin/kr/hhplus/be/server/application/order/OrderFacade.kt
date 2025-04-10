@@ -9,6 +9,7 @@ import kr.hhplus.be.server.domain.product.ProductService
 import kr.hhplus.be.server.domain.product.StockService
 import kr.hhplus.be.server.interfaces.order.OrderRequest
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
 
 @Component
 class OrderFacade(
@@ -18,7 +19,7 @@ class OrderFacade(
     private val stockService: StockService,
     private val orderService: OrderService
 ) {
-
+    @Transactional
     fun createOrder(request: OrderRequest.Create): Order {
         // 1.사용자 조회
         val customer = customerService.getById(request.customerId)

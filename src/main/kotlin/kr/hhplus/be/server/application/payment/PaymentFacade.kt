@@ -14,6 +14,7 @@ import kr.hhplus.be.server.domain.product.Statistic
 import kr.hhplus.be.server.domain.product.StatisticService
 import kr.hhplus.be.server.domain.product.StockService
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
 
 @Component
 class PaymentFacade(
@@ -27,6 +28,7 @@ class PaymentFacade(
     private val stockService: StockService,
     private val dataPlatformSender: DataPlatformSender
 ) {
+    @Transactional
     fun pay(orderId: Long, couponId: Long?): Payment {
         // 1. 주문 조회 및 상태 확인
         val order = orderService.getValidOrderForPayment(orderId)
