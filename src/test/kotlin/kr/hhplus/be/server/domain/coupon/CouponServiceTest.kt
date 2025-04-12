@@ -1,14 +1,16 @@
 package kr.hhplus.be.server.domain.coupon
 
+import io.mockk.Called
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import kr.hhplus.be.server.domain.customer.Customer
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 class CouponServiceTest {
     private val couponRepository = mockk<CouponRepository>()
@@ -27,8 +29,8 @@ class CouponServiceTest {
                 discountAmount = 1000,
                 currentQuantity = 10,
                 totalQuantity = 100,
-                startedAt = LocalDateTime.now().minusDays(1),
-                expiredAt = LocalDateTime.now().plusDays(1)
+                startedAt = LocalDate.now().minusDays(1),
+                expiredAt = LocalDate.now().plusDays(1)
             ).apply { id = couponId }
 
             every { couponRepository.findById(couponId) } returns expectedCoupon
@@ -59,7 +61,7 @@ class CouponServiceTest {
 
     @Nested
     inner class CalculateDiscount {
-        private val now = LocalDateTime.now()
+        private val now = LocalDate.now()
 
         @Test
         @DisplayName("정액 할인 쿠폰일 경우 할인 금액 반환")
@@ -147,6 +149,97 @@ class CouponServiceTest {
 
             // then
             assertThat(exception).hasMessage("유효하지 않은 쿠폰입니다.")
+        }
+    }
+
+    @Nested
+    inner class DecreaseQuantity {
+        @Test
+        @DisplayName("쿠폰 수량이 남아 있을 경우 쿠폰 수량 1 감소")
+        fun whenQuantityIsSufficient() {
+            // given
+            val coupon = Coupon(
+                name = "테스트쿠폰",
+                discountType = DiscountType.FIXED,
+                discountAmount = 3000,
+                currentQuantity = 5,
+                totalQuantity = 10,
+                startedAt = LocalDate.now().minusDays(1),
+                expiredAt = LocalDate.now().plusDays(1)
+            )
+
+            every { couponRepository.save(coupon) } returns coupon
+
+            // when
+            couponService.decreaseQuantity(coupon)
+
+            // then
+            assertThat(coupon.currentQuantity).isEqualTo(4)
+            verify(exactly = 1) { couponRepository.save(coupon) }
+        }
+
+        @Test
+        @DisplayName("쿠폰 수량이 0일 경우 예외 발생")
+        fun throwException_whenQuantityIsZero() {
+            // given
+            val coupon = Coupon(
+                name = "소진쿠폰",
+                discountType = DiscountType.FIXED,
+                discountAmount = 3000,
+                currentQuantity = 0,
+                totalQuantity = 10,
+                startedAt = LocalDate.now().minusDays(1),
+                expiredAt = LocalDate.now().plusDays(1)
+            )
+
+            // when
+            val exception = assertThrows<IllegalStateException> {
+                couponService.decreaseQuantity(coupon)
+            }
+
+            // then
+            assertThat(exception)
+                .hasMessage("쿠폰 수량이 모두 소진되었습니다.")
+            verify { couponRepository wasNot Called }
+        }
+    }
+
+    @Nested
+    inner class GetExpiredCoupons {
+        @Test
+        @DisplayName("지정한 기준 날짜 이전에 만료된 쿠폰들을 반환")
+        fun shouldReturnExpiredCoupons() {
+            // given
+            val today = LocalDate.of(2025, 4, 11)
+            val expiredCoupons = listOf(
+                Coupon(
+                    name = "첫 구매 할인",
+                    discountType = DiscountType.FIXED,
+                    discountAmount = 1000,
+                    currentQuantity = 10,
+                    totalQuantity = 100,
+                    startedAt = today.minusDays(10),
+                    expiredAt = today.minusDays(1)
+                ).apply { id = 1L },
+                Coupon(
+                    name = "봄맞이 할인",
+                    discountType = DiscountType.RATE,
+                    discountAmount = 20,
+                    currentQuantity = 5,
+                    totalQuantity = 50,
+                    startedAt = today.minusDays(30),
+                    expiredAt = today.minusDays(5)
+                ).apply { id = 2L }
+            )
+
+            every { couponRepository.findAllByExpiredAtBefore(today) } returns expiredCoupons
+
+            // when
+            val result = couponService.getExpiredCoupons(today)
+
+            // then
+            assertThat(result).isEqualTo(expiredCoupons)
+            verify(exactly = 1) { couponRepository.findAllByExpiredAtBefore(today) }
         }
     }
 }

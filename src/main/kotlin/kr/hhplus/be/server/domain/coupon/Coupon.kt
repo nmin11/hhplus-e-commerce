@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.coupon
 
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 class Coupon(
@@ -8,8 +9,8 @@ class Coupon(
     var discountAmount: Int,
     var currentQuantity: Int,
     var totalQuantity: Int,
-    var startedAt: LocalDateTime,
-    var expiredAt: LocalDateTime
+    var startedAt: LocalDate,
+    var expiredAt: LocalDate
 ) {
     var id: Long? = null
     val createdAt: LocalDateTime = LocalDateTime.now()

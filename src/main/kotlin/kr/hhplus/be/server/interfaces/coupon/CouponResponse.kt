@@ -1,12 +1,26 @@
 package kr.hhplus.be.server.interfaces.coupon
 
+import kr.hhplus.be.server.application.coupon.CouponResult
+import kr.hhplus.be.server.domain.coupon.CustomerCoupon
+
 sealed class CouponResponse {
     data class Issue(
         val couponId: Long,
         val customerId: Long,
         val status: String,
         val issuedAt: String
-    )
+    ) {
+        companion object {
+            fun from(result: CouponResult.Issue): Issue {
+                return Issue(
+                    couponId = result.couponId,
+                    customerId = result.customerId,
+                    status = result.status,
+                    issuedAt = result.issuedAt
+                )
+            }
+        }
+    }
 
     data class Owned(
         val name: String,
@@ -15,5 +29,19 @@ sealed class CouponResponse {
         val status: String,
         val issuedAt: String,
         val expiredAt: String
-    )
+    ) {
+        companion object {
+            fun from(customerCoupon: CustomerCoupon): Owned {
+                val coupon = customerCoupon.coupon
+                return Owned(
+                    name = coupon.name,
+                    discountType = coupon.discountType.name,
+                    discountAmount = coupon.discountAmount,
+                    status = customerCoupon.status.name,
+                    issuedAt = customerCoupon.issuedAt.toString(),
+                    expiredAt = coupon.expiredAt.toString()
+                )
+            }
+        }
+    }
 }

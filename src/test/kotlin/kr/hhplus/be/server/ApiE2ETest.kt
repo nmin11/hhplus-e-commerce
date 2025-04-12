@@ -4,8 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import kr.hhplus.be.server.domain.balance.*
-import kr.hhplus.be.server.domain.coupon.CouponRepository
-import kr.hhplus.be.server.domain.coupon.CustomerCouponRepository
+import kr.hhplus.be.server.domain.coupon.*
 import kr.hhplus.be.server.domain.customer.Customer
 import kr.hhplus.be.server.domain.customer.CustomerRepository
 import kr.hhplus.be.server.domain.order.Order
@@ -22,11 +21,11 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.data.jpa.domain.AbstractPersistable_.id
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 @SpringBootTest
@@ -177,6 +176,57 @@ class ApiE2ETest {
             payment
         }
 
+        val coupon = Coupon(
+            name = "5천원 할인 쿠폰",
+            discountType = DiscountType.FIXED,
+            discountAmount = 5000,
+            currentQuantity = 100,
+            totalQuantity = 100,
+            startedAt = LocalDate.now().minusDays(1),
+            expiredAt = LocalDate.now().plusDays(1)
+        ).apply { id = 1L }
+
+        every { couponRepository.findById(1L) } returns coupon
+
+        every { customerCouponRepository.findByCustomerIdAndCouponId(1L, 1L) } returns null
+
+        every { couponRepository.save(any()) } answers { firstArg() }
+
+        every { customerCouponRepository.save(any()) } answers { firstArg() }
+
+        val coupon1 = Coupon(
+            name = "첫 구매 할인",
+            discountType = DiscountType.FIXED,
+            discountAmount = 3000,
+            currentQuantity = 100,
+            totalQuantity = 100,
+            startedAt = LocalDate.parse("2025-04-01"),
+            expiredAt = LocalDate.parse("2025-04-30")
+        ).apply { id = 1L }
+
+        val coupon2 = Coupon(
+            name = "봄맞이 프로모션",
+            discountType = DiscountType.RATE,
+            discountAmount = 10,
+            currentQuantity = 50,
+            totalQuantity = 50,
+            startedAt = LocalDate.parse("2025-03-15"),
+            expiredAt = LocalDate.parse("2025-04-10")
+        ).apply { id = 2L }
+
+        val customerCoupon1 = CustomerCoupon(customer, coupon1).apply {
+            id = 1L
+            status = CustomerCouponStatus.AVAILABLE
+        }
+
+        val customerCoupon2 = CustomerCoupon(customer, coupon2).apply {
+            id = 2L
+            status = CustomerCouponStatus.USED
+        }
+
+        every { customerCouponRepository.findAllByCustomerId(1L) } returns
+            listOf(customerCoupon1, customerCoupon2)
+
         // 1. 고객 잔액 충전
         mockMvc.perform(
             patch("/balances/charge")
@@ -228,10 +278,10 @@ class ApiE2ETest {
             .andExpect(status().isOk)
 
         // 8. 쿠폰 발급
-        val couponRequest = CouponRequest.Issue(customerId = 1L)
+        val couponRequest = CouponRequest.Issue(couponId = 1L, customerId = 1L)
 
         mockMvc.perform(
-            post("/coupons/1/issue")
+            post("/coupons/issue")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(couponRequest))
         ).andExpect(status().isCreated)

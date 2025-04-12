@@ -1,7 +1,7 @@
 package kr.hhplus.be.server.domain.coupon
 
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 @Service
 class CouponService(
@@ -13,7 +13,7 @@ class CouponService(
     }
 
     fun calculateDiscount(coupon: Coupon, totalPrice: Int): Int {
-        val now = LocalDateTime.now()
+        val now = LocalDate.now()
         if (now.isBefore(coupon.startedAt) || now.isAfter(coupon.expiredAt)) {
             throw IllegalStateException("유효하지 않은 쿠폰입니다.")
         }
@@ -22,5 +22,18 @@ class CouponService(
             DiscountType.FIXED -> coupon.discountAmount
             DiscountType.RATE -> (totalPrice * coupon.discountAmount / 100.0).toInt()
         }
+    }
+
+    fun decreaseQuantity(coupon: Coupon) {
+        if (coupon.currentQuantity <= 0) {
+            throw IllegalStateException("쿠폰 수량이 모두 소진되었습니다.")
+        }
+
+        coupon.currentQuantity -= 1
+        couponRepository.save(coupon)
+    }
+
+    fun getExpiredCoupons(referenceDate: LocalDate = LocalDate.now()): List<Coupon> {
+        return couponRepository.findAllByExpiredAtBefore(referenceDate)
     }
 }
