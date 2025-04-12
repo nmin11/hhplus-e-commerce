@@ -18,7 +18,10 @@ class PaymentServiceTest {
     fun create_shouldSaveAndReturnPayment() {
         // given
         val customer = Customer(username = "tester").apply { id = 1L }
-        val order = Order(customer = customer, totalPrice = 50_000).apply { id = 1L }
+        val order = Order.create(customer).apply {
+            id = 1L
+            totalPrice = 50_000
+        }
         val payment = Payment(
             order = order,
             customer = customer,

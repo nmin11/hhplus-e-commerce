@@ -151,11 +151,11 @@ class ApiE2ETest {
         every { stockRepository.findByProductOptionId(optionM.id!!) } returns stockOptionM
         every { stockRepository.findByProductOptionId(optionL.id!!) } returns stockOptionL
 
-        val order = Order(
-            customer = customer,
-            totalPrice = 40000 + 31000
+        val order = Order.create(
+            customer = customer
         ).apply {
             id = 1L
+            totalPrice = 40000 + 31000
             orderItems.addAll(
                 listOf(
                     OrderItem(order = this, productOption = optionM, quantity = 1, subtotalPrice = 40000),

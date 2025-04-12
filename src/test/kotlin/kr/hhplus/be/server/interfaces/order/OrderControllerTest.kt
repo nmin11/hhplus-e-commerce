@@ -37,11 +37,9 @@ class OrderControllerTest {
         val option1 = ProductOption(product1, "M", 1000).apply { id = 2L }
         val option2 = ProductOption(product2, "L", 2000).apply { id = 3L }
 
-        val order = Order(
-            customer = customer,
-            totalPrice = 87000,
-        ).apply {
+        val order = Order.create(customer).apply {
             id = 1L
+            totalPrice = 87000
             orderItems.addAll(
                 listOf(
                     OrderItem(order = this, productOption = option1, quantity = 1, subtotalPrice = 39000),

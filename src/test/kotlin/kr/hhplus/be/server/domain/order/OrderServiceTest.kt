@@ -21,10 +21,12 @@ class OrderServiceTest {
         fun shouldSaveAndReturnOrder() {
             // given
             val customer = Customer("tester").apply { id = 1L }
-            val order = Order(
-                customer = customer,
+            val order = Order.create(
+                customer = customer
+            ).apply {
+                id = 1L
                 totalPrice = 70000
-            ).apply { id = 1L }
+            }
 
             every { orderRepository.save(order) } returns order
 
@@ -46,7 +48,10 @@ class OrderServiceTest {
         fun returnOrder_whenExists() {
             // given
             val customer = Customer("tester").apply { id = 1L }
-            val expectedOrder = Order(customer = customer, totalPrice = 50000).apply { id = orderId }
+            val expectedOrder = Order.create(customer = customer).apply {
+                id = orderId
+                totalPrice = 50000
+            }
 
             every { orderRepository.findById(orderId) } returns expectedOrder
 
@@ -84,8 +89,9 @@ class OrderServiceTest {
             // given
             val orderId = 1L
             val customer = Customer("tester").apply { id = 1L }
-            val order = Order(customer = customer, totalPrice = 10000).apply {
+            val order = Order.create(customer).apply {
                 id = orderId
+                totalPrice = 10000
                 status = OrderStatus.CREATED
             }
 
@@ -104,8 +110,9 @@ class OrderServiceTest {
             // given
             val orderId = 1L
             val customer = Customer("tester").apply { id = 1L }
-            val order = Order(customer = customer, totalPrice = 10000).apply {
+            val order = Order.create(customer).apply {
                 id = orderId
+                totalPrice = 10000
                 status = OrderStatus.PAID
             }
 
