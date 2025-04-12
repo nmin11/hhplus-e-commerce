@@ -1,7 +1,6 @@
 package kr.hhplus.be.server.application.payment
 
 import kr.hhplus.be.server.application.dataplatform.DataPlatformSender
-import kr.hhplus.be.server.domain.balance.BalanceChangeType
 import kr.hhplus.be.server.domain.balance.BalanceHistory
 import kr.hhplus.be.server.domain.balance.BalanceHistoryService
 import kr.hhplus.be.server.domain.balance.BalanceService
@@ -78,7 +77,7 @@ class PaymentFacade(
 
         // 8. 통계 반영
         order.orderItems.forEach { item ->
-            val stat = Statistic(
+            val stat = Statistic.create(
                 product = item.productOption.product,
                 salesCount = item.quantity
             )

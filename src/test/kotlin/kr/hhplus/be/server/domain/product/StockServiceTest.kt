@@ -16,7 +16,7 @@ class StockServiceTest {
     fun whenStockIsSufficient_shouldPass() {
         // given
         val optionId = 1L
-        val stock = Stock(productOption = mockk(), quantity = 10).apply { id = 1L }
+        val stock = Stock.create(productOption = mockk(), quantity = 10).apply { id = 1L }
         every { stockRepository.findByProductOptionId(optionId) } returns stock
 
         // when & then
@@ -46,7 +46,7 @@ class StockServiceTest {
     fun whenStockIsInsufficient_shouldThrowException() {
         // given
         val optionId = 1L
-        val stock = Stock(productOption = mockk(), quantity = 2).apply { id = 1L }
+        val stock = Stock.create(productOption = mockk(), quantity = 2).apply { id = 1L }
         every { stockRepository.findByProductOptionId(optionId) } returns stock
 
         // when

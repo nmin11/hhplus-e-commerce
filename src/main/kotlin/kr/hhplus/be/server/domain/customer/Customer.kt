@@ -21,6 +21,7 @@ class Customer private constructor(
 
     companion object {
         fun create(username: String): Customer {
+            require(username.isNotBlank()) { "사용자 이름은 비어있을 수 없습니다." }
             return Customer(username)
         }
     }

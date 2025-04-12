@@ -23,8 +23,8 @@ class ProductControllerTest {
     fun getAllProduct_shouldReturnListOfSummaries() {
         // given
         val products = listOf(
-            Product(name = "청바지", basePrice = 39000).apply { id = 1L },
-            Product(name = "후드티", basePrice = 29000).apply { id = 2L }
+            Product.create(name = "청바지", basePrice = 39000).apply { id = 1L },
+            Product.create(name = "후드티", basePrice = 29000).apply { id = 2L }
         )
         every { productService.getAll() } returns products
 
@@ -41,9 +41,9 @@ class ProductControllerTest {
     @DisplayName("상품 상세 조회")
     fun getProductDetail_shouldReturnProductDetail() {
         // given
-        val product = Product(name = "청바지", basePrice = 39000).apply { id = 1L }
+        val product = Product.create(name = "청바지", basePrice = 39000).apply { id = 1L }
         val options = listOf(
-            ProductOption(product = product, optionName = "M", extraPrice = 1000).apply { id = 1L }
+            ProductOption.create(product = product, optionName = "M", extraPrice = 1000).apply { id = 1L }
         )
         val productDetailResult = ProductResult.Detail(product, options)
 

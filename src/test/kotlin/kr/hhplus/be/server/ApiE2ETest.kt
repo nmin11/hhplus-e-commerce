@@ -93,43 +93,43 @@ class ApiE2ETest {
         every { balanceRepository.save(any()) } answers { firstArg() }
         every { balanceHistoryRepository.save(any()) } answers { firstArg() }
 
-        val product1 = Product(name = "청바지", basePrice = 39000).apply { id = 1L }
-        val product2 = Product(name = "후드티", basePrice = 29000).apply { id = 2L }
-        val product3 = Product(name = "운동화", basePrice = 59000).apply { id = 3L }
-        val product4 = Product(name = "잠바", basePrice = 79000).apply { id = 4L }
-        val product5 = Product(name = "실내화", basePrice = 15000).apply { id = 5L }
+        val product1 = Product.create(name = "청바지", basePrice = 39000).apply { id = 1L }
+        val product2 = Product.create(name = "후드티", basePrice = 29000).apply { id = 2L }
+        val product3 = Product.create(name = "운동화", basePrice = 59000).apply { id = 3L }
+        val product4 = Product.create(name = "잠바", basePrice = 79000).apply { id = 4L }
+        val product5 = Product.create(name = "실내화", basePrice = 15000).apply { id = 5L }
 
         every { productRepository.findAll() } returns listOf(product1, product2, product3)
         every { productRepository.findById(1L) } returns product1
         every { productRepository.findById(2L) } returns product2
 
         every { productOptionRepository.findAllByProductId(1L) } returns listOf(
-            ProductOption(product = product1, optionName = "S", extraPrice = 0).apply { id = 1L },
-            ProductOption(product = product1, optionName = "M", extraPrice = 1000).apply { id = 2L },
-            ProductOption(product = product1, optionName = "L", extraPrice = 2000).apply { id = 3L }
+            ProductOption.create(product = product1, optionName = "S", extraPrice = 0).apply { id = 1L },
+            ProductOption.create(product = product1, optionName = "M", extraPrice = 1000).apply { id = 2L },
+            ProductOption.create(product = product1, optionName = "L", extraPrice = 2000).apply { id = 3L }
         )
 
         every {
             productRepository.findAllByIds(listOf(1L, 2L, 3L, 4L, 5L))
         } returns listOf(product1, product2, product3, product4, product5)
 
-        val stat1 = Statistic(product = product1, salesCount = 12).apply {
+        val stat1 = Statistic.create(product = product1, salesCount = 12).apply {
             id = 1L
             soldAt = LocalDateTime.now().minusDays(1)
         }
-        val stat2 = Statistic(product = product2, salesCount = 9).apply {
+        val stat2 = Statistic.create(product = product2, salesCount = 9).apply {
             id = 2L
             soldAt = LocalDateTime.now().minusDays(2)
         }
-        val stat3 = Statistic(product = product3, salesCount = 7).apply {
+        val stat3 = Statistic.create(product = product3, salesCount = 7).apply {
             id = 3L
             soldAt = LocalDateTime.now().minusDays(3)
         }
-        val stat4 = Statistic(product = product4, salesCount = 5).apply {
+        val stat4 = Statistic.create(product = product4, salesCount = 5).apply {
             id = 4L
             soldAt = LocalDateTime.now().minusDays(1)
         }
-        val stat5 = Statistic(product = product5, salesCount = 3).apply {
+        val stat5 = Statistic.create(product = product5, salesCount = 3).apply {
             id = 5L
             soldAt = LocalDateTime.now().minusDays(2)
         }
@@ -138,14 +138,14 @@ class ApiE2ETest {
             statisticRepository.findTop5BySoldAtAfterOrderBySalesCountDesc(any())
         } returns listOf(stat1, stat2, stat3, stat4, stat5)
 
-        val optionM = ProductOption(product = product1, optionName = "M", extraPrice = 1000).apply { id = 2L }
-        val optionL = ProductOption(product = product2, optionName = "L", extraPrice = 2000).apply { id = 3L }
+        val optionM = ProductOption.create(product = product1, optionName = "M", extraPrice = 1000).apply { id = 2L }
+        val optionL = ProductOption.create(product = product2, optionName = "L", extraPrice = 2000).apply { id = 3L }
 
         every { productOptionRepository.findById(2L) } returns optionM
         every { productOptionRepository.findById(3L) } returns optionL
 
-        val stockOptionM = Stock(productOption = optionM, quantity = 10).apply { id = 2L }
-        val stockOptionL = Stock(productOption = optionL, quantity = 10).apply { id = 3L }
+        val stockOptionM = Stock.create(productOption = optionM, quantity = 10).apply { id = 2L }
+        val stockOptionL = Stock.create(productOption = optionL, quantity = 10).apply { id = 3L }
 
         every { stockRepository.findByProductOptionId(optionM.id!!) } returns stockOptionM
         every { stockRepository.findByProductOptionId(optionL.id!!) } returns stockOptionL

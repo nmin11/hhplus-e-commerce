@@ -32,10 +32,10 @@ class OrderControllerTest {
         )
 
         val customer = Customer.create("tester").apply { id = 1L }
-        val product1 = Product("청바지", 39000).apply { id = 1L }
-        val product2 = Product("후드티", 29000).apply { id = 2L }
-        val option1 = ProductOption(product1, "M", 1000).apply { id = 2L }
-        val option2 = ProductOption(product2, "L", 2000).apply { id = 3L }
+        val product1 = Product.create("청바지", 39000).apply { id = 1L }
+        val product2 = Product.create("후드티", 29000).apply { id = 2L }
+        val option1 = ProductOption.create(product1, "M", 1000).apply { id = 2L }
+        val option2 = ProductOption.create(product2, "L", 2000).apply { id = 3L }
 
         val order = Order.create(customer).apply {
             id = 1L

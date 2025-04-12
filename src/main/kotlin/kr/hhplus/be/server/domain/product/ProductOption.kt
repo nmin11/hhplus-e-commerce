@@ -3,16 +3,25 @@ package kr.hhplus.be.server.domain.product
 import kr.hhplus.be.server.domain.order.OrderItem
 import java.time.LocalDateTime
 
-class ProductOption(
+class ProductOption private constructor(
     val product: Product,
-    var optionName: String,
-    var extraPrice: Int
+    val optionName: String,
+    val extraPrice: Int
 ) {
     var id: Long? = null
     val createdAt: LocalDateTime = LocalDateTime.now()
     var updatedAt: LocalDateTime = LocalDateTime.now()
     var stock: Stock? = null
-    var orderItems: MutableList<OrderItem> = mutableListOf()
+    val orderItems: MutableList<OrderItem> = mutableListOf()
+
+    companion object {
+        fun create(product: Product, optionName: String, extraPrice: Int): ProductOption {
+            require(optionName.isNotBlank()) { "옵션 이름은 공백일 수 없습니다." }
+            require(extraPrice >= 0) { "추가 가격은 0 이상이어야 합니다." }
+
+            return ProductOption(product, optionName, extraPrice)
+        }
+    }
 
     fun requireSavedId(): Long =
         id ?: throw IllegalStateException("ProductOption 객체가 저장되지 않았습니다.")
