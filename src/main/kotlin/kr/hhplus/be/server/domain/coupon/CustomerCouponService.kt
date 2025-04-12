@@ -33,7 +33,7 @@ class CustomerCouponService(
     }
 
     fun issue(customer: Customer, coupon: Coupon): CustomerCoupon {
-        val customerCoupon = CustomerCoupon(customer, coupon)
+        val customerCoupon = CustomerCoupon.issue(customer, coupon)
         return customerCouponRepository.save(customerCoupon)
     }
 

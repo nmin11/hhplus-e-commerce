@@ -24,17 +24,15 @@ class CouponControllerTest {
         // given
         val request = CouponRequest.Issue(couponId = 1L, customerId = 1L)
         val customer = Customer("tester").apply { id = 1L }
-        val coupon = Coupon(
+        val coupon = Coupon.createFixedDiscount(
             name = "첫 구매 할인",
-            discountType = DiscountType.FIXED,
             discountAmount = 3000,
-            currentQuantity = 100,
-            totalQuantity = 100,
+            quantity = 100,
             startedAt = LocalDate.now().minusDays(1),
             expiredAt = LocalDate.now().plusDays(10)
         ).apply { id = 1L }
 
-        val customerCoupon = CustomerCoupon(customer, coupon).apply {
+        val customerCoupon = CustomerCoupon.issue(customer, coupon).apply {
             id = 10L
             status = CustomerCouponStatus.AVAILABLE
         }
@@ -56,31 +54,27 @@ class CouponControllerTest {
     fun getCustomerCoupons_shouldReturnOwnedCoupons() {
         // given
         val customer = Customer("tester").apply { id = 1L }
-        val coupon1 = Coupon(
+        val coupon1 = Coupon.createFixedDiscount(
             name = "첫 구매 할인",
-            discountType = DiscountType.FIXED,
             discountAmount = 3000,
-            currentQuantity = 10,
-            totalQuantity = 100,
+            quantity = 100,
             startedAt = LocalDate.now().minusDays(5),
             expiredAt = LocalDate.now().plusDays(5)
         ).apply { id = 1L }
-        val coupon2 = Coupon(
+        val coupon2 = Coupon.createRateDiscount(
             name = "봄맞이 프로모션",
-            discountType = DiscountType.RATE,
-            discountAmount = 10,
-            currentQuantity = 20,
-            totalQuantity = 100,
+            discountRate = 10,
+            quantity = 100,
             startedAt = LocalDate.now().minusDays(15),
             expiredAt = LocalDate.now().plusDays(3)
         ).apply { id = 2L }
 
         val customerCoupons = listOf(
-            CustomerCoupon(customer, coupon1).apply {
+            CustomerCoupon.issue(customer, coupon1).apply {
                 id = 1L
                 status = CustomerCouponStatus.AVAILABLE
             },
-            CustomerCoupon(customer, coupon2).apply {
+            CustomerCoupon.issue(customer, coupon2).apply {
                 id = 2L
                 status = CustomerCouponStatus.USED
             }

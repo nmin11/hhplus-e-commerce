@@ -175,12 +175,10 @@ class ApiE2ETest {
             payment
         }
 
-        val coupon = Coupon(
+        val coupon = Coupon.createFixedDiscount(
             name = "5천원 할인 쿠폰",
-            discountType = DiscountType.FIXED,
             discountAmount = 5000,
-            currentQuantity = 100,
-            totalQuantity = 100,
+            quantity = 100,
             startedAt = LocalDate.now().minusDays(1),
             expiredAt = LocalDate.now().plusDays(1)
         ).apply { id = 1L }
@@ -193,32 +191,28 @@ class ApiE2ETest {
 
         every { customerCouponRepository.save(any()) } answers { firstArg() }
 
-        val coupon1 = Coupon(
+        val coupon1 = Coupon.createFixedDiscount(
             name = "첫 구매 할인",
-            discountType = DiscountType.FIXED,
             discountAmount = 3000,
-            currentQuantity = 100,
-            totalQuantity = 100,
+            quantity = 100,
             startedAt = LocalDate.parse("2025-04-01"),
             expiredAt = LocalDate.parse("2025-04-30")
         ).apply { id = 1L }
 
-        val coupon2 = Coupon(
+        val coupon2 = Coupon.createRateDiscount(
             name = "봄맞이 프로모션",
-            discountType = DiscountType.RATE,
-            discountAmount = 10,
-            currentQuantity = 50,
-            totalQuantity = 50,
+            discountRate = 10,
+            quantity = 50,
             startedAt = LocalDate.parse("2025-03-15"),
             expiredAt = LocalDate.parse("2025-04-10")
         ).apply { id = 2L }
 
-        val customerCoupon1 = CustomerCoupon(customer, coupon1).apply {
+        val customerCoupon1 = CustomerCoupon.issue(customer, coupon1).apply {
             id = 1L
             status = CustomerCouponStatus.AVAILABLE
         }
 
-        val customerCoupon2 = CustomerCoupon(customer, coupon2).apply {
+        val customerCoupon2 = CustomerCoupon.issue(customer, coupon2).apply {
             id = 2L
             status = CustomerCouponStatus.USED
         }

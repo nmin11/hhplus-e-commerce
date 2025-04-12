@@ -23,12 +23,10 @@ class CouponServiceTest {
         fun returnCoupon_whenExists() {
             // given
             val couponId = 1L
-            val expectedCoupon = Coupon(
+            val expectedCoupon = Coupon.createFixedDiscount(
                 name = "할인쿠폰",
-                discountType = DiscountType.FIXED,
                 discountAmount = 1000,
-                currentQuantity = 10,
-                totalQuantity = 100,
+                quantity = 100,
                 startedAt = LocalDate.now().minusDays(1),
                 expiredAt = LocalDate.now().plusDays(1)
             ).apply { id = couponId }
@@ -67,12 +65,10 @@ class CouponServiceTest {
         @DisplayName("정액 할인 쿠폰일 경우 할인 금액 반환")
         fun returnFixedDiscountAmount_whenCouponIsFixed() {
             // given
-            val coupon = Coupon(
+            val coupon = Coupon.createFixedDiscount(
                 name = "5천원 할인",
-                discountType = DiscountType.FIXED,
                 discountAmount = 5000,
-                currentQuantity = 10,
-                totalQuantity = 100,
+                quantity = 100,
                 startedAt = now.minusDays(1),
                 expiredAt = now.plusDays(1)
             )
@@ -88,12 +84,10 @@ class CouponServiceTest {
         @DisplayName("퍼센트 할인 쿠폰일 경우 비율에 따른 할인 금액 반환")
         fun returnRateDiscountAmount_whenCouponIsRate() {
             // given
-            val coupon = Coupon(
+            val coupon = Coupon.createRateDiscount(
                 name = "10% 할인",
-                discountType = DiscountType.RATE,
-                discountAmount = 10,
-                currentQuantity = 10,
-                totalQuantity = 100,
+                discountRate = 10,
+                quantity = 100,
                 startedAt = now.minusDays(1),
                 expiredAt = now.plusDays(1)
             )
@@ -109,12 +103,10 @@ class CouponServiceTest {
         @DisplayName("유효기간이 지난 쿠폰일 경우 예외 발생")
         fun throwException_whenCouponIsExpired() {
             // given
-            val coupon = Coupon(
+            val coupon = Coupon.createFixedDiscount(
                 name = "만료된 쿠폰",
-                discountType = DiscountType.FIXED,
                 discountAmount = 3000,
-                currentQuantity = 10,
-                totalQuantity = 100,
+                quantity = 100,
                 startedAt = now.minusDays(10),
                 expiredAt = now.minusDays(1)
             )
@@ -132,12 +124,10 @@ class CouponServiceTest {
         @DisplayName("시작일이 아직 안 된 쿠폰일 경우 예외 발생")
         fun throwException_whenCouponNotYetStarted() {
             // given
-            val coupon = Coupon(
+            val coupon = Coupon.createFixedDiscount(
                 name = "예약된 쿠폰",
-                discountType = DiscountType.FIXED,
                 discountAmount = 3000,
-                currentQuantity = 10,
-                totalQuantity = 100,
+                quantity = 100,
                 startedAt = now.plusDays(1),
                 expiredAt = now.plusDays(10)
             )
@@ -158,15 +148,15 @@ class CouponServiceTest {
         @DisplayName("쿠폰 수량이 남아 있을 경우 쿠폰 수량 1 감소")
         fun whenQuantityIsSufficient() {
             // given
-            val coupon = Coupon(
+            val coupon = Coupon.createFixedDiscount(
                 name = "테스트쿠폰",
-                discountType = DiscountType.FIXED,
                 discountAmount = 3000,
-                currentQuantity = 5,
-                totalQuantity = 10,
+                quantity = 10,
                 startedAt = LocalDate.now().minusDays(1),
                 expiredAt = LocalDate.now().plusDays(1)
-            )
+            ).apply {
+                currentQuantity = 5
+            }
 
             every { couponRepository.save(coupon) } returns coupon
 
@@ -182,15 +172,15 @@ class CouponServiceTest {
         @DisplayName("쿠폰 수량이 0일 경우 예외 발생")
         fun throwException_whenQuantityIsZero() {
             // given
-            val coupon = Coupon(
+            val coupon = Coupon.createFixedDiscount(
                 name = "소진쿠폰",
-                discountType = DiscountType.FIXED,
                 discountAmount = 3000,
-                currentQuantity = 0,
-                totalQuantity = 10,
+                quantity = 10,
                 startedAt = LocalDate.now().minusDays(1),
                 expiredAt = LocalDate.now().plusDays(1)
-            )
+            ).apply {
+                currentQuantity = 0
+            }
 
             // when
             val exception = assertThrows<IllegalStateException> {
@@ -212,21 +202,17 @@ class CouponServiceTest {
             // given
             val today = LocalDate.of(2025, 4, 11)
             val expiredCoupons = listOf(
-                Coupon(
+                Coupon.createFixedDiscount(
                     name = "첫 구매 할인",
-                    discountType = DiscountType.FIXED,
                     discountAmount = 1000,
-                    currentQuantity = 10,
-                    totalQuantity = 100,
+                    quantity = 100,
                     startedAt = today.minusDays(10),
                     expiredAt = today.minusDays(1)
                 ).apply { id = 1L },
-                Coupon(
+                Coupon.createRateDiscount(
                     name = "봄맞이 할인",
-                    discountType = DiscountType.RATE,
-                    discountAmount = 20,
-                    currentQuantity = 5,
-                    totalQuantity = 50,
+                    discountRate = 20,
+                    quantity = 50,
                     startedAt = today.minusDays(30),
                     expiredAt = today.minusDays(5)
                 ).apply { id = 2L }
