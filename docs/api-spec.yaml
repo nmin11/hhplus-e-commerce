@@ -10,7 +10,7 @@ tags:
   - name: Coupons
   - name: Payments
 paths:
-  /customers/{id}/balance:
+  /balances/{customerId}:
     get:
       summary: 사용자 잔액 조회
       deprecated: false
@@ -18,7 +18,7 @@ paths:
       tags:
         - Balance
       parameters:
-        - name: id
+        - name: customerId
           in: path
           description: 사용자 ID
           required: true
@@ -47,33 +47,31 @@ paths:
                 amount: 10000
           headers: {}
       security: []
-  /customers/{id}/balance/charge:
+  /balances/charge:
     patch:
       summary: 사용자 잔액 충전
       deprecated: false
       description: ''
       tags:
         - Balance
-      parameters:
-        - name: id
-          in: path
-          description: 사용자 ID
-          required: true
-          example: '1'
-          schema:
-            type: string
+      parameters: []
       requestBody:
         content:
           application/json:
             schema:
               type: object
               properties:
+                custoemrId:
+                  type: integer
+                  description: 사용자 ID
                 amount:
                   type: integer
                   description: 충전할 금액
               required:
                 - amount
+                - custoemrId
             example:
+              customerId: 1
               amount: 50000
       responses:
         '200':
@@ -97,7 +95,7 @@ paths:
                 amount: 150000
           headers: {}
       security: []
-  /customers/{id}/balance-histories:
+  /balances/{customerId}/balance-histories:
     get:
       summary: 사용자 잔액 변경 내역 조회
       deprecated: false
@@ -105,7 +103,7 @@ paths:
       tags:
         - Balance
       parameters:
-        - name: id
+        - name: customerId
           in: path
           description: 사용자 ID
           required: true
@@ -507,7 +505,7 @@ paths:
                 issuedAt: '2025-04-02T15:00:00Z'
           headers: {}
       security: []
-  /customers/{id}/coupons:
+  /coupons/customer/{customerId}:
     get:
       summary: 사용자 보유 쿠폰 조회
       deprecated: false
@@ -515,10 +513,11 @@ paths:
       tags:
         - Coupons
       parameters:
-        - name: id
+        - name: customerId
           in: path
-          description: 고객 ID
+          description: 사용자 ID
           required: true
+          example: '1'
           schema:
             type: string
       responses:
