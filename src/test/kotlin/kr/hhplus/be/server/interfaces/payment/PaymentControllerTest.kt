@@ -29,7 +29,7 @@ class PaymentControllerTest {
             totalPrice = 87000
         }
 
-        val payment = Payment(
+        val payment = Payment.create(
             order = order,
             customer = customer,
             coupon = null,

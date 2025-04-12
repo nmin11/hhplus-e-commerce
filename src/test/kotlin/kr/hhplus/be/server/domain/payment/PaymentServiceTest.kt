@@ -22,7 +22,7 @@ class PaymentServiceTest {
             id = 1L
             totalPrice = 50_000
         }
-        val payment = Payment(
+        val payment = Payment.create(
             order = order,
             customer = customer,
             coupon = null,

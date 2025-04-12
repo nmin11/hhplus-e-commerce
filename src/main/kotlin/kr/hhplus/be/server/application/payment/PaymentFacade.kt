@@ -66,7 +66,7 @@ class PaymentFacade(
         balanceHistoryService.create(history)
 
         // 7. 결제 정보 저장
-        val payment = Payment(
+        val payment = Payment.create(
             order = order,
             customer = order.customer,
             coupon = command.couponId?.let { couponService.getById(it) },
