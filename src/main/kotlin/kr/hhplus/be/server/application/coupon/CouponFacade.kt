@@ -1,7 +1,6 @@
 package kr.hhplus.be.server.application.coupon
 
 import kr.hhplus.be.server.domain.coupon.CouponService
-import kr.hhplus.be.server.domain.coupon.CustomerCoupon
 import kr.hhplus.be.server.domain.coupon.CustomerCouponService
 import kr.hhplus.be.server.domain.customer.CustomerService
 import org.springframework.stereotype.Component

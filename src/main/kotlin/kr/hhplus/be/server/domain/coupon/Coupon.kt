@@ -5,56 +5,76 @@ import java.time.LocalDateTime
 
 class Coupon private constructor(
     val name: String,
-    val discountType: DiscountType,
-    val discountAmount: Int,
-    var currentQuantity: Int,
-    val totalQuantity: Int,
+    val quantity: Int,
     val startedAt: LocalDate,
-    val expiredAt: LocalDate
+    val expiredAt: LocalDate,
+    val discountPolicy: DiscountPolicy
 ) {
     var id: Long? = null
+    var currentQuantity: Int = quantity
+    val totalQuantity: Int = quantity
     val createdAt: LocalDateTime = LocalDateTime.now()
-    var updatedAt: LocalDateTime = LocalDateTime.now()
+    private var updatedAt: LocalDateTime = LocalDateTime.now()
     val customerCoupons: MutableList<CustomerCoupon> = mutableListOf()
 
     companion object {
         fun createFixedDiscount(
             name: String,
-            discountAmount: Int,
+            amount: Int,
             quantity: Int,
             startedAt: LocalDate,
             expiredAt: LocalDate
         ): Coupon {
             return Coupon(
                 name = name,
-                discountType = DiscountType.FIXED,
-                discountAmount = discountAmount,
-                currentQuantity = quantity,
-                totalQuantity = quantity,
+                quantity = quantity,
                 startedAt = startedAt,
-                expiredAt = expiredAt
+                expiredAt = expiredAt,
+                discountPolicy = FixedDiscountPolicy(amount)
             )
         }
 
         fun createRateDiscount(
             name: String,
-            discountRate: Int,
+            rate: Int,
             quantity: Int,
             startedAt: LocalDate,
             expiredAt: LocalDate
         ): Coupon {
             return Coupon(
                 name = name,
-                discountType = DiscountType.RATE,
-                discountAmount = discountRate,
-                currentQuantity = quantity,
-                totalQuantity = quantity,
+                quantity = quantity,
                 startedAt = startedAt,
-                expiredAt = expiredAt
+                expiredAt = expiredAt,
+                discountPolicy = RateDiscountPolicy(rate)
             )
+        }
+    }
+
+    fun decreaseQuantity() {
+        if (currentQuantity <= 0) {
+            throw IllegalStateException("쿠폰 수량이 모두 소진되었습니다.")
+        }
+
+        currentQuantity -= 1
+        updatedAt = LocalDateTime.now()
+    }
+
+    fun calculateDiscount(totalPrice: Int): Int {
+        val now = LocalDate.now()
+        if (now.isBefore(startedAt) || now.isAfter(expiredAt)) {
+            throw IllegalStateException("유효하지 않은 쿠폰입니다.")
+        }
+        return discountPolicy.calculateDiscount(totalPrice)
+    }
+
+    fun validatePeriod(now: LocalDate = LocalDate.now()) {
+        if (now.isBefore(startedAt) || now.isAfter(expiredAt)) {
+            throw IllegalStateException("유효하지 않은 쿠폰입니다.")
         }
     }
 
     fun requireSavedId(): Long =
         id ?: throw IllegalStateException("Coupon 객체가 저장되지 않았습니다.")
+
 }

@@ -177,7 +177,7 @@ class ApiE2ETest {
 
         val coupon = Coupon.createFixedDiscount(
             name = "5천원 할인 쿠폰",
-            discountAmount = 5000,
+            amount = 5000,
             quantity = 100,
             startedAt = LocalDate.now().minusDays(1),
             expiredAt = LocalDate.now().plusDays(1)
@@ -193,7 +193,7 @@ class ApiE2ETest {
 
         val coupon1 = Coupon.createFixedDiscount(
             name = "첫 구매 할인",
-            discountAmount = 3000,
+            amount = 3000,
             quantity = 100,
             startedAt = LocalDate.parse("2025-04-01"),
             expiredAt = LocalDate.parse("2025-04-30")
@@ -201,7 +201,7 @@ class ApiE2ETest {
 
         val coupon2 = Coupon.createRateDiscount(
             name = "봄맞이 프로모션",
-            discountRate = 10,
+            rate = 10,
             quantity = 50,
             startedAt = LocalDate.parse("2025-03-15"),
             expiredAt = LocalDate.parse("2025-04-10")

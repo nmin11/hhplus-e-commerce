@@ -2,6 +2,7 @@ package kr.hhplus.be.server.interfaces.coupon
 
 import kr.hhplus.be.server.application.coupon.CouponCommand
 import kr.hhplus.be.server.application.coupon.CouponFacade
+import kr.hhplus.be.server.application.coupon.CustomerCouponResult
 import kr.hhplus.be.server.domain.coupon.CustomerCouponService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RequestBody
@@ -21,7 +22,8 @@ class CouponController(
 
     override fun getCustomerCoupons(customerId: Long): ResponseEntity<List<CouponResponse.Owned>> {
         val customerCoupons = customerCouponService.getAllByCustomerId(customerId)
-        val response = customerCoupons.map { CouponResponse.Owned.from(it) }
+        val result = customerCoupons.map { CustomerCouponResult.from(it) }
+        val response = result.map { CouponResponse.Owned.from(it) }
         return ResponseEntity.ok(response)
     }
 }

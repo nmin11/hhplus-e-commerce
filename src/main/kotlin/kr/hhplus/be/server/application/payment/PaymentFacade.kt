@@ -46,7 +46,7 @@ class PaymentFacade(
             val customerCoupon = customerCouponService.validateIssuedCoupon(customerId, it)
             val coupon = customerCoupon.coupon
 
-            couponService.calculateDiscount(coupon, order.totalPrice)
+            coupon.calculateDiscount(order.totalPrice)
         } ?: 0
 
         // 4. 결제 금액 계산

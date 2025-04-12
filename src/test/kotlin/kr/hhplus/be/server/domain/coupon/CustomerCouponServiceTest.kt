@@ -26,7 +26,7 @@ class CustomerCouponServiceTest {
 
             val coupon1 = Coupon.createFixedDiscount(
                 name = "5천원 할인",
-                discountAmount = 5000,
+                amount = 5000,
                 quantity = 100,
                 startedAt = LocalDate.now().minusDays(1),
                 expiredAt = LocalDate.now().plusDays(5)
@@ -34,7 +34,7 @@ class CustomerCouponServiceTest {
 
             val coupon2 = Coupon.createFixedDiscount(
                 name = "1만원 할인",
-                discountAmount = 10000,
+                amount = 10000,
                 quantity = 50,
                 startedAt = LocalDate.now().minusDays(2),
                 expiredAt = LocalDate.now().plusDays(3)
@@ -68,7 +68,7 @@ class CustomerCouponServiceTest {
             val customer = Customer.create("tester").apply { id = customerId }
             val coupon = Coupon.createFixedDiscount(
                 name = "정상 쿠폰",
-                discountAmount = 1000,
+                amount = 1000,
                 quantity = 100,
                 startedAt = LocalDate.now().minusDays(1),
                 expiredAt = LocalDate.now().plusDays(1)
@@ -104,7 +104,7 @@ class CustomerCouponServiceTest {
             val customer = Customer.create("tester").apply { id = customerId }
             val coupon = Coupon.createFixedDiscount(
                 name = "사용된 쿠폰",
-                discountAmount = 1000,
+                amount = 1000,
                 quantity = 100,
                 startedAt = LocalDate.now().minusDays(3),
                 expiredAt = LocalDate.now().plusDays(2)
@@ -128,7 +128,7 @@ class CustomerCouponServiceTest {
             val customer = Customer.create("tester").apply { id = customerId }
             val coupon = Coupon.createFixedDiscount(
                 name = "만료 쿠폰",
-                discountAmount = 1000,
+                amount = 1000,
                 quantity = 100,
                 startedAt = LocalDate.now().minusDays(10),
                 expiredAt = LocalDate.now().minusDays(1)
@@ -169,7 +169,7 @@ class CustomerCouponServiceTest {
             val customer = Customer.create("tester").apply { id = customerId }
             val coupon = Coupon.createFixedDiscount(
                 name = "할인쿠폰",
-                discountAmount = 3000,
+                amount = 3000,
                 quantity = 100,
                 startedAt = LocalDate.now().minusDays(1),
                 expiredAt = LocalDate.now().plusDays(1)
@@ -199,7 +199,7 @@ class CustomerCouponServiceTest {
             val customer = Customer.create("tester").apply { id = 1L }
             val coupon = Coupon.createFixedDiscount(
                 name = "웰컴쿠폰",
-                discountAmount = 1000,
+                amount = 1000,
                 quantity = 100,
                 startedAt = LocalDate.now().minusDays(1),
                 expiredAt = LocalDate.now().plusDays(1)
@@ -227,7 +227,7 @@ class CustomerCouponServiceTest {
             // given
             val coupon = Coupon.createFixedDiscount(
                 name = "할인 가능 쿠폰",
-                discountAmount = 1000,
+                amount = 1000,
                 quantity = 100,
                 startedAt = LocalDate.now().minusDays(10),
                 expiredAt = LocalDate.now().minusDays(1)
@@ -256,7 +256,7 @@ class CustomerCouponServiceTest {
             // given
             val coupon = Coupon.createFixedDiscount(
                 name = "이전에 사용한 쿠폰",
-                discountAmount = 1000,
+                amount = 1000,
                 quantity = 100,
                 startedAt = LocalDate.now().minusDays(10),
                 expiredAt = LocalDate.now().minusDays(1)

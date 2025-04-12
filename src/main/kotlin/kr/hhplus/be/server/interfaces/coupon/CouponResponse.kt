@@ -1,7 +1,7 @@
 package kr.hhplus.be.server.interfaces.coupon
 
 import kr.hhplus.be.server.application.coupon.CouponResult
-import kr.hhplus.be.server.domain.coupon.CustomerCoupon
+import kr.hhplus.be.server.application.coupon.CustomerCouponResult
 
 sealed class CouponResponse {
     data class Issue(
@@ -31,15 +31,14 @@ sealed class CouponResponse {
         val expiredAt: String
     ) {
         companion object {
-            fun from(customerCoupon: CustomerCoupon): Owned {
-                val coupon = customerCoupon.coupon
+            fun from(result: CustomerCouponResult): Owned {
                 return Owned(
-                    name = coupon.name,
-                    discountType = coupon.discountType.name,
-                    discountAmount = coupon.discountAmount,
-                    status = customerCoupon.status.name,
-                    issuedAt = customerCoupon.issuedAt.toString(),
-                    expiredAt = coupon.expiredAt.toString()
+                    name = result.name,
+                    discountType = result.discountType,
+                    discountAmount = result.discountAmount,
+                    status = result.status.name,
+                    issuedAt = result.issuedAt,
+                    expiredAt = result.expiredAt
                 )
             }
         }

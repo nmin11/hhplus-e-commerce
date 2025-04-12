@@ -5,6 +5,7 @@ import io.mockk.mockk
 import kr.hhplus.be.server.application.coupon.CouponCommand
 import kr.hhplus.be.server.application.coupon.CouponFacade
 import kr.hhplus.be.server.application.coupon.CouponResult
+import kr.hhplus.be.server.application.coupon.CustomerCouponResult
 import kr.hhplus.be.server.domain.coupon.*
 import kr.hhplus.be.server.domain.customer.Customer
 import org.assertj.core.api.Assertions.assertThat
@@ -26,7 +27,7 @@ class CouponControllerTest {
         val customer = Customer.create("tester").apply { id = 1L }
         val coupon = Coupon.createFixedDiscount(
             name = "첫 구매 할인",
-            discountAmount = 3000,
+            amount = 3000,
             quantity = 100,
             startedAt = LocalDate.now().minusDays(1),
             expiredAt = LocalDate.now().plusDays(10)
@@ -56,14 +57,14 @@ class CouponControllerTest {
         val customer = Customer.create("tester").apply { id = 1L }
         val coupon1 = Coupon.createFixedDiscount(
             name = "첫 구매 할인",
-            discountAmount = 3000,
+            amount = 3000,
             quantity = 100,
             startedAt = LocalDate.now().minusDays(5),
             expiredAt = LocalDate.now().plusDays(5)
         ).apply { id = 1L }
         val coupon2 = Coupon.createRateDiscount(
             name = "봄맞이 프로모션",
-            discountRate = 10,
+            rate = 10,
             quantity = 100,
             startedAt = LocalDate.now().minusDays(15),
             expiredAt = LocalDate.now().plusDays(3)
@@ -80,6 +81,8 @@ class CouponControllerTest {
             }
         )
 
+        val result = customerCoupons.map { CustomerCouponResult.from(it) }
+
         every { customerCouponService.getAllByCustomerId(1L) } returns customerCoupons
 
         // when
@@ -87,6 +90,6 @@ class CouponControllerTest {
 
         // then
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat(response.body).isEqualTo(customerCoupons.map { CouponResponse.Owned.from(it) })
+        assertThat(response.body).isEqualTo(result.map { CouponResponse.Owned.from(it) })
     }
 }
