@@ -79,14 +79,13 @@ class ApiE2ETest {
 
         every { customerRepository.findById(1L) } returns customer
 
-        val balance = Balance(customer = customer, amount = 150000).apply { id = 1L }
+        val balance = Balance.create(customer = customer, amount = 150000).apply { id = 1L }
         every { balanceRepository.findByCustomerId(1L) } returns balance
 
-        val history = BalanceHistory(
+        val history = BalanceHistory.charge(
             customer = customer,
-            changeType = BalanceChangeType.CHARGE,
-            changeAmount = 1000,
-            totalAmount = 6000
+            amount = 1000,
+            updatedAmount = 6000
         ).apply { id = 1L }
 
         every { balanceHistoryRepository.findAllByCustomerId(1L) } returns listOf(history)

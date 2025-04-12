@@ -18,11 +18,10 @@ class BalanceHistoryServiceTest {
     @DisplayName("잔액 변경 내역을 저장하고 반환")
     fun create_shouldSaveAndReturnBalanceHistory() {
         // given
-        val history = BalanceHistory(
+        val history = BalanceHistory.charge(
             customer = customer,
-            changeType = BalanceChangeType.CHARGE,
-            changeAmount = 50_000,
-            totalAmount = 150_000
+            amount = 50_000,
+            updatedAmount = 150_000
         )
         every { balanceHistoryRepository.save(history) } returns history
 
@@ -40,8 +39,16 @@ class BalanceHistoryServiceTest {
         // given
         val customerId = 1L
         val histories = listOf(
-            BalanceHistory(customer = customer, changeType = BalanceChangeType.CHARGE, changeAmount = 50_000, totalAmount = 150_000),
-            BalanceHistory(customer = customer, changeType = BalanceChangeType.USE, changeAmount = 75_000, totalAmount = 75_000)
+            BalanceHistory.charge(
+                customer,
+                amount = 50_000,
+                updatedAmount = 150_000
+            ),
+            BalanceHistory.use(
+                customer,
+                amount = 75_000,
+                updatedAmount = 75_000
+            )
         )
         every { balanceHistoryRepository.findAllByCustomerId(customerId) } returns histories
 

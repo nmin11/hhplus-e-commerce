@@ -58,11 +58,10 @@ class PaymentFacade(
         val balance = balanceService.deduct(customerId, discountedPrice)
 
         // 6. 잔액 변경 내역 저장
-        val history = BalanceHistory(
+        val history = BalanceHistory.use(
             customer = order.customer,
-            changeType = BalanceChangeType.USE,
-            changeAmount = discountedPrice,
-            totalAmount = balance.amount
+            amount = discountedPrice,
+            updatedAmount = balance.amount
         )
         balanceHistoryService.create(history)
 

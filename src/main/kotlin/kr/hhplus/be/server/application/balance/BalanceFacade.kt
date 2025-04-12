@@ -32,14 +32,12 @@ class BalanceFacade(
         val updatedBalance = balanceService.charge(command.customerId, command.amount)
 
         // 3. 충전 내역 저장
-        balanceHistoryService.create(
-            BalanceHistory(
-                customer,
-                changeType = BalanceChangeType.CHARGE,
-                changeAmount = command.amount,
-                totalAmount = updatedBalance.amount
-            )
+        val history = BalanceHistory.charge(
+            customer = customer,
+            amount = command.amount,
+            updatedAmount = updatedBalance.amount
         )
+        balanceHistoryService.create(history)
 
         return BalanceResult.Summary.from(updatedBalance)
     }

@@ -19,7 +19,7 @@ class BalanceServiceTest {
         fun whenExists_thenReturnBalance() {
             // given
             val customer = Customer(username = "tester").apply { id = 1L }
-            val expectedBalance = Balance(customer, amount = 100_000)
+            val expectedBalance = Balance.create(customer, amount = 100_000)
             every { balanceRepository.findByCustomerId(customerId) } returns expectedBalance
 
             // when
@@ -54,7 +54,7 @@ class BalanceServiceTest {
         fun shouldAddAmountToBalance() {
             // given
             val customer = Customer(username = "tester").apply { id = 1L }
-            val balance = Balance(customer, amount = 100_000)
+            val balance = Balance.create(customer, amount = 100_000)
             every { balanceRepository.findByCustomerId(1L) } returns balance
             every { balanceRepository.save(any()) } answers { firstArg() }
 
@@ -112,7 +112,7 @@ class BalanceServiceTest {
         fun whenAmountIsSufficient_thenDeductBalance() {
             // given
             val customer = Customer(username = "tester").apply { id = 1L }
-            val balance = Balance(customer, amount = 100_000)
+            val balance = Balance.create(customer, amount = 100_000)
             every { balanceRepository.findByCustomerId(customerId) } returns balance
             every { balanceRepository.save(any()) } answers { firstArg() }
 
@@ -162,7 +162,7 @@ class BalanceServiceTest {
         fun whenAmountExceedsBalance_thenThrowException() {
             // given
             val customer = Customer(username = "tester").apply { id = 1L }
-            val balance = Balance(customer, amount = 20_000)
+            val balance = Balance.create(customer, amount = 20_000)
             every { balanceRepository.findByCustomerId(customerId) } returns balance
 
             // when

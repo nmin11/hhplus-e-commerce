@@ -6,7 +6,6 @@ import kr.hhplus.be.server.application.balance.BalanceCommand
 import kr.hhplus.be.server.application.balance.BalanceFacade
 import kr.hhplus.be.server.application.balance.BalanceResult
 import kr.hhplus.be.server.domain.balance.Balance
-import kr.hhplus.be.server.domain.balance.BalanceChangeType
 import kr.hhplus.be.server.domain.balance.BalanceHistory
 import kr.hhplus.be.server.domain.customer.Customer
 import org.assertj.core.api.Assertions.assertThat
@@ -24,7 +23,7 @@ class BalanceControllerTest {
         // given
         val customerId = 1L
         val customer = Customer(username = "tester").apply { id = customerId }
-        val balance = Balance(customer, amount = 100_000).apply { id = 1L }
+        val balance = Balance.create(customer, amount = 100_000).apply { id = 1L }
         val result = BalanceResult.Summary.from(balance)
         every { balanceFacade.getBalance(customerId) } returns result
 
@@ -42,11 +41,10 @@ class BalanceControllerTest {
         // given
         val customerId = 1L
         val histories = listOf(
-            BalanceHistory(
+            BalanceHistory.charge(
                 customer = Customer("tester").apply { id = customerId },
-                changeType = BalanceChangeType.CHARGE,
-                changeAmount = 10_000,
-                totalAmount = 110_000
+                amount = 10_000,
+                updatedAmount = 110_000
             ).apply { id = 1L }
         )
         val results = histories.map { BalanceResult.History.from(it) }
@@ -67,7 +65,7 @@ class BalanceControllerTest {
         val customerId = 1L
         val customer = Customer(username = "tester").apply { id = customerId }
         val request = BalanceRequest.Charge(customerId, amount = 50_000)
-        val updatedBalance = Balance(customer, amount = 150_000).apply { id = 1L }
+        val updatedBalance = Balance.create(customer, amount = 150_000).apply { id = 1L }
         val result = BalanceResult.Summary.from(updatedBalance)
         every { balanceFacade.charge(BalanceCommand.Charge.from(request)) } returns result
 
