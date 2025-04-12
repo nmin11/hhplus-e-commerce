@@ -7,17 +7,23 @@ import kr.hhplus.be.server.domain.order.Order
 import kr.hhplus.be.server.domain.payment.Payment
 import java.time.LocalDateTime
 
-class Customer(
-    var username: String,
+class Customer private constructor(
+    val username: String,
 ) {
     var id: Long? = null
     val createdAt: LocalDateTime = LocalDateTime.now()
     var updatedAt: LocalDateTime = LocalDateTime.now()
     var balance: Balance? = null
-    var balanceHistories: MutableList<BalanceHistory> = mutableListOf()
-    var customerCoupons: MutableList<CustomerCoupon> = mutableListOf()
-    var orders: MutableList<Order> = mutableListOf()
-    var payments: MutableList<Payment> = mutableListOf()
+    val balanceHistories: MutableList<BalanceHistory> = mutableListOf()
+    val customerCoupons: MutableList<CustomerCoupon> = mutableListOf()
+    val orders: MutableList<Order> = mutableListOf()
+    val payments: MutableList<Payment> = mutableListOf()
+
+    companion object {
+        fun create(username: String): Customer {
+            return Customer(username)
+        }
+    }
 
     fun requireSavedId(): Long =
         id ?: throw IllegalStateException("Customer 객체가 저장되지 않았습니다.")

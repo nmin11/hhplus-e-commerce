@@ -23,7 +23,7 @@ class CouponControllerTest {
     fun issue_shouldReturnIssuedCouponResponse() {
         // given
         val request = CouponRequest.Issue(couponId = 1L, customerId = 1L)
-        val customer = Customer("tester").apply { id = 1L }
+        val customer = Customer.create("tester").apply { id = 1L }
         val coupon = Coupon.createFixedDiscount(
             name = "첫 구매 할인",
             discountAmount = 3000,
@@ -53,7 +53,7 @@ class CouponControllerTest {
     @DisplayName("사용자 쿠폰 목록 조회 시 보유 쿠폰 리스트 반환")
     fun getCustomerCoupons_shouldReturnOwnedCoupons() {
         // given
-        val customer = Customer("tester").apply { id = 1L }
+        val customer = Customer.create("tester").apply { id = 1L }
         val coupon1 = Coupon.createFixedDiscount(
             name = "첫 구매 할인",
             discountAmount = 3000,

@@ -17,7 +17,7 @@ class PaymentServiceTest {
     @DisplayName("결제를 저장하고 반환")
     fun create_shouldSaveAndReturnPayment() {
         // given
-        val customer = Customer(username = "tester").apply { id = 1L }
+        val customer = Customer.create(username = "tester").apply { id = 1L }
         val order = Order.create(customer).apply {
             id = 1L
             totalPrice = 50_000

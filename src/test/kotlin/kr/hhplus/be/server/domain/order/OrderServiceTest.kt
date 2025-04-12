@@ -20,7 +20,7 @@ class OrderServiceTest {
         @DisplayName("주문을 저장하고 반환")
         fun shouldSaveAndReturnOrder() {
             // given
-            val customer = Customer("tester").apply { id = 1L }
+            val customer = Customer.create("tester").apply { id = 1L }
             val order = Order.create(
                 customer = customer
             ).apply {
@@ -47,7 +47,7 @@ class OrderServiceTest {
         @DisplayName("ID로 주문을 조회하여 반환")
         fun returnOrder_whenExists() {
             // given
-            val customer = Customer("tester").apply { id = 1L }
+            val customer = Customer.create("tester").apply { id = 1L }
             val expectedOrder = Order.create(customer = customer).apply {
                 id = orderId
                 totalPrice = 50000
@@ -88,7 +88,7 @@ class OrderServiceTest {
         fun returnOrder_whenStatusIsCreated() {
             // given
             val orderId = 1L
-            val customer = Customer("tester").apply { id = 1L }
+            val customer = Customer.create("tester").apply { id = 1L }
             val order = Order.create(customer).apply {
                 id = orderId
                 totalPrice = 10000
@@ -109,7 +109,7 @@ class OrderServiceTest {
         fun throwException_whenStatusIsNotCreated() {
             // given
             val orderId = 1L
-            val customer = Customer("tester").apply { id = 1L }
+            val customer = Customer.create("tester").apply { id = 1L }
             val order = Order.create(customer).apply {
                 id = orderId
                 totalPrice = 10000

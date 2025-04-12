@@ -22,7 +22,7 @@ class CustomerCouponServiceTest {
         fun returnAllCouponsForCustomer() {
             // given
             val customerId = 1L
-            val customer = Customer("tester").apply { id = customerId }
+            val customer = Customer.create("tester").apply { id = customerId }
 
             val coupon1 = Coupon.createFixedDiscount(
                 name = "5천원 할인",
@@ -65,7 +65,7 @@ class CustomerCouponServiceTest {
         @DisplayName("고객에게 발급된 사용 가능한 쿠폰이면 반환")
         fun returnCustomerCoupon_whenValidAndAvailable() {
             // given
-            val customer = Customer("tester").apply { id = customerId }
+            val customer = Customer.create("tester").apply { id = customerId }
             val coupon = Coupon.createFixedDiscount(
                 name = "정상 쿠폰",
                 discountAmount = 1000,
@@ -101,7 +101,7 @@ class CustomerCouponServiceTest {
         @Test
         @DisplayName("이미 사용된 쿠폰이면 예외 발생")
         fun throwException_whenUsed() {
-            val customer = Customer("tester").apply { id = customerId }
+            val customer = Customer.create("tester").apply { id = customerId }
             val coupon = Coupon.createFixedDiscount(
                 name = "사용된 쿠폰",
                 discountAmount = 1000,
@@ -125,7 +125,7 @@ class CustomerCouponServiceTest {
         @Test
         @DisplayName("만료된 쿠폰이면 예외 발생")
         fun throwException_whenExpired() {
-            val customer = Customer("tester").apply { id = customerId }
+            val customer = Customer.create("tester").apply { id = customerId }
             val coupon = Coupon.createFixedDiscount(
                 name = "만료 쿠폰",
                 discountAmount = 1000,
@@ -166,7 +166,7 @@ class CustomerCouponServiceTest {
         @DisplayName("쿠폰이 이미 발급된 경우 예외 발생")
         fun throwsException_whenCouponAlreadyIssued() {
             // given
-            val customer = Customer("tester").apply { id = customerId }
+            val customer = Customer.create("tester").apply { id = customerId }
             val coupon = Coupon.createFixedDiscount(
                 name = "할인쿠폰",
                 discountAmount = 3000,
@@ -196,7 +196,7 @@ class CustomerCouponServiceTest {
         @DisplayName("쿠폰을 발급하고 저장된 객체 반환")
         fun saveAndReturnCustomerCoupon() {
             // given
-            val customer = Customer("tester").apply { id = 1L }
+            val customer = Customer.create("tester").apply { id = 1L }
             val coupon = Coupon.createFixedDiscount(
                 name = "웰컴쿠폰",
                 discountAmount = 1000,
@@ -232,7 +232,7 @@ class CustomerCouponServiceTest {
                 startedAt = LocalDate.now().minusDays(10),
                 expiredAt = LocalDate.now().minusDays(1)
             ).apply { id = 1L }
-            val customer = Customer("tester").apply { id = 1L }
+            val customer = Customer.create("tester").apply { id = 1L }
 
             val available = CustomerCoupon.issue(customer, coupon).apply {
                 id = 1L
@@ -261,7 +261,7 @@ class CustomerCouponServiceTest {
                 startedAt = LocalDate.now().minusDays(10),
                 expiredAt = LocalDate.now().minusDays(1)
             ).apply { id = 2L }
-            val customer = Customer("tester").apply { id = 2L }
+            val customer = Customer.create("tester").apply { id = 2L }
 
             val used = CustomerCoupon.issue(customer, coupon).apply {
                 id = 2L

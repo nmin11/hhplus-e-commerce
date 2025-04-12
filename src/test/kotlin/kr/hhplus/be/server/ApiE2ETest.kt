@@ -73,7 +73,7 @@ class ApiE2ETest {
     @Test
     @DisplayName("전체 API 성공 흐름 테스트")
     fun allApiSuccessFlow() {
-        val customer = Customer(username = "tester").apply { id = 1L }
+        val customer = Customer.create(username = "tester").apply { id = 1L }
 
         every { customerRepository.existsById(1L) } returns true
 

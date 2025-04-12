@@ -22,7 +22,7 @@ class BalanceControllerTest {
     fun getBalance_shouldReturnBalanceSummary() {
         // given
         val customerId = 1L
-        val customer = Customer(username = "tester").apply { id = customerId }
+        val customer = Customer.create(username = "tester").apply { id = customerId }
         val balance = Balance.create(customer, amount = 100_000).apply { id = 1L }
         val result = BalanceResult.Summary.from(balance)
         every { balanceFacade.getBalance(customerId) } returns result
@@ -42,7 +42,7 @@ class BalanceControllerTest {
         val customerId = 1L
         val histories = listOf(
             BalanceHistory.charge(
-                customer = Customer("tester").apply { id = customerId },
+                customer = Customer.create("tester").apply { id = customerId },
                 amount = 10_000,
                 updatedAmount = 110_000
             ).apply { id = 1L }
@@ -63,7 +63,7 @@ class BalanceControllerTest {
     fun chargeBalance_shouldReturnUpdatedBalance() {
         // given
         val customerId = 1L
-        val customer = Customer(username = "tester").apply { id = customerId }
+        val customer = Customer.create(username = "tester").apply { id = customerId }
         val request = BalanceRequest.Charge(customerId, amount = 50_000)
         val updatedBalance = Balance.create(customer, amount = 150_000).apply { id = 1L }
         val result = BalanceResult.Summary.from(updatedBalance)

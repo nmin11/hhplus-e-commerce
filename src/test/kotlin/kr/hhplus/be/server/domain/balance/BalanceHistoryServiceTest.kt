@@ -12,7 +12,7 @@ class BalanceHistoryServiceTest {
     private val balanceHistoryRepository = mockk<BalanceHistoryRepository>()
     private val balanceHistoryService = BalanceHistoryService(balanceHistoryRepository)
 
-    private val customer = Customer(username = "tester").apply { id = 1L }
+    private val customer = Customer.create(username = "tester").apply { id = 1L }
 
     @Test
     @DisplayName("잔액 변경 내역을 저장하고 반환")
