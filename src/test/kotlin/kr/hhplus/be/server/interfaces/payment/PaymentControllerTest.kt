@@ -34,8 +34,7 @@ class PaymentControllerTest {
             customer = customer,
             coupon = null,
             originalPrice = 87000,
-            discountAmount = 0,
-            discountedPrice = 87000,
+            discountAmount = 0
         ).apply {
             id = 100L
         }

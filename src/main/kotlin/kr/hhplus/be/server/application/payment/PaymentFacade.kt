@@ -71,8 +71,7 @@ class PaymentFacade(
             customer = order.customer,
             coupon = command.couponId?.let { couponService.getById(it) },
             originalPrice = originalPrice,
-            discountAmount = discountAmount,
-            discountedPrice = discountedPrice
+            discountAmount = discountAmount
         )
         paymentService.create(payment)
 

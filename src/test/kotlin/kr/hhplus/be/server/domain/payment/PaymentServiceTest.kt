@@ -27,8 +27,7 @@ class PaymentServiceTest {
             customer = customer,
             coupon = null,
             originalPrice = 50_000,
-            discountAmount = 0,
-            discountedPrice = 50_000,
+            discountAmount = 0
         ).apply { id = 1L }
 
         every { paymentRepository.save(payment) } returns payment

@@ -22,14 +22,13 @@ class Payment private constructor(
             customer: Customer,
             originalPrice: Int,
             discountAmount: Int,
-            discountedPrice: Int,
             coupon: Coupon? = null
         ): Payment {
             require(originalPrice >= 0) { "기존 금액은 0 이상이어야 합니다." }
             require(discountAmount >= 0) { "할인 금액은 0 이상이어야 합니다." }
-            require(discountedPrice == originalPrice - discountAmount) {
-                "최종 금액은 (기존 금액) - (할인 금액) 이어야 합니다."
-            }
+            require(discountAmount <= originalPrice) { "할인 금액은 총 주문 금액보다 낮아야 합니다." }
+
+            val discountedPrice = originalPrice - discountAmount
 
             return Payment(
                 order = order,
