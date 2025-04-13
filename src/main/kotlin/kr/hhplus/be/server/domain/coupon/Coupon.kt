@@ -11,7 +11,7 @@ class Coupon private constructor(
     val discountPolicy: DiscountPolicy
 ) {
     var id: Long? = null
-    var currentQuantity: Int = quantity
+    private var currentQuantity: Int = quantity
     val totalQuantity: Int = quantity
     val createdAt: LocalDateTime = LocalDateTime.now()
     private var updatedAt: LocalDateTime = LocalDateTime.now()
@@ -76,5 +76,4 @@ class Coupon private constructor(
 
     fun requireSavedId(): Long =
         id ?: throw IllegalStateException("Coupon 객체가 저장되지 않았습니다.")
-
 }
