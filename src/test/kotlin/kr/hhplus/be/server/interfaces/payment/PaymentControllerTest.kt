@@ -23,9 +23,8 @@ class PaymentControllerTest {
         // given
         val request = PaymentRequest(orderId = 1L, couponId = null)
 
-        val customer = Customer.create("tester").apply { id = 1L }
+        val customer = Customer.create("tester")
         val order = Order.create(customer).apply {
-            id = 10L
             totalPrice = 87000
         }
 
@@ -35,9 +34,7 @@ class PaymentControllerTest {
             coupon = null,
             originalPrice = 87000,
             discountAmount = 0
-        ).apply {
-            id = 100L
-        }
+        )
 
         val command = PaymentCommand.from(request)
         val result = PaymentResult.from(payment)

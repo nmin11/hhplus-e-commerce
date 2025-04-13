@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
 class CustomerTest {
-
     @Nested
     inner class Create {
         @Test
@@ -37,37 +36,6 @@ class CustomerTest {
                 // then
                 assertThat(exception.message).isEqualTo("사용자 이름은 비어있을 수 없습니다.")
             }
-        }
-    }
-
-    @Nested
-    inner class RequireSavedId {
-        @Test
-        @DisplayName("ID가 존재하면 해당 ID 반환")
-        fun requireSavedId_shouldReturnId_whenExists() {
-            // given
-            val customer = Customer.create("tester").apply { id = 100L }
-
-            // when
-            val result = customer.requireSavedId()
-
-            // then
-            assertThat(result).isEqualTo(100L)
-        }
-
-        @Test
-        @DisplayName("ID가 null 이면 예외 발생")
-        fun requireSavedId_shouldThrowException_whenIdIsNull() {
-            // given
-            val customer = Customer.create("tester")
-
-            // when
-            val exception = assertThrows<IllegalStateException> {
-                customer.requireSavedId()
-            }
-
-            // then
-            assertThat(exception.message).isEqualTo("Customer 객체가 저장되지 않았습니다.")
         }
     }
 }

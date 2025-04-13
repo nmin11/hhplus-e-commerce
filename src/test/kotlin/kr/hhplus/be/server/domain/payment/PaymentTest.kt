@@ -11,15 +11,15 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 class PaymentTest {
-    private val customer = Customer.create("tester").apply { id = 1L }
-    private val order = Order.create(customer).apply { id = 1L }
+    private val customer = Customer.create("tester")
+    private val order = Order.create(customer)
     private val coupon = Coupon.createFixedDiscount(
         name = "5천원 할인",
         amount = 5000,
         quantity = 100,
         startedAt = LocalDate.now().minusDays(1),
         expiredAt = LocalDate.now().plusDays(1)
-    ).apply { id = 3L }
+    )
 
     @Nested
     inner class Create {
@@ -85,31 +85,6 @@ class PaymentTest {
             }
 
             assertThat(exception.message).isEqualTo("기존 금액은 0 이상이어야 합니다.")
-        }
-    }
-
-    @Nested
-    inner class RequireSavedId {
-        @Test
-        @DisplayName("ID가 존재할 경우 반환")
-        fun returnId_whenExists() {
-            val payment = Payment.create(order, customer, 30000, 0).apply { id = 42L }
-
-            val result = payment.requireSavedId()
-
-            assertThat(result).isEqualTo(42L)
-        }
-
-        @Test
-        @DisplayName("ID가 없을 경우 예외 발생")
-        fun throwException_whenIdIsNull() {
-            val payment = Payment.create(order, customer, 30000, 0)
-
-            val exception = assertThrows(IllegalStateException::class.java) {
-                payment.requireSavedId()
-            }
-
-            assertThat(exception.message).isEqualTo("Payment 객체가 저장되지 않았습니다.")
         }
     }
 }

@@ -10,7 +10,7 @@ import java.time.LocalDateTime
 class Customer private constructor(
     val username: String,
 ) {
-    var id: Long? = null
+    val id: Long = 0L
     val createdAt: LocalDateTime = LocalDateTime.now()
     var updatedAt: LocalDateTime = LocalDateTime.now()
     var balance: Balance? = null
@@ -25,7 +25,4 @@ class Customer private constructor(
             return Customer(username)
         }
     }
-
-    fun requireSavedId(): Long =
-        id ?: throw IllegalStateException("Customer 객체가 저장되지 않았습니다.")
 }

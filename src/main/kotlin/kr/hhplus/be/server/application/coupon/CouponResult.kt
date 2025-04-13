@@ -12,8 +12,8 @@ sealed class CouponResult {
         companion object {
             fun from(customerCoupon: CustomerCoupon): Issue {
                 return Issue(
-                    couponId = customerCoupon.coupon.requireSavedId(),
-                    customerId = customerCoupon.customer.requireSavedId(),
+                    couponId = customerCoupon.coupon.id,
+                    customerId = customerCoupon.customer.id,
                     status = customerCoupon.status.name,
                     issuedAt = customerCoupon.issuedAt.toString()
                 )

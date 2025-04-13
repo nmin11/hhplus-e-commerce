@@ -33,11 +33,11 @@ class PaymentFacade(
         // 1. 주문 조회 및 상태 확인
         val order = orderService.getValidOrderForPayment(command.orderId)
         val customer = order.customer
-        val customerId = customer.requireSavedId()
+        val customerId = customer.id
 
         // 2. 재고 검증
         order.orderItems.forEach { item ->
-            val optionId = item.productOption.requireSavedId()
+            val optionId = item.productOption.id
             stockService.validate(optionId, item.quantity)
         }
 

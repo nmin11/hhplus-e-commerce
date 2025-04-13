@@ -8,7 +8,7 @@ class ProductOption private constructor(
     val optionName: String,
     val extraPrice: Int
 ) {
-    var id: Long? = null
+    val id: Long = 0L
     val createdAt: LocalDateTime = LocalDateTime.now()
     var updatedAt: LocalDateTime = LocalDateTime.now()
     var stock: Stock? = null
@@ -22,7 +22,4 @@ class ProductOption private constructor(
             return ProductOption(product, optionName, extraPrice)
         }
     }
-
-    fun requireSavedId(): Long =
-        id ?: throw IllegalStateException("ProductOption 객체가 저장되지 않았습니다.")
 }

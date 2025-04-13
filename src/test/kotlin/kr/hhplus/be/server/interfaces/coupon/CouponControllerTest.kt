@@ -24,17 +24,16 @@ class CouponControllerTest {
     fun issue_shouldReturnIssuedCouponResponse() {
         // given
         val request = CouponRequest.Issue(couponId = 1L, customerId = 1L)
-        val customer = Customer.create("tester").apply { id = 1L }
+        val customer = Customer.create("tester")
         val coupon = Coupon.createFixedDiscount(
             name = "첫 구매 할인",
             amount = 3000,
             quantity = 100,
             startedAt = LocalDate.now().minusDays(1),
             expiredAt = LocalDate.now().plusDays(10)
-        ).apply { id = 1L }
+        )
 
         val customerCoupon = CustomerCoupon.issue(customer, coupon).apply {
-            id = 10L
             status = CustomerCouponStatus.AVAILABLE
         }
 
@@ -54,29 +53,27 @@ class CouponControllerTest {
     @DisplayName("사용자 쿠폰 목록 조회 시 보유 쿠폰 리스트 반환")
     fun getCustomerCoupons_shouldReturnOwnedCoupons() {
         // given
-        val customer = Customer.create("tester").apply { id = 1L }
+        val customer = Customer.create("tester")
         val coupon1 = Coupon.createFixedDiscount(
             name = "첫 구매 할인",
             amount = 3000,
             quantity = 100,
             startedAt = LocalDate.now().minusDays(5),
             expiredAt = LocalDate.now().plusDays(5)
-        ).apply { id = 1L }
+        )
         val coupon2 = Coupon.createRateDiscount(
             name = "봄맞이 프로모션",
             rate = 10,
             quantity = 100,
             startedAt = LocalDate.now().minusDays(15),
             expiredAt = LocalDate.now().plusDays(3)
-        ).apply { id = 2L }
+        )
 
         val customerCoupons = listOf(
             CustomerCoupon.issue(customer, coupon1).apply {
-                id = 1L
                 status = CustomerCouponStatus.AVAILABLE
             },
             CustomerCoupon.issue(customer, coupon2).apply {
-                id = 2L
                 status = CustomerCouponStatus.USED
             }
         )

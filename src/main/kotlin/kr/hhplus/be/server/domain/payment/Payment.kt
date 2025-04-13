@@ -13,7 +13,7 @@ class Payment private constructor(
     val discountAmount: Int,
     val discountedPrice: Int
 ) {
-    var id: Long? = null
+    val id: Long = 0L
     val paidAt: LocalDateTime = LocalDateTime.now()
 
     companion object {
@@ -40,7 +40,4 @@ class Payment private constructor(
             )
         }
     }
-
-    fun requireSavedId(): Long =
-        id ?: throw IllegalStateException("Payment 객체가 저장되지 않았습니다.")
 }

@@ -3,6 +3,7 @@ package kr.hhplus.be.server
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
+import io.mockk.spyk
 import kr.hhplus.be.server.domain.balance.*
 import kr.hhplus.be.server.domain.coupon.*
 import kr.hhplus.be.server.domain.customer.Customer
@@ -73,40 +74,42 @@ class ApiE2ETest {
     @Test
     @DisplayName("전체 API 성공 흐름 테스트")
     fun allApiSuccessFlow() {
-        val customer = Customer.create(username = "tester").apply { id = 1L }
+        val customer = spyk(Customer.create(username = "tester"))
+
+        every { customer.id } returns 1L
 
         every { customerRepository.existsById(1L) } returns true
 
         every { customerRepository.findById(1L) } returns customer
 
-        val balance = Balance.create(customer = customer, amount = 150000).apply { id = 1L }
+        val balance = Balance.create(customer = customer, amount = 150000)
         every { balanceRepository.findByCustomerId(1L) } returns balance
 
         val history = BalanceHistory.charge(
             customer = customer,
             amount = 1000,
             updatedAmount = 6000
-        ).apply { id = 1L }
+        )
 
         every { balanceHistoryRepository.findAllByCustomerId(1L) } returns listOf(history)
 
         every { balanceRepository.save(any()) } answers { firstArg() }
         every { balanceHistoryRepository.save(any()) } answers { firstArg() }
 
-        val product1 = Product.create(name = "청바지", basePrice = 39000).apply { id = 1L }
-        val product2 = Product.create(name = "후드티", basePrice = 29000).apply { id = 2L }
-        val product3 = Product.create(name = "운동화", basePrice = 59000).apply { id = 3L }
-        val product4 = Product.create(name = "잠바", basePrice = 79000).apply { id = 4L }
-        val product5 = Product.create(name = "실내화", basePrice = 15000).apply { id = 5L }
+        val product1 = Product.create(name = "청바지", basePrice = 39000)
+        val product2 = Product.create(name = "후드티", basePrice = 29000)
+        val product3 = Product.create(name = "운동화", basePrice = 59000)
+        val product4 = Product.create(name = "잠바", basePrice = 79000)
+        val product5 = Product.create(name = "실내화", basePrice = 15000)
 
         every { productRepository.findAll() } returns listOf(product1, product2, product3)
         every { productRepository.findById(1L) } returns product1
         every { productRepository.findById(2L) } returns product2
 
         every { productOptionRepository.findAllByProductId(1L) } returns listOf(
-            ProductOption.create(product = product1, optionName = "S", extraPrice = 0).apply { id = 1L },
-            ProductOption.create(product = product1, optionName = "M", extraPrice = 1000).apply { id = 2L },
-            ProductOption.create(product = product1, optionName = "L", extraPrice = 2000).apply { id = 3L }
+            ProductOption.create(product = product1, optionName = "S", extraPrice = 0),
+            ProductOption.create(product = product1, optionName = "M", extraPrice = 1000),
+            ProductOption.create(product = product1, optionName = "L", extraPrice = 2000)
         )
 
         every {
@@ -114,23 +117,18 @@ class ApiE2ETest {
         } returns listOf(product1, product2, product3, product4, product5)
 
         val stat1 = Statistic.create(product = product1, salesCount = 12).apply {
-            id = 1L
             soldAt = LocalDateTime.now().minusDays(1)
         }
         val stat2 = Statistic.create(product = product2, salesCount = 9).apply {
-            id = 2L
             soldAt = LocalDateTime.now().minusDays(2)
         }
         val stat3 = Statistic.create(product = product3, salesCount = 7).apply {
-            id = 3L
             soldAt = LocalDateTime.now().minusDays(3)
         }
         val stat4 = Statistic.create(product = product4, salesCount = 5).apply {
-            id = 4L
             soldAt = LocalDateTime.now().minusDays(1)
         }
         val stat5 = Statistic.create(product = product5, salesCount = 3).apply {
-            id = 5L
             soldAt = LocalDateTime.now().minusDays(2)
         }
 
@@ -138,22 +136,27 @@ class ApiE2ETest {
             statisticRepository.findTop5BySoldAtAfterOrderBySalesCountDesc(any())
         } returns listOf(stat1, stat2, stat3, stat4, stat5)
 
-        val optionM = ProductOption.create(product = product1, optionName = "M", extraPrice = 1000).apply { id = 2L }
-        val optionL = ProductOption.create(product = product2, optionName = "L", extraPrice = 2000).apply { id = 3L }
+        val optionM = spyk(ProductOption.create(product = product1, optionName = "M", extraPrice = 1000))
+        val optionL = spyk(ProductOption.create(product = product2, optionName = "L", extraPrice = 2000))
 
-        every { productOptionRepository.findById(2L) } returns optionM
-        every { productOptionRepository.findById(3L) } returns optionL
+        val optionMId = 2L
+        val optionLId = 3L
 
-        val stockOptionM = Stock.create(productOption = optionM, quantity = 10).apply { id = 2L }
-        val stockOptionL = Stock.create(productOption = optionL, quantity = 10).apply { id = 3L }
+        every { optionM.id } returns optionMId
+        every { optionL.id } returns optionLId
 
-        every { stockRepository.findByProductOptionId(optionM.id!!) } returns stockOptionM
-        every { stockRepository.findByProductOptionId(optionL.id!!) } returns stockOptionL
+        every { productOptionRepository.findById(optionMId) } returns optionM
+        every { productOptionRepository.findById(optionLId) } returns optionL
+
+        val stockOptionM = Stock.create(productOption = optionM, quantity = 10)
+        val stockOptionL = Stock.create(productOption = optionL, quantity = 10)
+
+        every { stockRepository.findByProductOptionId(optionMId) } returns stockOptionM
+        every { stockRepository.findByProductOptionId(optionLId) } returns stockOptionL
 
         val order = Order.create(
             customer = customer
         ).apply {
-            id = 1L
             totalPrice = 40000 + 31000
             orderItems.addAll(
                 listOf(
@@ -171,7 +174,6 @@ class ApiE2ETest {
 
         every { paymentRepository.save(any()) } answers {
             val payment = firstArg<Payment>()
-            payment.id = 1L
             payment
         }
 
@@ -181,7 +183,7 @@ class ApiE2ETest {
             quantity = 100,
             startedAt = LocalDate.now().minusDays(1),
             expiredAt = LocalDate.now().plusDays(1)
-        ).apply { id = 1L }
+        )
 
         every { couponRepository.findById(1L) } returns coupon
 
@@ -197,7 +199,7 @@ class ApiE2ETest {
             quantity = 100,
             startedAt = LocalDate.parse("2025-04-01"),
             expiredAt = LocalDate.parse("2025-04-30")
-        ).apply { id = 1L }
+        )
 
         val coupon2 = Coupon.createRateDiscount(
             name = "봄맞이 프로모션",
@@ -205,15 +207,13 @@ class ApiE2ETest {
             quantity = 50,
             startedAt = LocalDate.parse("2025-03-15"),
             expiredAt = LocalDate.parse("2025-04-10")
-        ).apply { id = 2L }
+        )
 
         val customerCoupon1 = CustomerCoupon.issue(customer, coupon1).apply {
-            id = 1L
             status = CustomerCouponStatus.AVAILABLE
         }
 
         val customerCoupon2 = CustomerCoupon.issue(customer, coupon2).apply {
-            id = 2L
             status = CustomerCouponStatus.USED
         }
 

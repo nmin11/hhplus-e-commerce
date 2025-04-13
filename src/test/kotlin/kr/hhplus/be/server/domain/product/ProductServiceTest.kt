@@ -40,8 +40,8 @@ class ProductServiceTest {
             // given
             val ids = listOf(1L, 2L)
             val products = listOf(
-                Product.create(name = "청바지", basePrice = 39000).apply { id = 1L },
-                Product.create(name = "후드티", basePrice = 29000).apply { id = 2L }
+                Product.create(name = "청바지", basePrice = 39000),
+                Product.create(name = "후드티", basePrice = 29000)
             )
             every { productRepository.findAllByIds(ids) } returns products
 

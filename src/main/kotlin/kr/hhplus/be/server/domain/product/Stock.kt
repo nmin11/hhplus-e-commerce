@@ -6,7 +6,7 @@ class Stock private constructor(
     val productOption: ProductOption,
     var quantity: Int
 ) {
-    var id: Long? = null
+    val id: Long = 0L
     var updatedAt: LocalDateTime = LocalDateTime.now()
 
     companion object {
@@ -16,7 +16,4 @@ class Stock private constructor(
             return Stock(productOption, quantity)
         }
     }
-
-    fun requireSavedId(): Long =
-        id ?: throw IllegalStateException("Stock 객체가 저장되지 않았습니다.")
 }

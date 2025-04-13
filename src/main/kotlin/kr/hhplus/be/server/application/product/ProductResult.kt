@@ -19,7 +19,7 @@ sealed class ProductResult {
         companion object {
             fun from(statistic: Statistic): Popular {
                 return Popular(
-                    productId = statistic.product.requireSavedId(),
+                    productId = statistic.product.id,
                     name = statistic.product.name,
                     basePrice = statistic.product.basePrice,
                     salesCount = statistic.salesCount

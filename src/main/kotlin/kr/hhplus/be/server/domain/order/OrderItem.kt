@@ -8,7 +8,7 @@ class OrderItem(
     val quantity: Int,
     val subtotalPrice: Int
 ) {
-    var id: Long? = null
+    val id: Long = 0L
 
     companion object {
         fun create(order: Order, option: ProductOption, quantity: Int): OrderItem {
@@ -16,7 +16,4 @@ class OrderItem(
             return OrderItem(order, option, quantity, subtotal)
         }
     }
-
-    fun requireSavedId(): Long =
-        id ?: throw IllegalStateException("OrderItem 객체가 저장되지 않았습니다.")
 }

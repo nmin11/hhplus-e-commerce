@@ -4,7 +4,6 @@ import kr.hhplus.be.server.domain.customer.CustomerService
 import kr.hhplus.be.server.domain.order.Order
 import kr.hhplus.be.server.domain.order.OrderItemInfo
 import kr.hhplus.be.server.domain.order.OrderService
-import kr.hhplus.be.server.domain.product.ProductOption
 import kr.hhplus.be.server.domain.product.ProductOptionService
 import kr.hhplus.be.server.domain.product.ProductService
 import kr.hhplus.be.server.domain.product.StockService
@@ -30,7 +29,7 @@ class OrderFacade(
             val option = productOptionService.getById(item.productOptionId)
 
             productOptionService.validateOptionBelongsToProduct(option.id, product.id)
-            stockService.validate(option.requireSavedId(), item.quantity)
+            stockService.validate(option.id, item.quantity)
 
             OrderItemInfo(option, item.quantity)
         }

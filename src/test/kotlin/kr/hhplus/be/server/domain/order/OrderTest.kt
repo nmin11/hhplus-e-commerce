@@ -7,12 +7,11 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 
 class OrderTest {
-    private val customer = Customer.create("tester").apply { id = 1L }
-    private val product = Product.create("청바지", basePrice = 39_000).apply { id = 10L }
-    private val option = ProductOption.create(product, "M", extraPrice = 1_000).apply { id = 100L }
+    private val customer = Customer.create("tester")
+    private val product = Product.create("청바지", basePrice = 39_000)
+    private val option = ProductOption.create(product, "M", extraPrice = 1_000)
 
     @Nested
     inner class Create {
@@ -63,37 +62,6 @@ class OrderTest {
             // then
             assertThat(order.orderItems).hasSize(1)
             assertThat(order.totalPrice).isEqualTo(product.basePrice + option.extraPrice)
-        }
-    }
-
-    @Nested
-    inner class RequireSavedId {
-        @Test
-        @DisplayName("ID가 존재하면 해당 ID 반환")
-        fun shouldReturnId_whenExists() {
-            // given
-            val order = Order.create(customer).apply { id = 99L }
-
-            // when
-            val result = order.requireSavedId()
-
-            // then
-            assertThat(result).isEqualTo(99L)
-        }
-
-        @Test
-        @DisplayName("ID가 null 이면 예외 발생")
-        fun shouldThrowException_whenIdIsNull() {
-            // given
-            val order = Order.create(customer)
-
-            // when
-            val exception = assertThrows<IllegalStateException> {
-                order.requireSavedId()
-            }
-
-            // then
-            assertThat(exception.message).isEqualTo("Order 객체가 저장되지 않았습니다.")
         }
     }
 }

@@ -8,7 +8,7 @@ import java.time.LocalDateTime
 class Order private constructor(
     val customer: Customer
 ) {
-    var id: Long? = null
+    val id: Long = 0L
     var status = OrderStatus.CREATED
     val createdAt: LocalDateTime = LocalDateTime.now()
     var updatedAt: LocalDateTime = LocalDateTime.now()
@@ -34,7 +34,4 @@ class Order private constructor(
         orderItems.add(OrderItem.create(this, option, quantity))
         totalPrice += (option.product.basePrice + option.extraPrice) * quantity
     }
-
-    fun requireSavedId(): Long =
-        id ?: throw IllegalStateException("Order 객체가 저장되지 않았습니다.")
 }

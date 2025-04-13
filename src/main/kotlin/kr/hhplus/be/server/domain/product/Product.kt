@@ -6,7 +6,7 @@ class Product private constructor(
     val name: String,
     val basePrice: Int
 ) {
-    var id: Long? = null
+    val id: Long = 0L
     val createdAt: LocalDateTime = LocalDateTime.now()
     val updatedAt: LocalDateTime = LocalDateTime.now()
     val productOptions: MutableList<ProductOption> = mutableListOf()
@@ -19,7 +19,4 @@ class Product private constructor(
             return Product(name, basePrice)
         }
     }
-
-    fun requireSavedId(): Long =
-        id ?: throw IllegalStateException("Product 객체가 저장되지 않았습니다.")
 }

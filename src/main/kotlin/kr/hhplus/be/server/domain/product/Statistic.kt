@@ -6,7 +6,7 @@ class Statistic private constructor(
     val product: Product,
     val salesCount: Int
 ) {
-    var id: Long? = null
+    val id: Long = 0L
     var soldAt: LocalDateTime = LocalDateTime.now()
 
     companion object {
@@ -16,7 +16,4 @@ class Statistic private constructor(
             return Statistic(product, salesCount)
         }
     }
-
-    fun requireSavedId(): Long =
-        id ?: throw IllegalStateException("Statistic 객체가 저장되지 않았습니다.")
 }

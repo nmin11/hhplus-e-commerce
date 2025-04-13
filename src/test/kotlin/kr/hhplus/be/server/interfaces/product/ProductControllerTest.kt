@@ -2,6 +2,7 @@ package kr.hhplus.be.server.interfaces.product
 
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.spyk
 import kr.hhplus.be.server.application.product.ProductCriteria
 import kr.hhplus.be.server.application.product.ProductFacade
 import kr.hhplus.be.server.application.product.ProductResult
@@ -23,8 +24,8 @@ class ProductControllerTest {
     fun getAllProduct_shouldReturnListOfSummaries() {
         // given
         val products = listOf(
-            Product.create(name = "청바지", basePrice = 39000).apply { id = 1L },
-            Product.create(name = "후드티", basePrice = 29000).apply { id = 2L }
+            Product.create(name = "청바지", basePrice = 39000),
+            Product.create(name = "후드티", basePrice = 29000)
         )
         every { productService.getAll() } returns products
 
@@ -41,12 +42,13 @@ class ProductControllerTest {
     @DisplayName("상품 상세 조회")
     fun getProductDetail_shouldReturnProductDetail() {
         // given
-        val product = Product.create(name = "청바지", basePrice = 39000).apply { id = 1L }
+        val product = spyk(Product.create(name = "청바지", basePrice = 39000))
         val options = listOf(
-            ProductOption.create(product = product, optionName = "M", extraPrice = 1000).apply { id = 1L }
+            ProductOption.create(product = product, optionName = "M", extraPrice = 1000)
         )
         val productDetailResult = ProductResult.Detail(product, options)
 
+        every { product.id } returns 1L
         every { productFacade.getProductDetail(1L) } returns productDetailResult
 
         // when

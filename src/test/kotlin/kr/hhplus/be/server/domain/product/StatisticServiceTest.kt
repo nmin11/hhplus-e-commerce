@@ -17,8 +17,8 @@ class StatisticServiceTest {
     @DisplayName("통계 정보를 저장하고 반환")
     fun record_shouldSaveAndReturnStatistic() {
         // given
-        val product = Product.create(name = "청바지", basePrice = 39000).apply { id = 1L }
-        val statistic = Statistic.create(product = product, salesCount = 10).apply { id = 1L }
+        val product = Product.create(name = "청바지", basePrice = 39000)
+        val statistic = Statistic.create(product = product, salesCount = 10)
 
         every { statisticRepository.save(statistic) } returns statistic
 
@@ -35,14 +35,12 @@ class StatisticServiceTest {
     fun returnTop5StatisticsSinceDate() {
         // given
         val since = LocalDate.now().minusDays(3)
-        val product = Product.create(name = "청바지", basePrice = 10_000).apply { id = 1L }
+        val product = Product.create(name = "청바지", basePrice = 10_000)
         val statistics = listOf(
             Statistic.create(product, salesCount = 12).apply {
-                id = 1L
                 soldAt = LocalDateTime.now().minusDays(1)
             },
             Statistic.create(product, salesCount = 9).apply {
-                id = 2L
                 soldAt = LocalDateTime.now().minusDays(2)
             }
         )

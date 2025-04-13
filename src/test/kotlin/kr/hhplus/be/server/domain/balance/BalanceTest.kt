@@ -8,38 +8,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
 class BalanceTest {
-    private val customer = Customer.create("tester").apply { id = 1L }
-
-    @Nested
-    inner class RequireSavedId {
-        @Test
-        @DisplayName("ID가 존재할 경우 해당 ID를 반환")
-        fun returnId_whenIdIsPresent() {
-            // given
-            val balance = Balance.create(customer, 10_000).apply { id = 42L }
-
-            // when
-            val result = balance.requireSavedId()
-
-            // then
-            assertThat(result).isEqualTo(42L)
-        }
-
-        @Test
-        @DisplayName("ID가 null 일 경우 예외 발생")
-        fun throwException_whenIdIsNull() {
-            // given
-            val balance = Balance.create(customer, 10_000)
-
-            // when
-            val exception = assertThrows<IllegalStateException> {
-                balance.requireSavedId()
-            }
-
-            // then
-            assertThat(exception.message).isEqualTo("Balance 객체가 저장되지 않았습니다.")
-        }
-    }
+    private val customer = Customer.create("tester")
 
     @Nested
     inner class Charge {

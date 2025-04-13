@@ -10,7 +10,7 @@ class Coupon private constructor(
     val expiredAt: LocalDate,
     val discountPolicy: DiscountPolicy
 ) {
-    var id: Long? = null
+    val id: Long = 0L
     private var currentQuantity: Int = quantity
     val totalQuantity: Int = quantity
     val createdAt: LocalDateTime = LocalDateTime.now()
@@ -73,7 +73,4 @@ class Coupon private constructor(
             throw IllegalStateException("유효하지 않은 쿠폰입니다.")
         }
     }
-
-    fun requireSavedId(): Long =
-        id ?: throw IllegalStateException("Coupon 객체가 저장되지 않았습니다.")
 }

@@ -20,13 +20,10 @@ class OrderServiceTest {
         @DisplayName("주문을 저장하고 반환")
         fun shouldSaveAndReturnOrder() {
             // given
-            val customer = Customer.create("tester").apply { id = 1L }
+            val customer = Customer.create("tester")
             val order = Order.create(
                 customer = customer
-            ).apply {
-                id = 1L
-                totalPrice = 70000
-            }
+            ).apply { totalPrice = 70000 }
 
             every { orderRepository.save(order) } returns order
 
@@ -47,11 +44,8 @@ class OrderServiceTest {
         @DisplayName("ID로 주문을 조회하여 반환")
         fun returnOrder_whenExists() {
             // given
-            val customer = Customer.create("tester").apply { id = 1L }
-            val expectedOrder = Order.create(customer = customer).apply {
-                id = orderId
-                totalPrice = 50000
-            }
+            val customer = Customer.create("tester")
+            val expectedOrder = Order.create(customer = customer).apply { totalPrice = 50000 }
 
             every { orderRepository.findById(orderId) } returns expectedOrder
 
@@ -88,9 +82,8 @@ class OrderServiceTest {
         fun returnOrder_whenStatusIsCreated() {
             // given
             val orderId = 1L
-            val customer = Customer.create("tester").apply { id = 1L }
+            val customer = Customer.create("tester")
             val order = Order.create(customer).apply {
-                id = orderId
                 totalPrice = 10000
                 status = OrderStatus.CREATED
             }
@@ -109,9 +102,8 @@ class OrderServiceTest {
         fun throwException_whenStatusIsNotCreated() {
             // given
             val orderId = 1L
-            val customer = Customer.create("tester").apply { id = 1L }
+            val customer = Customer.create("tester")
             val order = Order.create(customer).apply {
-                id = orderId
                 totalPrice = 10000
                 status = OrderStatus.PAID
             }

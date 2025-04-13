@@ -14,9 +14,9 @@ data class PaymentResult(
     companion object {
         fun from(payment: Payment): PaymentResult {
             return PaymentResult(
-                paymentId = payment.requireSavedId(),
-                orderId = payment.order.requireSavedId(),
-                customerId = payment.customer.requireSavedId(),
+                paymentId = payment.id,
+                orderId = payment.order.id,
+                customerId = payment.customer.id,
                 originalPrice = payment.originalPrice,
                 discountAmount = payment.discountAmount,
                 discountedPrice = payment.discountedPrice,

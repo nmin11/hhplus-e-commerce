@@ -7,7 +7,7 @@ class CustomerCoupon private constructor(
     val customer: Customer,
     val coupon: Coupon
 ) {
-    var id: Long? = null
+    val id: Long = 0L
     var status = CustomerCouponStatus.AVAILABLE
     val issuedAt: LocalDateTime = LocalDateTime.now()
     private var updatedAt: LocalDateTime = LocalDateTime.now()
@@ -37,7 +37,4 @@ class CustomerCoupon private constructor(
         }
         return this
     }
-
-    fun requireSavedId(): Long =
-        id ?: throw IllegalStateException("CustomerCoupon 객체가 저장되지 않았습니다.")
 }

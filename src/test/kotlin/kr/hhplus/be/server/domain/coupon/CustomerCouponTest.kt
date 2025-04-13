@@ -9,14 +9,14 @@ import org.junit.jupiter.api.assertThrows
 import java.time.LocalDate
 
 class CustomerCouponTest {
-    private val customer = Customer.create("tester").apply { id = 1L }
+    private val customer = Customer.create("tester")
     private val coupon = Coupon.createFixedDiscount(
         name = "10% 할인 쿠폰",
         amount = 1000,
         quantity = 100,
         startedAt = LocalDate.now().minusDays(1),
         expiredAt = LocalDate.now().plusDays(1)
-    ).apply { id = 2L }
+    )
 
     @Nested
     inner class Issue {
@@ -126,37 +126,6 @@ class CustomerCouponTest {
 
             // then
             assertThat(exception.message).isEqualTo("사용 기간이 만료된 쿠폰입니다.")
-        }
-    }
-
-    @Nested
-    inner class RequireSavedId {
-        @Test
-        @DisplayName("ID가 있으면 해당 ID 반환")
-        fun shouldReturnIdWhenExists() {
-            // given
-            val customerCoupon = CustomerCoupon.issue(customer, coupon).apply { id = 999L }
-
-            // when
-            val result = customerCoupon.requireSavedId()
-
-            // then
-            assertThat(result).isEqualTo(999L)
-        }
-
-        @Test
-        @DisplayName("ID가 없으면 예외 발생")
-        fun shouldThrowWhenIdIsNull() {
-            // given
-            val customerCoupon = CustomerCoupon.issue(customer, coupon)
-
-            // when
-            val exception = assertThrows<IllegalStateException> {
-                customerCoupon.requireSavedId()
-            }
-
-            // then
-            assertThat(exception.message).isEqualTo("CustomerCoupon 객체가 저장되지 않았습니다.")
         }
     }
 }

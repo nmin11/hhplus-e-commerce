@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component
 class PaymentCommandFactory {
     fun from(order: Order): DataPlatformCommand.Order {
         return DataPlatformCommand.Order(
-            orderId = order.requireSavedId(),
-            customerId = order.customer.requireSavedId(),
+            orderId = order.id,
+            customerId = order.customer.id,
             totalPrice = order.totalPrice,
             createdAt = order.createdAt.toString(),
             items = order.orderItems.map {

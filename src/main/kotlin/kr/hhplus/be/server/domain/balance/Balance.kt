@@ -7,7 +7,7 @@ class Balance private constructor(
     val customer: Customer,
     private var _amount: Int
 ) {
-    var id: Long? = null
+    val id: Long = 0L
     private var updatedAt: LocalDateTime = LocalDateTime.now()
 
     val amount: Int
@@ -36,7 +36,4 @@ class Balance private constructor(
         _amount -= amount
         updatedAt = LocalDateTime.now()
     }
-
-    fun requireSavedId(): Long =
-        id ?: throw IllegalStateException("Balance 객체가 저장되지 않았습니다.")
 }

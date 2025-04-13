@@ -9,7 +9,7 @@ class BalanceHistory private constructor(
     val changeAmount: Int,
     val totalAmount: Int
 ) {
-    var id: Long? = null
+    val id: Long = 0L
     val createdAt: LocalDateTime = LocalDateTime.now()
 
     companion object {
@@ -31,7 +31,4 @@ class BalanceHistory private constructor(
             )
         }
     }
-
-    fun requireSavedId(): Long =
-        id ?: throw IllegalStateException("BalanceHistory 객체가 저장되지 않았습니다.")
 }

@@ -25,7 +25,7 @@ class CouponServiceTest {
                 quantity = 100,
                 startedAt = LocalDate.now().minusDays(1),
                 expiredAt = LocalDate.now().plusDays(1)
-            ).apply { id = couponId }
+            )
 
             every { couponRepository.findById(couponId) } returns expectedCoupon
 
@@ -88,14 +88,14 @@ class CouponServiceTest {
                     quantity = 100,
                     startedAt = today.minusDays(10),
                     expiredAt = today.minusDays(1)
-                ).apply { id = 1L },
+                ),
                 Coupon.createRateDiscount(
                     name = "봄맞이 할인",
                     rate = 20,
                     quantity = 50,
                     startedAt = today.minusDays(30),
                     expiredAt = today.minusDays(5)
-                ).apply { id = 2L }
+                )
             )
 
             every { couponRepository.findAllByExpiredAtBefore(today) } returns expiredCoupons

@@ -13,8 +13,8 @@ sealed class OrderResult {
         companion object {
             fun from(order: Order): Create {
                 return Create(
-                    orderId = order.requireSavedId(),
-                    customerId = order.customer.requireSavedId(),
+                    orderId = order.id,
+                    customerId = order.customer.id,
                     totalPrice = order.totalPrice,
                     createdAt = order.createdAt.toString(),
                     items = order.orderItems.map {
