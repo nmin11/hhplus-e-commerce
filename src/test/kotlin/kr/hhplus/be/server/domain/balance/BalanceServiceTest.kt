@@ -59,7 +59,7 @@ class BalanceServiceTest {
             every { balanceRepository.save(any()) } answers { firstArg() }
 
             // when
-            val result = balanceService.charge(customer.id!!, 50_000)
+            val result = balanceService.charge(1L, 50_000)
 
             // then
             assertThat(result.amount).isEqualTo(150_000)
@@ -67,8 +67,10 @@ class BalanceServiceTest {
 
         @Test
         @DisplayName("충전 금액이 0 이하일 경우 예외 발생")
-        fun whenAmountIsNegative_thenThrowException() {
-            // given
+        fun shouldThrow_whenAmountInvalid() {
+            val customer = Customer.create(username = "tester").apply { id = 1L }
+            val balance = Balance.create(customer, amount = 100_000)
+            every { balanceRepository.findByCustomerId(1L) } returns balance
             val invalidAmounts = listOf(0, -100)
 
             for (amount in invalidAmounts) {
@@ -86,17 +88,13 @@ class BalanceServiceTest {
 
         @Test
         @DisplayName("존재하지 않는 잔액 정보로 충전 시 예외 발생")
-        fun whenBalanceDoesNotExist_thenThrowException() {
-            // given
-            val customerId = 1L
-            every { balanceRepository.findByCustomerId(customerId) } returns null
+        fun shouldThrow_whenBalanceNotFound() {
+            every { balanceRepository.findByCustomerId(1L) } returns null
 
-            // when
             val exception = assertThrows<IllegalStateException> {
-                balanceService.charge(customerId, 10_000)
+                balanceService.charge(1L, 10_000)
             }
 
-            // then
             assertThat(exception)
                 .isInstanceOf(IllegalStateException::class.java)
                 .hasMessage("잔액 정보가 존재하지 않습니다.")
@@ -105,33 +103,30 @@ class BalanceServiceTest {
 
     @Nested
     inner class Deduct {
-        private val customerId = 1L
-
         @Test
         @DisplayName("차감 금액이 잔액보다 적거나 같으면 차감 성공")
-        fun whenAmountIsSufficient_thenDeductBalance() {
-            // given
+        fun shouldSubtractAmount_whenSufficient() {
             val customer = Customer.create(username = "tester").apply { id = 1L }
             val balance = Balance.create(customer, amount = 100_000)
-            every { balanceRepository.findByCustomerId(customerId) } returns balance
+            every { balanceRepository.findByCustomerId(1L) } returns balance
             every { balanceRepository.save(any()) } answers { firstArg() }
 
-            // when
-            val result = balanceService.deduct(customerId, 30_000)
+            val result = balanceService.deduct(1L, 30_000)
 
-            // then
             assertThat(result.amount).isEqualTo(70_000)
         }
 
         @Test
         @DisplayName("차감 금액이 0 이하일 경우 예외 발생")
-        fun whenAmountIsNonPositive_thenThrowException() {
-            // given
+        fun shouldThrow_whenAmountInvalid() {
+            val customer = Customer.create(username = "tester").apply { id = 1L }
+            val balance = Balance.create(customer, amount = 100_000)
+            every { balanceRepository.findByCustomerId(1L) } returns balance
             val invalidAmounts = listOf(0, -10_000)
 
             for (amount in invalidAmounts) {
                 val exception = assertThrows<IllegalArgumentException> {
-                    balanceService.deduct(customerId, amount)
+                    balanceService.deduct(1L, amount)
                 }
 
                 assertThat(exception)
@@ -142,16 +137,13 @@ class BalanceServiceTest {
 
         @Test
         @DisplayName("잔액 정보가 존재하지 않으면 예외 발생")
-        fun whenBalanceNotFound_thenThrowException() {
-            // given
-            every { balanceRepository.findByCustomerId(customerId) } returns null
+        fun shouldThrow_whenBalanceNotFound() {
+            every { balanceRepository.findByCustomerId(1L) } returns null
 
-            // when
             val exception = assertThrows<IllegalStateException> {
-                balanceService.deduct(customerId, 10_000)
+                balanceService.deduct(1L, 10_000)
             }
 
-            // then
             assertThat(exception)
                 .isInstanceOf(IllegalStateException::class.java)
                 .hasMessage("잔액 정보가 존재하지 않습니다.")
@@ -159,18 +151,15 @@ class BalanceServiceTest {
 
         @Test
         @DisplayName("잔액이 부족할 경우 예외 발생")
-        fun whenAmountExceedsBalance_thenThrowException() {
-            // given
+        fun shouldThrow_whenInsufficientBalance() {
             val customer = Customer.create(username = "tester").apply { id = 1L }
             val balance = Balance.create(customer, amount = 20_000)
-            every { balanceRepository.findByCustomerId(customerId) } returns balance
+            every { balanceRepository.findByCustomerId(1L) } returns balance
 
-            // when
             val exception = assertThrows<IllegalStateException> {
-                balanceService.deduct(customerId, 30_000)
+                balanceService.deduct(1L, 30_000)
             }
 
-            // then
             assertThat(exception)
                 .isInstanceOf(IllegalStateException::class.java)
                 .hasMessage("잔액이 부족합니다.")
