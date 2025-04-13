@@ -20,4 +20,3 @@ class Stock private constructor(
     fun requireSavedId(): Long =
         id ?: throw IllegalStateException("Stock 객체가 저장되지 않았습니다.")
 }
-
