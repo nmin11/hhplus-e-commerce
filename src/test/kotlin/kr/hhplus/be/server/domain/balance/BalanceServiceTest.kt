@@ -10,16 +10,15 @@ class BalanceServiceTest {
     private val balanceRepository = mockk<BalanceRepository>()
     private val balanceService = BalanceService(balanceRepository)
 
+    private val customerId = 1L
+
     @Nested
     inner class GetByCustomerId {
-        private val customerId = 1L
-
         @Test
         @DisplayName("잔액 정보가 존재할 경우 잔액 반환")
         fun whenExists_thenReturnBalance() {
             // given
-            val customer = Customer.create(username = "tester")
-            val expectedBalance = Balance.create(customer, amount = 100_000)
+            val expectedBalance = Balance.create(customerId, amount = 100_000)
             every { balanceRepository.findByCustomerId(customerId) } returns expectedBalance
 
             // when
@@ -54,7 +53,7 @@ class BalanceServiceTest {
         fun shouldAddAmountToBalance() {
             // given
             val customer = Customer.create(username = "tester")
-            val balance = Balance.create(customer, amount = 100_000)
+            val balance = Balance.create(customerId, amount = 100_000)
             every { balanceRepository.findByCustomerId(1L) } returns balance
             every { balanceRepository.save(any()) } answers { firstArg() }
 
@@ -68,8 +67,7 @@ class BalanceServiceTest {
         @Test
         @DisplayName("충전 금액이 0 이하일 경우 예외 발생")
         fun shouldThrow_whenAmountInvalid() {
-            val customer = Customer.create(username = "tester")
-            val balance = Balance.create(customer, amount = 100_000)
+            val balance = Balance.create(customerId, amount = 100_000)
             every { balanceRepository.findByCustomerId(1L) } returns balance
             val invalidAmounts = listOf(0, -100)
 
@@ -106,9 +104,8 @@ class BalanceServiceTest {
         @Test
         @DisplayName("차감 금액이 잔액보다 적거나 같으면 차감 성공")
         fun shouldSubtractAmount_whenSufficient() {
-            val customer = Customer.create(username = "tester")
-            val balance = Balance.create(customer, amount = 100_000)
-            every { balanceRepository.findByCustomerId(1L) } returns balance
+            val balance = Balance.create(customerId, amount = 100_000)
+            every { balanceRepository.findByCustomerId(customerId) } returns balance
             every { balanceRepository.save(any()) } answers { firstArg() }
 
             val result = balanceService.deduct(1L, 30_000)
@@ -119,8 +116,7 @@ class BalanceServiceTest {
         @Test
         @DisplayName("차감 금액이 0 이하일 경우 예외 발생")
         fun shouldThrow_whenAmountInvalid() {
-            val customer = Customer.create(username = "tester")
-            val balance = Balance.create(customer, amount = 100_000)
+            val balance = Balance.create(customerId, amount = 100_000)
             every { balanceRepository.findByCustomerId(1L) } returns balance
             val invalidAmounts = listOf(0, -10_000)
 
@@ -152,8 +148,7 @@ class BalanceServiceTest {
         @Test
         @DisplayName("잔액이 부족할 경우 예외 발생")
         fun shouldThrow_whenInsufficientBalance() {
-            val customer = Customer.create(username = "tester")
-            val balance = Balance.create(customer, amount = 20_000)
+            val balance = Balance.create(customerId, amount = 20_000)
             every { balanceRepository.findByCustomerId(1L) } returns balance
 
             val exception = assertThrows<IllegalStateException> {

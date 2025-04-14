@@ -7,7 +7,6 @@ import kr.hhplus.be.server.application.balance.BalanceFacade
 import kr.hhplus.be.server.application.balance.BalanceResult
 import kr.hhplus.be.server.domain.balance.Balance
 import kr.hhplus.be.server.domain.balance.BalanceHistory
-import kr.hhplus.be.server.domain.customer.Customer
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -22,8 +21,7 @@ class BalanceControllerTest {
     fun getBalance_shouldReturnBalanceSummary() {
         // given
         val customerId = 1L
-        val customer = Customer.create(username = "tester")
-        val balance = Balance.create(customer, amount = 100_000)
+        val balance = Balance.create(customerId, amount = 100_000)
         val result = BalanceResult.Summary.from(balance)
         every { balanceFacade.getBalance(customerId) } returns result
 
@@ -63,9 +61,8 @@ class BalanceControllerTest {
     fun chargeBalance_shouldReturnUpdatedBalance() {
         // given
         val customerId = 1L
-        val customer = Customer.create(username = "tester")
         val request = BalanceRequest.Charge(customerId, amount = 50_000)
-        val updatedBalance = Balance.create(customer, amount = 150_000)
+        val updatedBalance = Balance.create(customerId, amount = 150_000)
         val result = BalanceResult.Summary.from(updatedBalance)
         every { balanceFacade.charge(BalanceCommand.Charge.from(request)) } returns result
 

@@ -1,18 +1,17 @@
 package kr.hhplus.be.server.domain.balance
 
-import kr.hhplus.be.server.domain.customer.Customer
 import java.time.LocalDateTime
 
 class Balance private constructor(
-    val customer: Customer,
+    val customerId: Long,
     private var amount: Int
 ) {
     val id: Long = 0L
     private var updatedAt: LocalDateTime = LocalDateTime.now()
 
     companion object {
-        fun create(customer: Customer, amount: Int): Balance {
-            return Balance(customer, amount)
+        fun create(customerId: Long, amount: Int): Balance {
+            return Balance(customerId, amount)
         }
     }
 

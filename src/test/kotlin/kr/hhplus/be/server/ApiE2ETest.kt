@@ -83,7 +83,7 @@ class ApiE2ETest {
 
         every { customerRepository.findById(customerId) } returns customer
 
-        val balance = Balance.create(customer = customer, amount = 150000)
+        val balance = Balance.create(customerId, amount = 150000)
         every { balanceRepository.findByCustomerId(customerId) } returns balance
 
         val history = BalanceHistory.charge(
