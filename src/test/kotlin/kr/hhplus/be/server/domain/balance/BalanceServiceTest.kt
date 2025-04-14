@@ -62,7 +62,7 @@ class BalanceServiceTest {
             val result = balanceService.charge(1L, 50_000)
 
             // then
-            assertThat(result.amount).isEqualTo(150_000)
+            assertThat(result.getAmount()).isEqualTo(150_000)
         }
 
         @Test
@@ -113,7 +113,7 @@ class BalanceServiceTest {
 
             val result = balanceService.deduct(1L, 30_000)
 
-            assertThat(result.amount).isEqualTo(70_000)
+            assertThat(result.getAmount()).isEqualTo(70_000)
         }
 
         @Test

@@ -22,7 +22,7 @@ class BalanceTest {
             balance.charge(5_000)
 
             // then
-            assertThat(balance.amount).isEqualTo(15_000)
+            assertThat(balance.getAmount()).isEqualTo(15_000)
         }
 
         @Test
@@ -53,7 +53,7 @@ class BalanceTest {
             balance.deduct(5_000)
 
             // then
-            assertThat(balance.amount).isEqualTo(15_000)
+            assertThat(balance.getAmount()).isEqualTo(15_000)
         }
 
         @Test

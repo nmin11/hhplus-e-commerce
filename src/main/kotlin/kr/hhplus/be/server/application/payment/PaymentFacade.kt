@@ -61,7 +61,7 @@ class PaymentFacade(
         val history = BalanceHistory.use(
             customer = order.customer,
             amount = discountedPrice,
-            updatedAmount = balance.amount
+            updatedAmount = balance.getAmount()
         )
         balanceHistoryService.create(history)
 

@@ -35,7 +35,7 @@ class BalanceFacade(
         val history = BalanceHistory.charge(
             customer = customer,
             amount = command.amount,
-            updatedAmount = updatedBalance.amount
+            updatedAmount = updatedBalance.getAmount()
         )
         balanceHistoryService.create(history)
 

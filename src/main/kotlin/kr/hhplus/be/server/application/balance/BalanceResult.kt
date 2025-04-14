@@ -12,7 +12,7 @@ sealed class BalanceResult {
             fun from(balance: Balance): Summary {
                 return Summary(
                     customerId = balance.customer.id,
-                    amount = balance.amount
+                    amount = balance.getAmount()
                 )
             }
         }
