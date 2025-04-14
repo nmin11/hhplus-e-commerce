@@ -75,23 +75,24 @@ class ApiE2ETest {
     @DisplayName("전체 API 성공 흐름 테스트")
     fun allApiSuccessFlow() {
         val customer = spyk(Customer.create(username = "tester"))
+        val customerId = 1L
 
-        every { customer.id } returns 1L
+        every { customer.id } returns customerId
 
-        every { customerRepository.existsById(1L) } returns true
+        every { customerRepository.existsById(customerId) } returns true
 
-        every { customerRepository.findById(1L) } returns customer
+        every { customerRepository.findById(customerId) } returns customer
 
         val balance = Balance.create(customer = customer, amount = 150000)
-        every { balanceRepository.findByCustomerId(1L) } returns balance
+        every { balanceRepository.findByCustomerId(customerId) } returns balance
 
         val history = BalanceHistory.charge(
-            customer = customer,
+            customerId,
             amount = 1000,
             updatedAmount = 6000
         )
 
-        every { balanceHistoryRepository.findAllByCustomerId(1L) } returns listOf(history)
+        every { balanceHistoryRepository.findAllByCustomerId(customerId) } returns listOf(history)
 
         every { balanceRepository.save(any()) } answers { firstArg() }
         every { balanceHistoryRepository.save(any()) } answers { firstArg() }

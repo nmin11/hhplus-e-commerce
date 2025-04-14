@@ -25,16 +25,18 @@ class BalanceFacade(
 
     @Transactional
     fun charge(command: BalanceCommand.Charge): BalanceResult.Summary {
+        val (customerId, amount) = command
+
         // 1. 고객 조회
-        val customer = customerService.getById(command.customerId)
+        customerService.validateCustomerExistence(customerId)
 
         // 2. 잔액 충전
-        val updatedBalance = balanceService.charge(command.customerId, command.amount)
+        val updatedBalance = balanceService.charge(customerId, amount)
 
         // 3. 충전 내역 저장
         val history = BalanceHistory.charge(
-            customer = customer,
-            amount = command.amount,
+            customerId = customerId,
+            amount = amount,
             updatedAmount = updatedBalance.getAmount()
         )
         balanceHistoryService.create(history)

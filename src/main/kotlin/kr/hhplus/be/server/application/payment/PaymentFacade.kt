@@ -59,7 +59,7 @@ class PaymentFacade(
 
         // 6. 잔액 변경 내역 저장
         val history = BalanceHistory.use(
-            customer = order.customer,
+            customerId,
             amount = discountedPrice,
             updatedAmount = balance.getAmount()
         )

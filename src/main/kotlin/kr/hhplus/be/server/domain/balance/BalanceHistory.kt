@@ -1,10 +1,9 @@
 package kr.hhplus.be.server.domain.balance
 
-import kr.hhplus.be.server.domain.customer.Customer
 import java.time.LocalDateTime
 
 class BalanceHistory private constructor(
-    val customer: Customer,
+    val customerId: Long,
     val changeType: BalanceChangeType,
     val changeAmount: Int,
     val totalAmount: Int
@@ -13,18 +12,18 @@ class BalanceHistory private constructor(
     val createdAt: LocalDateTime = LocalDateTime.now()
 
     companion object {
-        fun charge(customer: Customer, amount: Int, updatedAmount: Int): BalanceHistory {
+        fun charge(customerId: Long, amount: Int, updatedAmount: Int): BalanceHistory {
             return BalanceHistory(
-                customer = customer,
+                customerId,
                 changeType = BalanceChangeType.CHARGE,
                 changeAmount = amount,
                 totalAmount = updatedAmount
             )
         }
 
-        fun use(customer: Customer, amount: Int, updatedAmount: Int): BalanceHistory {
+        fun use(customerId: Long, amount: Int, updatedAmount: Int): BalanceHistory {
             return BalanceHistory(
-                customer = customer,
+                customerId,
                 changeType = BalanceChangeType.USE,
                 changeAmount = amount,
                 totalAmount = updatedAmount

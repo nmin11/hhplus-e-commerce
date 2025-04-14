@@ -42,7 +42,7 @@ class BalanceControllerTest {
         val customerId = 1L
         val histories = listOf(
             BalanceHistory.charge(
-                customer = Customer.create("tester"),
+                customerId,
                 amount = 10_000,
                 updatedAmount = 110_000
             )

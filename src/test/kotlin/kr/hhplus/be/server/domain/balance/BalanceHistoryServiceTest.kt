@@ -3,7 +3,6 @@ package kr.hhplus.be.server.domain.balance
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import kr.hhplus.be.server.domain.customer.Customer
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -12,14 +11,12 @@ class BalanceHistoryServiceTest {
     private val balanceHistoryRepository = mockk<BalanceHistoryRepository>()
     private val balanceHistoryService = BalanceHistoryService(balanceHistoryRepository)
 
-    private val customer = Customer.create(username = "tester")
-
     @Test
     @DisplayName("잔액 변경 내역을 저장하고 반환")
     fun create_shouldSaveAndReturnBalanceHistory() {
         // given
         val history = BalanceHistory.charge(
-            customer = customer,
+            customerId = 1L,
             amount = 50_000,
             updatedAmount = 150_000
         )
@@ -40,12 +37,12 @@ class BalanceHistoryServiceTest {
         val customerId = 1L
         val histories = listOf(
             BalanceHistory.charge(
-                customer,
+                customerId = 1L,
                 amount = 50_000,
                 updatedAmount = 150_000
             ),
             BalanceHistory.use(
-                customer,
+                customerId = 1L,
                 amount = 75_000,
                 updatedAmount = 75_000
             )
