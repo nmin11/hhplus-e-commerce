@@ -194,27 +194,37 @@ class ApiE2ETest {
 
         every { customerCouponRepository.save(any()) } answers { firstArg() }
 
-        val coupon1 = Coupon.createFixedDiscount(
-            name = "첫 구매 할인",
-            amount = 3000,
-            quantity = 100,
-            startedAt = LocalDate.parse("2025-04-01"),
-            expiredAt = LocalDate.parse("2025-04-30")
+        val coupon1 = spyk(
+                Coupon.createFixedDiscount(
+                name = "첫 구매 할인",
+                amount = 3000,
+                quantity = 100,
+                startedAt = LocalDate.parse("2025-04-01"),
+                expiredAt = LocalDate.parse("2025-04-30")
+            )
         )
 
-        val coupon2 = Coupon.createRateDiscount(
-            name = "봄맞이 프로모션",
-            rate = 10,
-            quantity = 50,
-            startedAt = LocalDate.parse("2025-03-15"),
-            expiredAt = LocalDate.parse("2025-04-10")
+        val coupon2 = spyk(
+            Coupon.createRateDiscount(
+                name = "봄맞이 프로모션",
+                rate = 10,
+                quantity = 50,
+                startedAt = LocalDate.parse("2025-03-15"),
+                expiredAt = LocalDate.parse("2025-04-10")
+            )
         )
 
-        val customerCoupon1 = CustomerCoupon.issue(customer, coupon1).apply {
+        every { coupon1.id } returns 21L
+        every { coupon2.id } returns 22L
+
+        every { couponRepository.findById(21L) } returns coupon1
+        every { couponRepository.findById(22L) } returns coupon2
+
+        val customerCoupon1 = CustomerCoupon.issue(customerId, coupon1.id).apply {
             status = CustomerCouponStatus.AVAILABLE
         }
 
-        val customerCoupon2 = CustomerCoupon.issue(customer, coupon2).apply {
+        val customerCoupon2 = CustomerCoupon.issue(customerId, coupon2.id).apply {
             status = CustomerCouponStatus.USED
         }
 

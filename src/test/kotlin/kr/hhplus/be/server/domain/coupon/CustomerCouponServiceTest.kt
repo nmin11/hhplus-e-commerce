@@ -22,7 +22,6 @@ class CustomerCouponServiceTest {
         fun returnAllCouponsForCustomer() {
             // given
             val customerId = 1L
-            val customer = Customer.create("tester")
 
             val coupon1 = Coupon.createFixedDiscount(
                 name = "5천원 할인",
@@ -41,8 +40,8 @@ class CustomerCouponServiceTest {
             )
 
             val expectedCoupons = listOf(
-                CustomerCoupon.issue(customer, coupon1),
-                CustomerCoupon.issue(customer, coupon2)
+                CustomerCoupon.issue(customerId, coupon1.id),
+                CustomerCoupon.issue(customerId, coupon2.id)
             )
 
             every { customerCouponRepository.findAllByCustomerId(customerId) } returns expectedCoupons
@@ -64,7 +63,6 @@ class CustomerCouponServiceTest {
         @Test
         @DisplayName("고객에게 발급된 사용 가능한 쿠폰이면 반환")
         fun returnCustomerCoupon_whenValidAndAvailable() {
-            val customer = Customer.create("tester")
             val coupon = Coupon.createFixedDiscount(
                 name = "정상 쿠폰",
                 amount = 1000,
@@ -73,7 +71,7 @@ class CustomerCouponServiceTest {
                 expiredAt = LocalDate.now().plusDays(1)
             )
 
-            val customerCoupon = CustomerCoupon.issue(customer, coupon) // status: AVAILABLE by default
+            val customerCoupon = CustomerCoupon.issue(customerId, couponId)
 
             every { customerCouponRepository.findByCustomerIdAndCouponId(customerId, couponId) } returns customerCoupon
 
@@ -106,7 +104,7 @@ class CustomerCouponServiceTest {
                 expiredAt = LocalDate.now().plusDays(2)
             )
 
-            val customerCoupon = CustomerCoupon.issue(customer, coupon).apply {
+            val customerCoupon = CustomerCoupon.issue(customerId, couponId).apply {
                 status = CustomerCouponStatus.USED
             }
 
@@ -131,7 +129,7 @@ class CustomerCouponServiceTest {
                 expiredAt = LocalDate.now().minusDays(1)
             )
 
-            val customerCoupon = CustomerCoupon.issue(customer, coupon).apply {
+            val customerCoupon = CustomerCoupon.issue(customerId, couponId).apply {
                 status = CustomerCouponStatus.EXPIRED
             }
 
@@ -173,7 +171,7 @@ class CustomerCouponServiceTest {
                 expiredAt = LocalDate.now().plusDays(1)
             )
 
-            val issued = CustomerCoupon.issue(customer, coupon)
+            val issued = CustomerCoupon.issue(customerId, couponId)
 
             every { customerCouponRepository.findByCustomerIdAndCouponId(customerId, couponId) } returns issued
 
@@ -190,6 +188,9 @@ class CustomerCouponServiceTest {
 
     @Nested
     inner class Issue {
+        private val customerId = 1L
+        private val couponId = 1L
+
         @Test
         @DisplayName("쿠폰을 발급하고 저장된 객체 반환")
         fun saveAndReturnCustomerCoupon() {
@@ -203,12 +204,12 @@ class CustomerCouponServiceTest {
                 expiredAt = LocalDate.now().plusDays(1)
             )
 
-            val saved = CustomerCoupon.issue(customer, coupon)
+            val saved = CustomerCoupon.issue(customerId, couponId)
 
             every { customerCouponRepository.save(any()) } returns saved
 
             // when
-            val result = customerCouponService.issue(customer, coupon)
+            val result = customerCouponService.issue(customerId, couponId)
 
             // then
             assertThat(result).isEqualTo(saved)
@@ -218,6 +219,9 @@ class CustomerCouponServiceTest {
 
     @Nested
     inner class UpdateAsExpired {
+        private val customerId = 1L
+        private val couponId = 1L
+
         @Test
         @DisplayName("AVAILABLE 상태인 쿠폰은 EXPIRED 로 갱신된다")
         fun shouldUpdateAvailableToExpired() {
@@ -231,7 +235,7 @@ class CustomerCouponServiceTest {
 
             val customer = Customer.create("tester")
 
-            val available = CustomerCoupon.issue(customer, coupon)
+            val available = CustomerCoupon.issue(customerId, couponId)
 
             every { customerCouponRepository.findAllByCouponIn(listOf(coupon)) } returns listOf(available)
             every { customerCouponRepository.saveAll(any()) } returnsArgument 0
@@ -255,7 +259,7 @@ class CustomerCouponServiceTest {
 
             val customer = Customer.create("tester")
 
-            val used = CustomerCoupon.issue(customer, coupon).apply {
+            val used = CustomerCoupon.issue(customerId, couponId).apply {
                 status = CustomerCouponStatus.USED
             }
 

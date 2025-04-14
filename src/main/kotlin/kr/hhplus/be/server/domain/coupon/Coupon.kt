@@ -15,7 +15,6 @@ class Coupon private constructor(
     val totalQuantity: Int = quantity
     val createdAt: LocalDateTime = LocalDateTime.now()
     private var updatedAt: LocalDateTime = LocalDateTime.now()
-    val customerCoupons: MutableList<CustomerCoupon> = mutableListOf()
 
     companion object {
         fun createFixedDiscount(

@@ -26,8 +26,8 @@ class CustomerCouponService(
         }
     }
 
-    fun issue(customer: Customer, coupon: Coupon): CustomerCoupon {
-        val customerCoupon = CustomerCoupon.issue(customer, coupon)
+    fun issue(customerId: Long, couponId: Long): CustomerCoupon {
+        val customerCoupon = CustomerCoupon.issue(customerId, customerId)
         return customerCouponRepository.save(customerCoupon)
     }
 

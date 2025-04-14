@@ -5,9 +5,7 @@ import io.mockk.mockk
 import kr.hhplus.be.server.application.coupon.CouponCommand
 import kr.hhplus.be.server.application.coupon.CouponFacade
 import kr.hhplus.be.server.application.coupon.CouponResult
-import kr.hhplus.be.server.application.coupon.CustomerCouponResult
 import kr.hhplus.be.server.domain.coupon.*
-import kr.hhplus.be.server.domain.customer.Customer
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -16,28 +14,21 @@ import java.time.LocalDate
 
 class CouponControllerTest {
     private val couponFacade = mockk<CouponFacade>()
-    private val customerCouponService = mockk<CustomerCouponService>()
-    private val couponController = CouponController(couponFacade, customerCouponService)
+    private val couponController = CouponController(couponFacade)
 
     @Test
     @DisplayName("쿠폰 발급 요청 시 발급된 쿠폰 반환")
     fun issue_shouldReturnIssuedCouponResponse() {
         // given
-        val request = CouponRequest.Issue(couponId = 1L, customerId = 1L)
-        val customer = Customer.create("tester")
-        val coupon = Coupon.createFixedDiscount(
-            name = "첫 구매 할인",
-            amount = 3000,
-            quantity = 100,
-            startedAt = LocalDate.now().minusDays(1),
-            expiredAt = LocalDate.now().plusDays(10)
-        )
+        val couponId = 10L
+        val customerId = 1L
+        val request = CouponRequest.Issue(couponId, customerId)
 
-        val customerCoupon = CustomerCoupon.issue(customer, coupon).apply {
+        val customerCoupon = CustomerCoupon.issue(customerId, couponId).apply {
             status = CustomerCouponStatus.AVAILABLE
         }
 
-        val command = CouponCommand.Issue(1L, 1L)
+        val command = CouponCommand.Issue(couponId, customerId)
         val result = CouponResult.Issue.from(customerCoupon)
         every { couponFacade.issueCouponToCustomer(command) } returns result
 
@@ -53,7 +44,9 @@ class CouponControllerTest {
     @DisplayName("사용자 쿠폰 목록 조회 시 보유 쿠폰 리스트 반환")
     fun getCustomerCoupons_shouldReturnOwnedCoupons() {
         // given
-        val customer = Customer.create("tester")
+        val firstCouponId = 11L
+        val secondCouponId = 12L
+        val customerId = 1L
         val coupon1 = Coupon.createFixedDiscount(
             name = "첫 구매 할인",
             amount = 3000,
@@ -70,17 +63,21 @@ class CouponControllerTest {
         )
 
         val customerCoupons = listOf(
-            CustomerCoupon.issue(customer, coupon1).apply {
+            CustomerCoupon.issue(customerId, firstCouponId).apply {
                 status = CustomerCouponStatus.AVAILABLE
             },
-            CustomerCoupon.issue(customer, coupon2).apply {
+            CustomerCoupon.issue(customerId, secondCouponId).apply {
                 status = CustomerCouponStatus.USED
             }
         )
 
-        val result = customerCoupons.map { CustomerCouponResult.from(it) }
+        val result = mutableListOf<CouponResult.OwnedCoupon>()
+        customerCoupons.map {
+            result.add(CouponResult.OwnedCoupon.from(it, coupon1))
+            result.add(CouponResult.OwnedCoupon.from(it, coupon2))
+        }
 
-        every { customerCouponService.getAllByCustomerId(1L) } returns customerCoupons
+        every { couponFacade.getCustomerCoupons(1L) } returns result
 
         // when
         val response = couponController.getCustomerCoupons(1L)

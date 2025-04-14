@@ -1,11 +1,10 @@
 package kr.hhplus.be.server.domain.coupon
 
-import kr.hhplus.be.server.domain.customer.Customer
 import java.time.LocalDateTime
 
 class CustomerCoupon private constructor(
-    val customer: Customer,
-    val coupon: Coupon
+    val customerId: Long,
+    val couponId: Long
 ) {
     val id: Long = 0L
     var status = CustomerCouponStatus.AVAILABLE
@@ -13,11 +12,8 @@ class CustomerCoupon private constructor(
     private var updatedAt: LocalDateTime = LocalDateTime.now()
 
     companion object {
-        fun issue(customer: Customer, coupon: Coupon): CustomerCoupon {
-            return CustomerCoupon(
-                customer = customer,
-                coupon = coupon
-            )
+        fun issue(customerId: Long, couponId: Long): CustomerCoupon {
+            return CustomerCoupon(customerId, couponId)
         }
     }
 

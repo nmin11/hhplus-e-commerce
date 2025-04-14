@@ -44,7 +44,7 @@ class PaymentFacade(
         // 3. 쿠폰 유효성 검사 및 할인 금액 계산
         val discountAmount = command.couponId?.let {
             val customerCoupon = customerCouponService.validateIssuedCoupon(customerId, it)
-            val coupon = customerCoupon.coupon
+            val coupon = couponService.getById(command.couponId)
 
             coupon.validatePeriod()
             coupon.calculateDiscount(order.totalPrice)
