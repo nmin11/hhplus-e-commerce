@@ -11,7 +11,7 @@ class Order private constructor(
     @ManyToOne
     @JoinColumn(name = "customer_id", nullable = false)
     val customer: Customer
-) :BaseEntity() {
+) : BaseEntity() {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0L
 
