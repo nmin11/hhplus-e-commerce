@@ -1,7 +1,6 @@
 package kr.hhplus.be.server.domain.balance
 
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
 
 @Service
 class BalanceService(
