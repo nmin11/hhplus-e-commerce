@@ -2,7 +2,9 @@ package kr.hhplus.be.server.infrastructure.balance
 
 import kr.hhplus.be.server.domain.balance.BalanceHistory
 import kr.hhplus.be.server.domain.balance.BalanceHistoryRepository
+import org.springframework.stereotype.Repository
 
+@Repository
 class BalanceHistoryRepositoryImpl(
     private val balanceHistoryJpaRepository: BalanceHistoryJpaRepository
 ) : BalanceHistoryRepository {
