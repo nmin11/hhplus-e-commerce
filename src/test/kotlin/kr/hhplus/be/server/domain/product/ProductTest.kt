@@ -19,8 +19,6 @@ class ProductTest {
         // then
         assertThat(product.name).isEqualTo("청바지")
         assertThat(product.basePrice).isEqualTo(30000)
-        assertThat(product.productOptions).isEmpty()
-        assertThat(product.statistics).isEmpty()
     }
 
     @Test

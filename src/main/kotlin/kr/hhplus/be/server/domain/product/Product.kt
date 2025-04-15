@@ -9,8 +9,6 @@ class Product private constructor(
     val id: Long = 0L
     val createdAt: LocalDateTime = LocalDateTime.now()
     val updatedAt: LocalDateTime = LocalDateTime.now()
-    val productOptions: MutableList<ProductOption> = mutableListOf()
-    val statistics: MutableList<Statistic> = mutableListOf()
 
     companion object {
         fun create(name: String, basePrice: Int): Product {

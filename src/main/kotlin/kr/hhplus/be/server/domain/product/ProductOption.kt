@@ -1,6 +1,5 @@
 package kr.hhplus.be.server.domain.product
 
-import kr.hhplus.be.server.domain.order.OrderItem
 import java.time.LocalDateTime
 
 class ProductOption private constructor(
@@ -11,8 +10,6 @@ class ProductOption private constructor(
     val id: Long = 0L
     val createdAt: LocalDateTime = LocalDateTime.now()
     var updatedAt: LocalDateTime = LocalDateTime.now()
-    var stock: Stock? = null
-    val orderItems: MutableList<OrderItem> = mutableListOf()
 
     companion object {
         fun create(product: Product, optionName: String, extraPrice: Int): ProductOption {

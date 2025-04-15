@@ -18,8 +18,6 @@ class ProductOptionTest {
         assertThat(option.product).isEqualTo(product)
         assertThat(option.optionName).isEqualTo("M")
         assertThat(option.extraPrice).isEqualTo(1000)
-        assertThat(option.stock).isNull()
-        assertThat(option.orderItems).isEmpty()
     }
 
     @Test
