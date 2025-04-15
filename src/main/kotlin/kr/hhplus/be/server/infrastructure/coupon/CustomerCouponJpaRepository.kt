@@ -5,7 +5,6 @@ import kr.hhplus.be.server.domain.coupon.CustomerCoupon
 import org.springframework.data.jpa.repository.JpaRepository
 
 interface CustomerCouponJpaRepository : JpaRepository<CustomerCoupon, Long> {
-    fun saveAll(customerCoupons: List<CustomerCoupon>): List<CustomerCoupon>
     fun findAllByCustomerId(customerId: Long): List<CustomerCoupon>
     fun findByCustomerIdAndCouponId(customerId: Long, couponId: Long): CustomerCoupon?
     fun findAllByCouponIn(coupons: List<Coupon>): List<CustomerCoupon>
