@@ -7,7 +7,7 @@ class Statistic private constructor(
     val salesCount: Int
 ) {
     val id: Long = 0L
-    var soldAt: LocalDateTime = LocalDateTime.now()
+    val soldAt: LocalDateTime = LocalDateTime.now()
 
     companion object {
         fun create(product: Product, salesCount: Int): Statistic {
