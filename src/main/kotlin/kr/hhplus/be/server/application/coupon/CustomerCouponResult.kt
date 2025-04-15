@@ -16,8 +16,8 @@ data class CustomerCouponResult(
             val coupon = customerCoupon.coupon
             return CustomerCouponResult(
                 name = coupon.name,
-                discountType = coupon.discountPolicy.getType(),
-                discountAmount = coupon.discountPolicy.getAmount(),
+                discountType = coupon.discountType.name,
+                discountAmount = coupon.discountAmount,
                 status = customerCoupon.status,
                 issuedAt = customerCoupon.issuedAt.toString(),
                 expiredAt = coupon.expiredAt.toString()

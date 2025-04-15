@@ -1,21 +1,28 @@
 package kr.hhplus.be.server.domain.coupon
 
+import jakarta.persistence.Transient
 import java.time.LocalDate
 import java.time.LocalDateTime
 
 class Coupon private constructor(
     val name: String,
-    val quantity: Int,
+    val totalQuantity: Int,
     val startedAt: LocalDate,
     val expiredAt: LocalDate,
-    val discountPolicy: DiscountPolicy
+    val discountType: DiscountType,
+    val discountAmount: Int
 ) {
     val id: Long = 0L
-    private var currentQuantity: Int = quantity
-    val totalQuantity: Int = quantity
+    private var currentQuantity: Int = totalQuantity
     val createdAt: LocalDateTime = LocalDateTime.now()
     private var updatedAt: LocalDateTime = LocalDateTime.now()
-    val customerCoupons: MutableList<CustomerCoupon> = mutableListOf()
+
+    @Transient
+    private val discountPolicy: DiscountPolicy  =
+        when (discountType) {
+            DiscountType.FIXED -> FixedDiscountPolicy(discountAmount)
+            DiscountType.RATE -> RateDiscountPolicy(discountAmount)
+        }
 
     companion object {
         fun createFixedDiscount(
@@ -27,10 +34,11 @@ class Coupon private constructor(
         ): Coupon {
             return Coupon(
                 name = name,
-                quantity = quantity,
+                totalQuantity = quantity,
                 startedAt = startedAt,
                 expiredAt = expiredAt,
-                discountPolicy = FixedDiscountPolicy(amount)
+                discountType = DiscountType.FIXED,
+                discountAmount = amount
             )
         }
 
@@ -43,10 +51,11 @@ class Coupon private constructor(
         ): Coupon {
             return Coupon(
                 name = name,
-                quantity = quantity,
+                totalQuantity = quantity,
                 startedAt = startedAt,
                 expiredAt = expiredAt,
-                discountPolicy = RateDiscountPolicy(rate)
+                discountType = DiscountType.RATE,
+                discountAmount = rate
             )
         }
     }
@@ -61,10 +70,7 @@ class Coupon private constructor(
     }
 
     fun calculateDiscount(totalPrice: Int): Int {
-        val now = LocalDate.now()
-        if (now.isBefore(startedAt) || now.isAfter(expiredAt)) {
-            throw IllegalStateException("유효하지 않은 쿠폰입니다.")
-        }
+        validatePeriod()
         return discountPolicy.calculateDiscount(totalPrice)
     }
 
