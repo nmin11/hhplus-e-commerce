@@ -2,6 +2,7 @@ package kr.hhplus.be.server.domain.product
 
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.spyk
 import io.mockk.verify
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
@@ -36,14 +37,12 @@ class StatisticServiceTest {
         // given
         val since = LocalDate.now().minusDays(3)
         val product = Product.create(name = "청바지", basePrice = 10_000)
-        val statistics = listOf(
-            Statistic.create(product, salesCount = 12).apply {
-                soldAt = LocalDateTime.now().minusDays(1)
-            },
-            Statistic.create(product, salesCount = 9).apply {
-                soldAt = LocalDateTime.now().minusDays(2)
-            }
-        )
+        val stat1 = spyk(Statistic.create(product = product, salesCount = 12))
+        val stat2 = spyk(Statistic.create(product = product, salesCount = 9))
+        val statistics = listOf(stat1, stat2)
+
+        every { stat1.soldAt } returns LocalDateTime.now().minusDays(1)
+        every { stat2.soldAt } returns LocalDateTime.now().minusDays(2)
         every { statisticRepository.findTop5BySoldAtAfterOrderBySalesCountDesc(since) } returns statistics
 
         // when

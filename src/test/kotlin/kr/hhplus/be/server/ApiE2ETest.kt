@@ -116,21 +116,17 @@ class ApiE2ETest {
             productRepository.findAllByIds(listOf(1L, 2L, 3L, 4L, 5L))
         } returns listOf(product1, product2, product3, product4, product5)
 
-        val stat1 = Statistic.create(product = product1, salesCount = 12).apply {
-            soldAt = LocalDateTime.now().minusDays(1)
-        }
-        val stat2 = Statistic.create(product = product2, salesCount = 9).apply {
-            soldAt = LocalDateTime.now().minusDays(2)
-        }
-        val stat3 = Statistic.create(product = product3, salesCount = 7).apply {
-            soldAt = LocalDateTime.now().minusDays(3)
-        }
-        val stat4 = Statistic.create(product = product4, salesCount = 5).apply {
-            soldAt = LocalDateTime.now().minusDays(1)
-        }
-        val stat5 = Statistic.create(product = product5, salesCount = 3).apply {
-            soldAt = LocalDateTime.now().minusDays(2)
-        }
+        val stat1 = spyk(Statistic.create(product = product1, salesCount = 12))
+        val stat2 = spyk(Statistic.create(product = product2, salesCount = 9))
+        val stat3 = spyk(Statistic.create(product = product3, salesCount = 7))
+        val stat4 = spyk(Statistic.create(product = product4, salesCount = 5))
+        val stat5 = spyk(Statistic.create(product = product5, salesCount = 3))
+
+        every { stat1.soldAt } returns LocalDateTime.now().minusDays(1)
+        every { stat2.soldAt } returns LocalDateTime.now().minusDays(2)
+        every { stat3.soldAt } returns LocalDateTime.now().minusDays(3)
+        every { stat4.soldAt } returns LocalDateTime.now().minusDays(1)
+        every { stat5.soldAt } returns LocalDateTime.now().minusDays(2)
 
         every {
             statisticRepository.findTop5BySoldAtAfterOrderBySalesCountDesc(any())
