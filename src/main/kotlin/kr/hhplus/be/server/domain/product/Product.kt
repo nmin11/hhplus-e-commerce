@@ -1,14 +1,22 @@
 package kr.hhplus.be.server.domain.product
 
-import java.time.LocalDateTime
+import jakarta.persistence.*
+import kr.hhplus.be.server.domain.common.BaseEntity
 
+@Entity
+@Table(
+    name = "product",
+    uniqueConstraints = [UniqueConstraint(name = "uq_product_name", columnNames = ["name"])]
+)
 class Product private constructor(
+    @Column(name = "name", nullable = false, length = 50)
     val name: String,
+
+    @Column(name = "base_price", nullable = false)
     val basePrice: Int
-) {
+) : BaseEntity() {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0L
-    val createdAt: LocalDateTime = LocalDateTime.now()
-    val updatedAt: LocalDateTime = LocalDateTime.now()
 
     companion object {
         fun create(name: String, basePrice: Int): Product {

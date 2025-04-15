@@ -163,6 +163,7 @@ class ApiE2ETest {
                     OrderItem(order = this, productOption = optionL, quantity = 1, subtotalPrice = 31000)
                 )
             )
+            createdAt = now
         }
 
         every { orderRepository.save(any()) } returns order
