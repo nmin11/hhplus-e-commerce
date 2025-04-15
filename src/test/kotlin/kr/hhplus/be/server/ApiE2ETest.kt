@@ -74,6 +74,8 @@ class ApiE2ETest {
     @Test
     @DisplayName("전체 API 성공 흐름 테스트")
     fun allApiSuccessFlow() {
+        val now = LocalDateTime.now()
+
         val customer = spyk(Customer.create(username = "tester"))
 
         every { customer.id } returns 1L
@@ -90,6 +92,7 @@ class ApiE2ETest {
             amount = 1000,
             updatedAmount = 6000
         )
+        history.createdAt = now
 
         every { balanceHistoryRepository.findAllByCustomerId(1L) } returns listOf(history)
 
