@@ -1,21 +1,37 @@
 package kr.hhplus.be.server.domain.coupon
 
-import jakarta.persistence.Transient
+import jakarta.persistence.*
+import kr.hhplus.be.server.domain.common.BaseEntity
 import java.time.LocalDate
 import java.time.LocalDateTime
 
+@Entity
+@Table(name = "coupon")
 class Coupon private constructor(
+    @Column(name = "name", nullable = false, length = 50)
     val name: String,
+
+    @Column(name = "total_quantity", nullable = false)
     val totalQuantity: Int,
+
+    @Column(name = "started_at", nullable = false)
     val startedAt: LocalDate,
+
+    @Column(name = "expired_at", nullable = false)
     val expiredAt: LocalDate,
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "discount_type", nullable = false, length = 20)
     val discountType: DiscountType,
+
+    @Column(name = "discount_amount", nullable = false)
     val discountAmount: Int
-) {
+) : BaseEntity() {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0L
+
+    @Column(name = "current_quantity", nullable = false)
     private var currentQuantity: Int = totalQuantity
-    val createdAt: LocalDateTime = LocalDateTime.now()
-    private var updatedAt: LocalDateTime = LocalDateTime.now()
 
     @Transient
     private val discountPolicy: DiscountPolicy  =
