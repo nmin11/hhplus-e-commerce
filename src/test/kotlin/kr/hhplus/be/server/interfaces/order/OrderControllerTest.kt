@@ -14,6 +14,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
+import java.time.LocalDateTime
 
 class OrderControllerTest {
     private val orderFacade = mockk<OrderFacade>()
@@ -46,6 +47,7 @@ class OrderControllerTest {
                 )
             )
         }
+        order.createdAt = LocalDateTime.now()
 
         val command = OrderCommand.Create.from(request)
         val result = OrderResult.Create.from(order)

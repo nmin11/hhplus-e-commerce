@@ -1,17 +1,28 @@
 package kr.hhplus.be.server.domain.order
 
+import jakarta.persistence.*
+import kr.hhplus.be.server.domain.common.BaseEntity
 import kr.hhplus.be.server.domain.customer.Customer
 import kr.hhplus.be.server.domain.product.ProductOption
-import java.time.LocalDateTime
 
+@Entity
+@Table(name = "`order`")
 class Order private constructor(
+    @ManyToOne
+    @JoinColumn(name = "customer_id", nullable = false)
     val customer: Customer
-) {
+) :BaseEntity() {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0L
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 20)
     var status = OrderStatus.CREATED
-    val createdAt: LocalDateTime = LocalDateTime.now()
-    var updatedAt: LocalDateTime = LocalDateTime.now()
+
+    @Column(name = "total_price", nullable = false)
     var totalPrice: Int = 0
+
+    @OneToMany(mappedBy = "order", cascade = [CascadeType.ALL], orphanRemoval = true)
     val orderItems: MutableList<OrderItem> = mutableListOf()
 
     companion object {
