@@ -1,14 +1,22 @@
 package kr.hhplus.be.server.domain.balance
 
+import jakarta.persistence.*
+import kr.hhplus.be.server.domain.common.BaseEntity
 import kr.hhplus.be.server.domain.customer.Customer
 import java.time.LocalDateTime
 
+@Entity
+@Table(name = "balance")
 class Balance private constructor(
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_id", nullable = false, unique = true)
     val customer: Customer,
+
+    @Column(name = "amount", nullable = false)
     private var amount: Int
-) {
+) : BaseEntity() {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0L
-    private var updatedAt: LocalDateTime = LocalDateTime.now()
 
     companion object {
         fun create(customer: Customer, amount: Int): Balance {

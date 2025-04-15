@@ -14,6 +14,7 @@ CREATE TABLE balance (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     customer_id BIGINT NOT NULL,
     amount INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     INDEX idx_balance_customer_id (customer_id)
