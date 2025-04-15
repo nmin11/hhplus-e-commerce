@@ -1,7 +1,6 @@
 package kr.hhplus.be.server.domain.order
 
 import kr.hhplus.be.server.domain.customer.Customer
-import kr.hhplus.be.server.domain.payment.Payment
 import kr.hhplus.be.server.domain.product.ProductOption
 import java.time.LocalDateTime
 
@@ -13,7 +12,6 @@ class Order private constructor(
     val createdAt: LocalDateTime = LocalDateTime.now()
     var updatedAt: LocalDateTime = LocalDateTime.now()
     var totalPrice: Int = 0
-    var payment: Payment? = null
     val orderItems: MutableList<OrderItem> = mutableListOf()
 
     companion object {
