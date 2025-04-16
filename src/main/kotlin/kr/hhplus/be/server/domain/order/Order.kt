@@ -47,4 +47,12 @@ class Order private constructor(
         orderItems.add(OrderItem.create(this, option, quantity))
         totalPrice += (option.product.basePrice + option.extraPrice) * quantity
     }
+
+    fun markAsPaid() {
+        if (this.status != OrderStatus.CREATED) {
+            throw IllegalStateException("결제 가능한 상태가 아닙니다. (현재 상태: $status)")
+        }
+
+        this.status = OrderStatus.PAID
+    }
 }

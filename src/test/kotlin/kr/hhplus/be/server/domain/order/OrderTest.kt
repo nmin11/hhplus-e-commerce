@@ -77,4 +77,33 @@ class OrderTest {
             assertThat(order.totalPrice).isEqualTo(product.basePrice + option.extraPrice)
         }
     }
+
+    @Nested
+    inner class MarkAsPaid {
+        @Test
+        @DisplayName("주문 상태가 CREATED 일 때 PAID 로 변경됨")
+        fun shouldMarkOrderAsPaidWhenStatusIsCreated() {
+            // given
+            val order = Order.create(customer)
+
+            // when
+            order.markAsPaid()
+
+            // then
+            assertThat(order.status).isEqualTo(OrderStatus.PAID)
+        }
+
+        @Test
+        @DisplayName("주문 상태가 PAID 일 경우 예외 발생")
+        fun shouldThrowExceptionWhenOrderAlreadyPaid() {
+            // given
+            val order = Order.create(customer)
+            order.markAsPaid()
+
+            // when & then
+            assertThatThrownBy { order.markAsPaid() }
+                .isInstanceOf(IllegalStateException::class.java)
+                .hasMessage("결제 가능한 상태가 아닙니다. (현재 상태: PAID)")
+        }
+    }
 }
