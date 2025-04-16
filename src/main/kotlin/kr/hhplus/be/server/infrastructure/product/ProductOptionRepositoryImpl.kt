@@ -8,6 +8,10 @@ import org.springframework.stereotype.Repository
 class ProductOptionRepositoryImpl(
     private val productOptionJpaRepository: ProductOptionJpaRepository
 ) : ProductOptionRepository {
+    override fun save(productOption: ProductOption): ProductOption {
+        return productOptionJpaRepository.save(productOption)
+    }
+
     override fun findAllByProductId(productId: Long): List<ProductOption> {
         return productOptionJpaRepository.findAllByProductId(productId)
     }
