@@ -55,7 +55,6 @@ class CouponServiceTest {
 
     @Nested
     inner class DecreaseQuantity {
-
         @Test
         @DisplayName("쿠폰 수량이 남아 있는 경우 수량을 1 줄이고 저장")
         fun decreaseQuantity_shouldReduceAndSave() {
