@@ -5,14 +5,14 @@
 -- FK는 데드락 이슈를 고려하여 설정하지 않고, 대신 논리적 FK 개념으로 INDEX 사용
     -- 추후 FK 사용 가능성을 고려해 FK 설정 관련 쿼리를 주석 처리
 
-CREATE TABLE customer (
+CREATE TABLE IF NOT EXISTS customer (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-CREATE TABLE balance (
+CREATE TABLE IF NOT EXISTS balance (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     customer_id BIGINT NOT NULL,
     amount INT NOT NULL,
@@ -23,7 +23,7 @@ CREATE TABLE balance (
     -- FOREIGN KEY (customer_id) REFERENCES customer(id)
 );
 
-CREATE TABLE balance_history (
+CREATE TABLE IF NOT EXISTS balance_history (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     customer_id BIGINT NOT NULL,
     change_type VARCHAR(20) NOT NULL, -- 'CHARGE' || 'USE'
@@ -35,7 +35,7 @@ CREATE TABLE balance_history (
     -- FOREIGN KEY (customer_id) REFERENCES customer(id)
 );
 
-CREATE TABLE product (
+CREATE TABLE IF NOT EXISTS product (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50) NOT NULL UNIQUE,
     base_price INT NOT NULL,
@@ -43,7 +43,7 @@ CREATE TABLE product (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-CREATE TABLE product_option (
+CREATE TABLE IF NOT EXISTS product_option (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     product_id BIGINT NOT NULL,
     option_name VARCHAR(50) NOT NULL,
@@ -56,7 +56,7 @@ CREATE TABLE product_option (
     -- FOREIGN KEY (product_id) REFERENCES product(id)
 );
 
-CREATE TABLE stock (
+CREATE TABLE IF NOT EXISTS stock (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     product_option_id BIGINT NOT NULL,
     quantity INT NOT NULL,
@@ -66,7 +66,7 @@ CREATE TABLE stock (
     -- FOREIGN KEY (product_option_id) REFERENCES product_option(id)
 );
 
-CREATE TABLE statistic (
+CREATE TABLE IF NOT EXISTS statistic (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     product_id BIGINT NOT NULL,
     sales_count INT NOT NULL,
@@ -77,7 +77,7 @@ CREATE TABLE statistic (
     -- FOREIGN KEY (product_id) REFERENCES product(id)
 );
 
-CREATE TABLE coupon (
+CREATE TABLE IF NOT EXISTS coupon (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
     discount_type VARCHAR(20) NOT NULL, -- 'FIXED' || 'RATE'
@@ -92,7 +92,7 @@ CREATE TABLE coupon (
     UNIQUE KEY uq_coupon_name (name)
 );
 
-CREATE TABLE customer_coupon (
+CREATE TABLE IF NOT EXISTS customer_coupon (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     customer_id BIGINT NOT NULL,
     coupon_id BIGINT NOT NULL,
@@ -107,7 +107,7 @@ CREATE TABLE customer_coupon (
     -- FOREIGN KEY (coupon_id) REFERENCES coupon(id)
 );
 
-CREATE TABLE `order` (
+CREATE TABLE IF NOT EXISTS `order` (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     customer_id BIGINT NOT NULL,
     total_price INT NOT NULL,
@@ -119,7 +119,7 @@ CREATE TABLE `order` (
     -- FOREIGN KEY (customer_id) REFERENCES customer(id)
 );
 
-CREATE TABLE order_item (
+CREATE TABLE IF NOT EXISTS order_item (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     order_id BIGINT NOT NULL,
     product_option_id BIGINT NOT NULL,
@@ -132,7 +132,7 @@ CREATE TABLE order_item (
     -- FOREIGN KEY (product_option_id) REFERENCES product_option(id)
 );
 
-CREATE TABLE payment (
+CREATE TABLE IF NOT EXISTS payment (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     order_id BIGINT NOT NULL,
     customer_id BIGINT NOT NULL,
