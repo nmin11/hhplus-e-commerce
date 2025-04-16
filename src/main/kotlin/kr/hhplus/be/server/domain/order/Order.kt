@@ -31,6 +31,10 @@ class Order private constructor(
         }
 
         fun createWithItems(customer: Customer, items: List<OrderItemInfo>): Order {
+            if (items.isEmpty()) {
+                throw IllegalArgumentException("주문 항목이 비어있습니다.")
+            }
+
             val order = Order(customer)
             items.forEach { (option, quantity) ->
                 order.addOrderItem(option, quantity)

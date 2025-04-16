@@ -4,6 +4,7 @@ import kr.hhplus.be.server.domain.customer.Customer
 import kr.hhplus.be.server.domain.product.Product
 import kr.hhplus.be.server.domain.product.ProductOption
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -45,6 +46,18 @@ class OrderTest {
             assertThat(order.customer).isEqualTo(customer)
             assertThat(order.orderItems).hasSize(1)
             assertThat(order.totalPrice).isEqualTo((product.basePrice + option.extraPrice) * quantity)
+        }
+
+        @Test
+        @DisplayName("주문 항목이 비어 있으면 예외 발생")
+        fun shouldThrowExceptionWhenItemsAreEmpty() {
+            // given
+            val emptyItems = emptyList<OrderItemInfo>()
+
+            // when & then
+            assertThatThrownBy { Order.createWithItems(customer, emptyItems) }
+                .isInstanceOf(IllegalArgumentException::class.java)
+                .hasMessage("주문 항목이 비어있습니다.")
         }
     }
 
