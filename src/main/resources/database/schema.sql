@@ -8,16 +8,16 @@
 CREATE TABLE IF NOT EXISTS customer (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS balance (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     customer_id BIGINT NOT NULL,
     amount INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP,
 
     INDEX idx_balance_customer_id (customer_id)
     -- FOREIGN KEY (customer_id) REFERENCES customer(id)
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS balance_history (
     change_type VARCHAR(20) NOT NULL, -- 'CHARGE' || 'USE'
     change_amount INT NOT NULL,
     total_amount INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP,
 
     INDEX idx_balance_history_customer_id (customer_id)
     -- FOREIGN KEY (customer_id) REFERENCES customer(id)
@@ -39,8 +39,8 @@ CREATE TABLE IF NOT EXISTS product (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50) NOT NULL UNIQUE,
     base_price INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS product_option (
@@ -48,8 +48,8 @@ CREATE TABLE IF NOT EXISTS product_option (
     product_id BIGINT NOT NULL,
     option_name VARCHAR(50) NOT NULL,
     extra_price INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP,
 
     INDEX idx_product_option_product_id (product_id),
     UNIQUE KEY uq_product_option_product_id_option_name (product_id, option_name) -- 동일 상품 내 같은 옵션 생성 방지
@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS stock (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     product_option_id BIGINT NOT NULL,
     quantity INT NOT NULL,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
 
     INDEX idx_stock_product_option_id (product_option_id)
     -- FOREIGN KEY (product_option_id) REFERENCES product_option(id)
@@ -86,8 +86,8 @@ CREATE TABLE IF NOT EXISTS coupon (
     total_quantity INT NOT NULL,
     started_at TIMESTAMP NOT NULL,
     expired_at TIMESTAMP NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP,
 
     UNIQUE KEY uq_coupon_name (name)
 );
@@ -97,8 +97,8 @@ CREATE TABLE IF NOT EXISTS customer_coupon (
     customer_id BIGINT NOT NULL,
     coupon_id BIGINT NOT NULL,
     status VARCHAR(20) NOT NULL, -- 'ISSUED' || 'USED' || 'EXPIRED'
-    issued_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    issued_at TIMESTAMP,
+    updated_at TIMESTAMP,
 
     UNIQUE KEY uq_customer_coupon_customer_id_coupon_id (customer_id, coupon_id),
     INDEX idx_customer_coupon_customer_id (customer_id),
@@ -112,8 +112,8 @@ CREATE TABLE IF NOT EXISTS `order` (
     customer_id BIGINT NOT NULL,
     total_price INT NOT NULL,
     status VARCHAR(20) NOT NULL, -- 'PENDING' || 'PAID' || 'CANCELLED'
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP,
 
     INDEX idx_order_customer_id (customer_id)
     -- FOREIGN KEY (customer_id) REFERENCES customer(id)
@@ -140,7 +140,7 @@ CREATE TABLE IF NOT EXISTS payment (
     original_price INT NOT NULL,
     discount_amount INT NOT NULL,
     discounted_price INT NOT NULL,
-    paid_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    paid_at TIMESTAMP,
 
     INDEX idx_payment_order_id (order_id),
     INDEX idx_payment_customer_id (customer_id),
