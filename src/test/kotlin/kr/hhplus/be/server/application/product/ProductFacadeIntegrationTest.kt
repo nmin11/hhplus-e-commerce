@@ -26,7 +26,7 @@ class ProductFacadeIntegrationTest @Autowired constructor(
 
     @BeforeEach
     fun setup() {
-        product = Product.create("아메리카노", basePrice = 4_000)
+        product = Product.create("장갑", basePrice = 4_000)
         productRepository.save(product)
 
         option1 = ProductOption.create(product, "S", 0)
@@ -53,7 +53,7 @@ class ProductFacadeIntegrationTest @Autowired constructor(
     fun getPopularProducts_shouldReturnTop5BasedOnStatistics() {
         // given
         val now = LocalDate.now()
-        val product2 = Product.create("라떼", basePrice = 4_500)
+        val product2 = Product.create("양말", basePrice = 4_500)
         productRepository.save(product2)
 
         val stats = listOf(
