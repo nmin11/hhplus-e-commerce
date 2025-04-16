@@ -3,7 +3,7 @@ package kr.hhplus.be.server.infrastructure.product
 import kr.hhplus.be.server.domain.product.Statistic
 import kr.hhplus.be.server.domain.product.StatisticRepository
 import org.springframework.stereotype.Repository
-import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Repository
 class StatisticRepositoryImpl(
@@ -13,7 +13,7 @@ class StatisticRepositoryImpl(
         return statisticJpaRepository.save(statistic)
     }
 
-    override fun findTop5BySoldAtAfterOrderBySalesCountDesc(since: LocalDate): List<Statistic> {
+    override fun findTop5BySoldAtAfterOrderBySalesCountDesc(since: LocalDateTime): List<Statistic> {
         return statisticJpaRepository.findTop5BySoldAtAfterOrderBySalesCountDesc(since)
     }
 }

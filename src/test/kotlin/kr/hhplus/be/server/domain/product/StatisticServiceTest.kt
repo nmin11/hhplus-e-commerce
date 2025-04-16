@@ -36,6 +36,7 @@ class StatisticServiceTest {
     fun returnTop5StatisticsSinceDate() {
         // given
         val since = LocalDate.now().minusDays(3)
+        val startOfDay = since.atStartOfDay()
         val product = Product.create(name = "청바지", basePrice = 10_000)
         val stat1 = spyk(Statistic.create(product = product, salesCount = 12))
         val stat2 = spyk(Statistic.create(product = product, salesCount = 9))
@@ -43,7 +44,7 @@ class StatisticServiceTest {
 
         every { stat1.soldAt } returns LocalDateTime.now().minusDays(1)
         every { stat2.soldAt } returns LocalDateTime.now().minusDays(2)
-        every { statisticRepository.findTop5BySoldAtAfterOrderBySalesCountDesc(since) } returns statistics
+        every { statisticRepository.findTop5BySoldAtAfterOrderBySalesCountDesc(startOfDay) } returns statistics
 
         // when
         val result = statisticService.getTop5PopularProductStatistics(since)
