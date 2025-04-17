@@ -33,7 +33,7 @@ class BalanceServiceConcurrencyTest @Autowired constructor(
     }
 
     @Test
-    @DisplayName("잔액이 음수가 되도록 하는 잔액 차감 동시성 테스트")
+    @DisplayName("잔액이 음수가 되도록 하는 잔액 차감 요청 동시성 테스트")
     fun concurrentDeduct_shouldCauseRaceCondition() {
         // given
         val numberOfThreads = 10
