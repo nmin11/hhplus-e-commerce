@@ -65,6 +65,7 @@ class StockServiceConcurrencyTest @Autowired constructor(
         println("📦 최종 재고 수량: $remainingStock")
 
         assertThat(remainingStock).isEqualTo(0)
-        assertThat(exceptions.isNotEmpty())
+        assertThat(exceptions.count { it.message?.contains("재고가 부족합니다") == true })
+            .isGreaterThan(0)
     }
 }

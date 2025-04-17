@@ -73,7 +73,8 @@ class CouponFacadeConcurrencyTest @Autowired constructor(
         val issuedCoupons = customerCouponRepository.findAllByCustomerId(customer.id)
         println("발급된 쿠폰 개수: ${issuedCoupons.size}")
         assertThat(issuedCoupons.size).isEqualTo(1)
-        assertThat(exceptions).isNotEmpty()
+        assertThat(exceptions.count { it.message?.contains("해당 쿠폰은 이미 발급된 쿠폰입니다") == true })
+            .isGreaterThan(0)
     }
 
     @Test
@@ -111,6 +112,7 @@ class CouponFacadeConcurrencyTest @Autowired constructor(
         val issuedCoupons = customerCouponRepository.findAllByCouponIn(listOf(coupon))
         println("발급된 쿠폰 개수: ${issuedCoupons.size}")
         assertThat(issuedCoupons.size).isEqualTo(1)
-        assertThat(exceptions).isNotEmpty()
+        assertThat(exceptions.count { it.message?.contains("쿠폰 수량이 모두 소진되었습니다") == true })
+            .isGreaterThan(0)
     }
 }

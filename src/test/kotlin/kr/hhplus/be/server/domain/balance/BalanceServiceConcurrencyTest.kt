@@ -64,6 +64,7 @@ class BalanceServiceConcurrencyTest @Autowired constructor(
         println("💰 최종 잔액: $resultBalance.")
 
         assertThat(resultBalance).isEqualTo(1_000)
-        assertThat(exceptions.isNotEmpty())
+        assertThat(exceptions.count { it.message?.contains("잔액이 부족합니다") == true })
+            .isGreaterThan(0)
     }
 }
