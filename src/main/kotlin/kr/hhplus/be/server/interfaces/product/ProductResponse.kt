@@ -49,7 +49,7 @@ sealed class ProductResponse {
         val id: Long,
         val name: String,
         val basePrice: Int,
-        val salesCount: Int
+        val totalSales: Int
     ) {
         companion object {
             fun from(popular: ProductResult.Popular): Popular {
@@ -57,7 +57,7 @@ sealed class ProductResponse {
                     id = popular.productId,
                     name = popular.name,
                     basePrice = popular.basePrice,
-                    salesCount = popular.salesCount
+                    totalSales = popular.totalSales
                 )
             }
         }

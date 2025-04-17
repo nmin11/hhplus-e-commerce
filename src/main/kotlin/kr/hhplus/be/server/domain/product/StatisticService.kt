@@ -11,8 +11,9 @@ class StatisticService(
         return statisticRepository.save(statistic)
     }
 
-    fun getTop5PopularProductStatistics(since: LocalDate): List<Statistic> {
+    fun getTop5PopularProductStatistics(since: LocalDate): List<ProductInfo.Popular> {
         val startOfDay = since.atStartOfDay()
-        return statisticRepository.findTop5BySoldAtAfterOrderBySalesCountDesc(startOfDay)
+        val records = statisticRepository.findTop5ProductSales(startOfDay)
+        return records.map { ProductInfo.Popular.from(it) }
     }
 }

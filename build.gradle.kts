@@ -5,6 +5,7 @@ plugins {
 	kotlin("plugin.jpa") version "2.1.0"
 	id("org.springframework.boot") version "3.4.1"
 	id("io.spring.dependency-management") version "1.1.7"
+    id("nu.studer.jooq") version "8.2"
 }
 
 fun getGitHash(): String {
@@ -50,6 +51,9 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
 
     // DB
+    implementation("org.springframework.boot:spring-boot-starter-jooq")
+    implementation("org.jooq:jooq")
+
 	runtimeOnly("com.mysql:mysql-connector-j")
 
     // Docs

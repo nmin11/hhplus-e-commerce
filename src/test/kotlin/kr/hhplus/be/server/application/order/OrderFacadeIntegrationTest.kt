@@ -35,7 +35,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
         customerRepository.save(customer)
 
         // 상품 1: 후드
-        product1 = Product.create("후드", basePrice = 50_000)
+        product1 = Product.create("hood", basePrice = 50_000)
         productRepository.save(product1)
 
         option1 = ProductOption.create(product1, optionName = "L", extraPrice = 5_000)
@@ -43,7 +43,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
         stockRepository.save(Stock.create(option1, quantity = 10))
 
         // 상품 2: 티셔츠
-        product2 = Product.create("티셔츠", basePrice = 30_000)
+        product2 = Product.create("t-shirt", basePrice = 30_000)
         productRepository.save(product2)
 
         option2 = ProductOption.create(product2, optionName = "M", extraPrice = 3_000)
@@ -87,7 +87,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
     @DisplayName("옵션이 상품에 속하지 않으면 주문 생성 실패")
     fun createOrder_shouldFail_whenOptionDoesNotBelongToProduct() {
         // given
-        val anotherProduct = Product.create("초콜릿", basePrice = 1000)
+        val anotherProduct = Product.create("chocolate", basePrice = 1000)
         productRepository.save(anotherProduct)
 
         val anotherOption = ProductOption.create(anotherProduct, optionName = "bundle", extraPrice = 5000)

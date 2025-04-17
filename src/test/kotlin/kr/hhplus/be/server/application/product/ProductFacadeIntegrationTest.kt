@@ -57,8 +57,8 @@ class ProductFacadeIntegrationTest @Autowired constructor(
         productRepository.save(product2)
 
         val stats = listOf(
-            Statistic.create(product, 10),
-            Statistic.create(product2, 5)
+            Statistic.create(product, 3_000),
+            Statistic.create(product2, 1_500)
         )
         stats.forEach { statisticRepository.save(it) }
 
@@ -69,6 +69,6 @@ class ProductFacadeIntegrationTest @Autowired constructor(
         // then
         assertThat(result).hasSizeGreaterThanOrEqualTo(2)
         assertThat(result.first().productId).isEqualTo(product.id)
-        assertThat(result.first().salesCount).isEqualTo(10)
+        assertThat(result.first().totalSales).isEqualTo(3_000)
     }
 }

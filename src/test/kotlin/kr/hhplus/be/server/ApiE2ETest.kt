@@ -41,7 +41,6 @@ class ApiE2ETest @Autowired constructor(
     val stockRepository: StockRepository,
     val orderRepository: OrderRepository,
     val couponRepository: CouponRepository,
-    val customerCouponRepository: CustomerCouponRepository,
 ) {
     private lateinit var customer: Customer
     private lateinit var coupon1: Coupon
@@ -63,8 +62,8 @@ class ApiE2ETest @Autowired constructor(
         balanceRepository.save(balance)
 
         // 상품 + 옵션
-        product1 = Product.create("청바지", 39000)
-        product2 = Product.create("후드티", 29000)
+        product1 = Product.create("coat", 39000)
+        product2 = Product.create("jean", 29000)
         productRepository.save(product1)
         productRepository.save(product2)
 
@@ -78,9 +77,9 @@ class ApiE2ETest @Autowired constructor(
         stockRepository.save(Stock.create(optionL, 10))
 
         // 통계
-        val product3 = Product.create("운동화", 59000)
-        val product4 = Product.create("잠바", 79000)
-        val product5 = Product.create("실내화", 15000)
+        val product3 = Product.create("shoo", 59000)
+        val product4 = Product.create("sneakers", 79000)
+        val product5 = Product.create("slip", 15000)
         productRepository.save(product3)
         productRepository.save(product4)
         productRepository.save(product5)
