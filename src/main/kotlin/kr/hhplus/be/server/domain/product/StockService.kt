@@ -19,7 +19,7 @@ class StockService(
         }
     }
 
-    @Transactional
+//    @Transactional <- 재고 차감 동시성 테스트 해결을 하기 위해 설정해야 하는 어노테이션
     fun decrease(productOptionId: Long, quantity: Int) {
         val stock = getByProductOptionId(productOptionId)
         stock.decrease(quantity)
