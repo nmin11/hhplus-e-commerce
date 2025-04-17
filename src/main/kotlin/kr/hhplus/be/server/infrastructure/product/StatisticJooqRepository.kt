@@ -12,24 +12,29 @@ class StatisticJooqRepository(
 ) {
     // TODO: jooq-codegen 방식으로의 변경 필요
     fun findTop5ProductSales(since: LocalDateTime): List<PopularProductRecord> {
+        val s = table(
+            dsl
+                .select(
+                    field("product_id"),
+                    field("sum(sales_count)", Int::class.java).`as`("total_sales")
+                )
+                .from(table("statistic"))
+                .where(field("sold_at", LocalDateTime::class.java).gt(since))
+                .groupBy(field("product_id"))
+                .orderBy(field("total_sales").desc())
+                .limit(5)
+        ).`as`("s")
+
         return dsl
             .select(
                 field("p.id", Long::class.java).`as`("id"),
                 field("p.name", String::class.java).`as`("name"),
                 field("p.base_price", Int::class.java).`as`("basePrice"),
-                field("sum(s.sales_count)", Int::class.java).`as`("totalSales")
+                field("s.total_sales", Int::class.java).`as`("totalSales")
             )
-            .from(table("statistic").`as`("s"))
+            .from(s)
             .join(table("product").`as`("p"))
             .on(field("s.product_id").eq(field("p.id")))
-            .where(field("s.sold_at", LocalDateTime::class.java).gt(since))
-            .groupBy(
-                field("p.id"),
-                field("p.name"),
-                field("p.base_price")
-            )
-            .orderBy(field("totalSales").desc())
-            .limit(5)
             .fetch()
             .map {
                 PopularProductRecord(
