@@ -35,10 +35,11 @@ class PaymentFacade(
         val customer = order.customer
         val customerId = customer.id
 
-        // 2. 재고 검증
+        // 2. 재고 검증 및 차감
         order.orderItems.forEach { item ->
             val optionId = item.productOption.id
             stockService.validate(optionId, item.quantity)
+            stockService.decrease(optionId, item.quantity)
         }
 
         // 3. 쿠폰 유효성 검사 및 할인 금액 계산
