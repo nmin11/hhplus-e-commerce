@@ -12,7 +12,7 @@ ON DUPLICATE KEY UPDATE
   amount = VALUES(amount),
   updated_at = NOW();
 
--- 상품 10개 생성
+-- 상품 20개 생성
 INSERT INTO product (id, name, base_price, created_at, updated_at) VALUES
 (2001, '티셔츠', 10000, NOW(), NOW()),
 (2002, '후드티', 15000, NOW(), NOW()),
