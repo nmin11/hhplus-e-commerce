@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDate
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -52,13 +51,12 @@ class ProductFacadeIntegrationTest @Autowired constructor(
     @DisplayName("최근 3일간 가장 인기 있는 상품들을 조회")
     fun getPopularProducts_shouldReturnTop5BasedOnStatistics() {
         // given
-        val now = LocalDate.now()
         val product2 = Product.create("양말", basePrice = 4_500)
         productRepository.save(product2)
 
         val stats = listOf(
-            Statistic.create(product, 3_000),
-            Statistic.create(product2, 1_500)
+            Statistic.create(product, Int.MAX_VALUE),
+            Statistic.create(product2, Int.MAX_VALUE - 999_999)
         )
         stats.forEach { statisticRepository.save(it) }
 
@@ -68,7 +66,7 @@ class ProductFacadeIntegrationTest @Autowired constructor(
 
         // then
         assertThat(result).hasSizeGreaterThanOrEqualTo(2)
-        assertThat(result.first().productId).isEqualTo(product.id)
-        assertThat(result.first().totalSales).isEqualTo(3_000)
+        assertThat(result.first().productId).isIn(product.id)
+        assertThat(result.first().totalSales).isEqualTo(Int.MAX_VALUE)
     }
 }
