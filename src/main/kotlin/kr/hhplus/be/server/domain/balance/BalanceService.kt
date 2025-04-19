@@ -18,7 +18,7 @@ class BalanceService(
         return balanceRepository.save(balance)
     }
 
-    // @Transactional <- 잔액 차감 동시성 테스트 해결을 하기 위해 설정해야 하는 어노테이션
+    @Transactional
     fun deduct(customerId: Long, amount: Int): Balance {
         val balance = getByCustomerId(customerId)
         balance.deduct(amount)

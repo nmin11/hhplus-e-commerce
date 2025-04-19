@@ -73,7 +73,7 @@ class CustomerCouponServiceTest {
                 expiredAt = LocalDate.now().plusDays(1)
             )
 
-            val customerCoupon = CustomerCoupon.issue(customer, coupon) // status: AVAILABLE by default
+            val customerCoupon = CustomerCoupon.issue(customer, coupon)
 
             every { customerCouponRepository.findByCustomerIdAndCouponId(customerId, couponId) } returns customerCoupon
 

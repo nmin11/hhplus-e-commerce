@@ -45,22 +45,22 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
-    // Spring
+	// Spring
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 
-    // DB
+	// DB
 	implementation("org.springframework.boot:spring-boot-starter-jooq")
 	implementation("org.jooq:jooq")
 
 	runtimeOnly("com.mysql:mysql-connector-j")
 
-    // Docs
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6")
+	// Docs
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6")
 
-    // Test
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
+	// Test
+	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.boot:spring-boot-testcontainers")
 	testImplementation("org.testcontainers:junit-jupiter")
 	testImplementation("org.testcontainers:mysql")
