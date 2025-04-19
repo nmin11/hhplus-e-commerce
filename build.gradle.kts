@@ -54,6 +54,8 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-jooq")
 	implementation("org.jooq:jooq")
 
+	jooqGenerator("com.mysql:mysql-connector-j")
+
 	runtimeOnly("com.mysql:mysql-connector-j")
 
 	// Docs
@@ -71,4 +73,37 @@ dependencies {
 tasks.withType<Test> {
 	useJUnitPlatform()
 	systemProperty("user.timezone", "UTC")
+}
+
+jooq {
+    version.set("3.19.22")
+    configurations {
+        create("main") {
+            generateSchemaSourceOnCompilation.set(true)
+            jooqConfiguration.apply {
+                jdbc.apply {
+                    driver = "com.mysql.cj.jdbc.Driver"
+                    url = "jdbc:mysql://localhost:3306/hhplus"
+                    user = "root"
+                    password = "root"
+                }
+                generator.apply {
+                    database.apply {
+                        name = "org.jooq.meta.mysql.MySQLDatabase"
+                        inputSchema = "hhplus"
+                    }
+                    generate.apply {
+                        isDeprecated = false
+                        isRecords = true
+                        isImmutablePojos = true
+                        isFluentSetters = true
+                    }
+                    target.apply {
+                        packageName = "kr.hhplus.jooq"
+                        directory = "build/generated/jooq/main"
+                    }
+                }
+            }
+        }
+    }
 }
