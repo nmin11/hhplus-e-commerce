@@ -2,6 +2,7 @@ package kr.hhplus.be.server.interfaces.balance
 
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.spyk
 import kr.hhplus.be.server.application.balance.BalanceCommand
 import kr.hhplus.be.server.application.balance.BalanceFacade
 import kr.hhplus.be.server.application.balance.BalanceResult
@@ -12,6 +13,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
+import java.time.LocalDateTime
 
 class BalanceControllerTest {
     private val balanceFacade = mockk<BalanceFacade>()
@@ -40,15 +42,22 @@ class BalanceControllerTest {
     fun getBalanceHistories_shouldReturnHistoryList() {
         // given
         val customerId = 1L
-        val histories = listOf(
+        val now = LocalDateTime.now()
+        val history = spyk(
             BalanceHistory.charge(
                 customer = Customer.create("tester"),
                 amount = 10_000,
                 updatedAmount = 110_000
             )
         )
+
+        every { history.createdAt } returns now
+
+        val histories = listOf(history)
         val results = histories.map { BalanceResult.History.from(it) }
+
         every { balanceFacade.getHistories(customerId) } returns results
+
 
         // when
         val response = balanceController.getBalanceHistories(customerId)

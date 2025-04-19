@@ -74,6 +74,7 @@ class PaymentFacade(
             discountAmount = discountAmount
         )
         paymentService.create(payment)
+        order.markAsPaid()
 
         // 8. 통계 반영
         order.orderItems.forEach { item ->

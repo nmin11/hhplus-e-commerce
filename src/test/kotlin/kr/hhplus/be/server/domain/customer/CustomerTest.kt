@@ -17,8 +17,6 @@ class CustomerTest {
 
             // then
             assertThat(customer.username).isEqualTo("tester")
-            assertThat(customer.createdAt).isNotNull()
-            assertThat(customer.updatedAt).isNotNull()
         }
 
         @Test

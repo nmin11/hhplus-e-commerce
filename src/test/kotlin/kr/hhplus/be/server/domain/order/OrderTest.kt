@@ -4,6 +4,7 @@ import kr.hhplus.be.server.domain.customer.Customer
 import kr.hhplus.be.server.domain.product.Product
 import kr.hhplus.be.server.domain.product.ProductOption
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -46,6 +47,18 @@ class OrderTest {
             assertThat(order.orderItems).hasSize(1)
             assertThat(order.totalPrice).isEqualTo((product.basePrice + option.extraPrice) * quantity)
         }
+
+        @Test
+        @DisplayName("주문 항목이 비어 있으면 예외 발생")
+        fun shouldThrowExceptionWhenItemsAreEmpty() {
+            // given
+            val emptyItems = emptyList<OrderItemInfo>()
+
+            // when & then
+            assertThatThrownBy { Order.createWithItems(customer, emptyItems) }
+                .isInstanceOf(IllegalArgumentException::class.java)
+                .hasMessage("주문 항목이 비어있습니다.")
+        }
     }
 
     @Nested
@@ -62,6 +75,35 @@ class OrderTest {
             // then
             assertThat(order.orderItems).hasSize(1)
             assertThat(order.totalPrice).isEqualTo(product.basePrice + option.extraPrice)
+        }
+    }
+
+    @Nested
+    inner class MarkAsPaid {
+        @Test
+        @DisplayName("주문 상태가 CREATED 일 때 PAID 로 변경됨")
+        fun shouldMarkOrderAsPaidWhenStatusIsCreated() {
+            // given
+            val order = Order.create(customer)
+
+            // when
+            order.markAsPaid()
+
+            // then
+            assertThat(order.status).isEqualTo(OrderStatus.PAID)
+        }
+
+        @Test
+        @DisplayName("주문 상태가 PAID 일 경우 예외 발생")
+        fun shouldThrowExceptionWhenOrderAlreadyPaid() {
+            // given
+            val order = Order.create(customer)
+            order.markAsPaid()
+
+            // when & then
+            assertThatThrownBy { order.markAsPaid() }
+                .isInstanceOf(IllegalStateException::class.java)
+                .hasMessage("결제 가능한 상태가 아닙니다. (현재 상태: PAID)")
         }
     }
 }

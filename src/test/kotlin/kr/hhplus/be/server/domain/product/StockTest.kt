@@ -18,7 +18,6 @@ class StockTest {
         // then
         assertThat(stock.productOption).isEqualTo(option)
         assertThat(stock.quantity).isEqualTo(10)
-        assertThat(stock.updatedAt).isNotNull()
     }
 
     @Test

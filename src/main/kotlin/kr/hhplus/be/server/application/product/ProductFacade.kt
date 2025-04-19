@@ -17,7 +17,7 @@ class ProductFacade(
 
     fun getPopularProducts(condition: ProductCriteria.PeriodCondition): List<ProductResult.Popular> {
         val since = condition.toStartDate()
-        val statistics = statisticService.getTop5PopularProductStatistics(since)
-        return statistics.map { ProductResult.Popular.from(it) }
+        val infos = statisticService.getTop5PopularProductStatistics(since)
+        return infos.map { ProductResult.Popular.from(it) }
     }
 }

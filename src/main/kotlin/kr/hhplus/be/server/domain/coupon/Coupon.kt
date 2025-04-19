@@ -1,21 +1,44 @@
 package kr.hhplus.be.server.domain.coupon
 
+import jakarta.persistence.*
+import kr.hhplus.be.server.domain.common.BaseEntity
 import java.time.LocalDate
 import java.time.LocalDateTime
 
+@Entity
+@Table(name = "coupon")
 class Coupon private constructor(
+    @Column(name = "name", nullable = false, length = 50)
     val name: String,
-    val quantity: Int,
+
+    @Column(name = "total_quantity", nullable = false)
+    val totalQuantity: Int,
+
+    @Column(name = "started_at", nullable = false)
     val startedAt: LocalDate,
+
+    @Column(name = "expired_at", nullable = false)
     val expiredAt: LocalDate,
-    val discountPolicy: DiscountPolicy
-) {
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "discount_type", nullable = false, length = 20)
+    val discountType: DiscountType,
+
+    @Column(name = "discount_amount", nullable = false)
+    val discountAmount: Int
+) : BaseEntity() {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0L
-    private var currentQuantity: Int = quantity
-    val totalQuantity: Int = quantity
-    val createdAt: LocalDateTime = LocalDateTime.now()
-    private var updatedAt: LocalDateTime = LocalDateTime.now()
-    val customerCoupons: MutableList<CustomerCoupon> = mutableListOf()
+
+    @Column(name = "current_quantity", nullable = false)
+    private var currentQuantity: Int = totalQuantity
+
+    @Transient
+    private val discountPolicy: DiscountPolicy  =
+        when (discountType) {
+            DiscountType.FIXED -> FixedDiscountPolicy(discountAmount)
+            DiscountType.RATE -> RateDiscountPolicy(discountAmount)
+        }
 
     companion object {
         fun createFixedDiscount(
@@ -27,10 +50,11 @@ class Coupon private constructor(
         ): Coupon {
             return Coupon(
                 name = name,
-                quantity = quantity,
+                totalQuantity = quantity,
                 startedAt = startedAt,
                 expiredAt = expiredAt,
-                discountPolicy = FixedDiscountPolicy(amount)
+                discountType = DiscountType.FIXED,
+                discountAmount = amount
             )
         }
 
@@ -43,10 +67,11 @@ class Coupon private constructor(
         ): Coupon {
             return Coupon(
                 name = name,
-                quantity = quantity,
+                totalQuantity = quantity,
                 startedAt = startedAt,
                 expiredAt = expiredAt,
-                discountPolicy = RateDiscountPolicy(rate)
+                discountType = DiscountType.RATE,
+                discountAmount = rate
             )
         }
     }
@@ -61,10 +86,7 @@ class Coupon private constructor(
     }
 
     fun calculateDiscount(totalPrice: Int): Int {
-        val now = LocalDate.now()
-        if (now.isBefore(startedAt) || now.isAfter(expiredAt)) {
-            throw IllegalStateException("유효하지 않은 쿠폰입니다.")
-        }
+        validatePeriod()
         return discountPolicy.calculateDiscount(totalPrice)
     }
 

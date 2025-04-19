@@ -1,8 +1,8 @@
 package kr.hhplus.be.server.application.product
 
 import kr.hhplus.be.server.domain.product.Product
+import kr.hhplus.be.server.domain.product.ProductInfo
 import kr.hhplus.be.server.domain.product.ProductOption
-import kr.hhplus.be.server.domain.product.Statistic
 
 sealed class ProductResult {
     data class Detail(
@@ -14,15 +14,15 @@ sealed class ProductResult {
         val productId: Long,
         val name: String,
         val basePrice: Int,
-        val salesCount: Int
+        val totalSales: Int
     ) {
         companion object {
-            fun from(statistic: Statistic): Popular {
+            fun from(info: ProductInfo.Popular): Popular {
                 return Popular(
-                    productId = statistic.product.id,
-                    name = statistic.product.name,
-                    basePrice = statistic.product.basePrice,
-                    salesCount = statistic.salesCount
+                    productId = info.id,
+                    name = info.name,
+                    basePrice = info.basePrice,
+                    totalSales = info.totalSales
                 )
             }
         }

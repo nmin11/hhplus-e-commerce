@@ -1,13 +1,25 @@
 package kr.hhplus.be.server.domain.product
 
+import jakarta.persistence.*
+import org.hibernate.annotations.UpdateTimestamp
 import java.time.LocalDateTime
 
+@Entity
+@Table(name = "stock")
 class Stock private constructor(
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_option_id", nullable = false, unique = true)
     val productOption: ProductOption,
+
+    @Column(name = "quantity", nullable = false)
     var quantity: Int
 ) {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0L
-    var updatedAt: LocalDateTime = LocalDateTime.now()
+
+    @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
+    lateinit var updatedAt: LocalDateTime
 
     companion object {
         fun create(productOption: ProductOption, quantity: Int): Stock {
