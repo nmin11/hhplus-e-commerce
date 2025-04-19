@@ -1,3 +1,13 @@
+# 테스트 실행 방법
+
+프로젝트를 clone 받은 뒤 아래의 명령어들을 실행합니다.
+
+```shell
+docker compose up
+./gradlew build
+./gradlew test
+```
+
 # 분석 및 설계
 
 [Wiki 페이지에서 확인하기](https://github.com/nmin11/hhplus-e-commerce/wiki)
