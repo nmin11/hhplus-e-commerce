@@ -28,4 +28,12 @@ class Stock private constructor(
             return Stock(productOption, quantity)
         }
     }
+
+    fun decrease(quantityToDecrease: Int) {
+        if (quantity < quantityToDecrease) {
+            throw IllegalStateException("재고가 부족합니다.")
+        }
+
+        quantity -= quantityToDecrease
+    }
 }

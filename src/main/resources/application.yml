@@ -14,7 +14,7 @@ spring:
   jpa:
     open-in-view: false
     generate-ddl: false
-    show-sql: false
+    show-sql: true
     hibernate:
       ddl-auto: none
     properties:
@@ -36,3 +36,4 @@ spring:
     init:
       mode: always
       schema-locations: classpath:database/schema.sql
+      data-locations: classpath:database/data.sql
