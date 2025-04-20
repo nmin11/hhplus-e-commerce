@@ -7,19 +7,19 @@ import kr.hhplus.be.server.domain.coupon.CustomerCouponRepository
 import kr.hhplus.be.server.domain.customer.Customer
 import kr.hhplus.be.server.domain.customer.CustomerRepository
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 
 @SpringBootTest
 @ActiveProfiles("test")
-@Transactional
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class CouponFacadeIntegrationTest @Autowired constructor(
     private val couponFacade: CouponFacade,
     private val customerRepository: CustomerRepository,
@@ -29,7 +29,7 @@ class CouponFacadeIntegrationTest @Autowired constructor(
     private lateinit var customer: Customer
     private lateinit var coupon: Coupon
 
-    @BeforeEach
+    @BeforeAll
     fun setup() {
         customer = Customer.create("coupon-user")
         customerRepository.save(customer)

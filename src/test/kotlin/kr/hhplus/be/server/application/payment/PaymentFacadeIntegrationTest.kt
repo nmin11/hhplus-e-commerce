@@ -11,18 +11,18 @@ import kr.hhplus.be.server.domain.order.OrderRepository
 import kr.hhplus.be.server.domain.product.*
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
-import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 
 @SpringBootTest
 @ActiveProfiles("test")
-@Transactional
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class PaymentFacadeIntegrationTest @Autowired constructor(
     private val paymentFacade: PaymentFacade,
     private val customerRepository: CustomerRepository,
@@ -34,32 +34,34 @@ class PaymentFacadeIntegrationTest @Autowired constructor(
     private val customerCouponRepository: CustomerCouponRepository,
     private val orderRepository: OrderRepository
 ) {
-    private lateinit var customer: Customer
     private lateinit var product: Product
     private lateinit var option: ProductOption
-    private lateinit var coupon: Coupon
-    private lateinit var order: Order
     private lateinit var stock: Stock
     private lateinit var balance: Balance
 
-    @BeforeEach
+    @BeforeAll
     fun setup() {
-        customer = Customer.create("payment-user")
-        customerRepository.save(customer)
-
-        balance = Balance.create(customer, 200_000)
-        balanceRepository.save(balance)
-
         product = Product.create("후드", 50_000)
         productRepository.save(product)
 
         option = ProductOption.create(product, "L", 5_000)
         productOptionRepository.save(option)
 
-        stock = Stock.create(option, 10)
+        stock = Stock.create(option, 100)
         stockRepository.save(stock)
+    }
 
-        coupon = Coupon.createRateDiscount(
+    @Test
+    @DisplayName("쿠폰을 사용한 결제의 정상 처리")
+    fun pay_withValidCoupon_shouldSucceed() {
+        // given
+        val customer = Customer.create("coupon-user")
+        customerRepository.save(customer)
+
+        balance = Balance.create(customer, 200_000)
+        balanceRepository.save(balance)
+
+        val coupon = Coupon.createRateDiscount(
             name = "10-percent-discount",
             rate = 10,
             quantity = 10,
@@ -71,17 +73,11 @@ class PaymentFacadeIntegrationTest @Autowired constructor(
         val customerCoupon = CustomerCoupon.issue(customer, coupon)
         customerCouponRepository.save(customerCoupon)
 
-        // 주문
-        order = Order.createWithItems(customer, listOf(
+        val order = Order.createWithItems(customer, listOf(
             OrderItemInfo(option, quantity = 2)
         ))
         orderRepository.save(order)
-    }
 
-    @Test
-    @DisplayName("쿠폰을 사용한 결제의 정상 처리")
-    fun pay_withValidCoupon_shouldSucceed() {
-        // given
         val command = PaymentCommand(
             orderId = order.id,
             couponId = coupon.id // 사용할 쿠폰 ID
@@ -100,6 +96,17 @@ class PaymentFacadeIntegrationTest @Autowired constructor(
     @DisplayName("쿠폰을 사용하지 않은 결제의 정상 처리")
     fun pay_withoutCoupon_shouldSucceed() {
         // given
+        val customer = Customer.create("without-coupon-user")
+        customerRepository.save(customer)
+
+        balance = Balance.create(customer, 200_000)
+        balanceRepository.save(balance)
+
+        val order = Order.createWithItems(customer, listOf(
+            OrderItemInfo(option, quantity = 2)
+        ))
+        orderRepository.save(order)
+
         val command = PaymentCommand(
             orderId = order.id,
             couponId = null // 사용할 쿠폰 ID가 없음
@@ -118,7 +125,18 @@ class PaymentFacadeIntegrationTest @Autowired constructor(
     @DisplayName("결제 시 주문 상태가 CREATED 가 아니면 예외 발생")
     fun pay_shouldFail_whenOrderStatusIsNotCreated() {
         // given
+        val customer = Customer.create("already-ordered-user")
+        customerRepository.save(customer)
+
+        balance = Balance.create(customer, 200_000)
+        balanceRepository.save(balance)
+
+        val order = Order.createWithItems(customer, listOf(
+            OrderItemInfo(option, quantity = 2)
+        ))
         order.markAsPaid() // 결제된 주문으로 처리
+        orderRepository.save(order)
+
         val command = PaymentCommand(
             orderId = order.id,
             couponId = null
@@ -135,7 +153,23 @@ class PaymentFacadeIntegrationTest @Autowired constructor(
     @DisplayName("결제 시 상품 재고가 부족하면 예외 발생")
     fun pay_shouldFail_whenStockIsInsufficient() {
         // given
-        stock.quantity = 0 // 상품 재고 없음
+        val customer = Customer.create("without-coupon-user")
+        customerRepository.save(customer)
+
+        balance = Balance.create(customer, 200_000)
+        balanceRepository.save(balance)
+
+        val insufficientOption = ProductOption.create(product, "insufficient-option", 0)
+        productOptionRepository.save(insufficientOption)
+
+        val insufficientStock = Stock.create(insufficientOption, 0)
+        stockRepository.save(insufficientStock)
+
+        val order = Order.createWithItems(customer, listOf(
+            OrderItemInfo(insufficientOption, quantity = 2)
+        ))
+        orderRepository.save(order)
+
         val command = PaymentCommand(
             orderId = order.id,
             couponId = null
@@ -151,6 +185,14 @@ class PaymentFacadeIntegrationTest @Autowired constructor(
     @DisplayName("이미 사용된 쿠폰으로 결제 시 예외 발생")
     fun pay_shouldFail_withUsedCoupon() {
         // given
+        val customer = Customer.create("used-coupon-user")
+        customerRepository.save(customer)
+
+        val order = Order.createWithItems(customer, listOf(
+            OrderItemInfo(option, quantity = 2)
+        ))
+        orderRepository.save(order)
+
         val usedCoupon = Coupon.createFixedDiscount(
             name = "used-coupon",
             amount = 1000,
@@ -179,7 +221,17 @@ class PaymentFacadeIntegrationTest @Autowired constructor(
     @DisplayName("잔액이 부족할 경우 결제 실패")
     fun pay_shouldFail_whenBalanceIsInsufficient() {
         // given
-        balance.deduct(200_000) // 기존 20만을 가지고 있었는데, 결제 이전에 전액 소진 처리
+        val customer = Customer.create("insufficient-balance-user")
+        customerRepository.save(customer)
+
+        balance = Balance.create(customer, 0)  // 잔액 없음
+        balanceRepository.save(balance)
+
+        val order = Order.createWithItems(customer, listOf(
+            OrderItemInfo(option, quantity = 2)
+        ))
+        orderRepository.save(order)
+
         val command = PaymentCommand(
             orderId = order.id,
             couponId = null

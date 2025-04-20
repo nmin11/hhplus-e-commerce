@@ -4,18 +4,18 @@ import kr.hhplus.be.server.domain.customer.Customer
 import kr.hhplus.be.server.domain.customer.CustomerRepository
 import kr.hhplus.be.server.domain.product.*
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.transaction.annotation.Transactional
 
 @SpringBootTest
 @ActiveProfiles("test")
-@Transactional
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class OrderFacadeIntegrationTest @Autowired constructor(
     private val orderFacade: OrderFacade,
     private val customerRepository: CustomerRepository,
@@ -29,7 +29,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
     private lateinit var option1: ProductOption
     private lateinit var option2: ProductOption
 
-    @BeforeEach
+    @BeforeAll
     fun setup() {
         customer = Customer.create("order-user")
         customerRepository.save(customer)
