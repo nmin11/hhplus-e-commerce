@@ -34,7 +34,7 @@ class Coupon private constructor(
     private var currentQuantity: Int = totalQuantity
 
     @Transient
-    private val discountPolicy: DiscountPolicy  =
+    private var discountPolicy: DiscountPolicy  =
         when (discountType) {
             DiscountType.FIXED -> FixedDiscountPolicy(discountAmount)
             DiscountType.RATE -> RateDiscountPolicy(discountAmount)
@@ -73,6 +73,14 @@ class Coupon private constructor(
                 discountType = DiscountType.RATE,
                 discountAmount = rate
             )
+        }
+    }
+
+    @PostLoad
+    fun initDiscountPolicy() {
+        discountPolicy = when (discountType) {
+            DiscountType.FIXED -> FixedDiscountPolicy(discountAmount)
+            DiscountType.RATE -> RateDiscountPolicy(discountAmount)
         }
     }
 
