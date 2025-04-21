@@ -32,6 +32,9 @@ class CustomerCoupon private constructor(
     @Column(name = "status", nullable = false, length = 20)
     var status = CustomerCouponStatus.AVAILABLE
 
+    @Version
+    var version: Long = 0L
+
     @Column(name = "issued_at", nullable = false, updatable = false)
     val issuedAt: LocalDateTime = LocalDateTime.now()
 

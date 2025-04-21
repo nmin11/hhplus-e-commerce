@@ -95,6 +95,7 @@ CREATE TABLE IF NOT EXISTS customer_coupon (
     customer_id BIGINT NOT NULL,
     coupon_id BIGINT NOT NULL,
     status VARCHAR(20) NOT NULL, -- 'ISSUED' || 'USED' || 'EXPIRED'
+    `version` BIGINT NOT NULL DEFAULT 0,
     issued_at TIMESTAMP,
     updated_at TIMESTAMP,
 
