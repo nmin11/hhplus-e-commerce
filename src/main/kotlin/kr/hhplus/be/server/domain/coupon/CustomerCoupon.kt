@@ -55,13 +55,22 @@ class CustomerCoupon private constructor(
         }
     }
 
+    fun markAsUsed() {
+        checkValidation()
+        status = CustomerCouponStatus.USED
+    }
+
     fun validateUsable(): CustomerCoupon {
+        checkValidation()
+        return this
+    }
+
+    private fun checkValidation() {
         if (status == CustomerCouponStatus.USED) {
             throw IllegalStateException("이미 사용된 쿠폰입니다.")
         }
         if (status == CustomerCouponStatus.EXPIRED) {
             throw IllegalStateException("사용 기간이 만료된 쿠폰입니다.")
         }
-        return this
     }
 }

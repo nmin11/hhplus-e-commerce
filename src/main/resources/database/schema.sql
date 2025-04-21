@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS balance_history (
 
 CREATE TABLE IF NOT EXISTS product (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(50) NOT NULL UNIQUE,
+    name VARCHAR(50) NOT NULL,
     base_price INT NOT NULL,
     created_at TIMESTAMP,
     updated_at TIMESTAMP

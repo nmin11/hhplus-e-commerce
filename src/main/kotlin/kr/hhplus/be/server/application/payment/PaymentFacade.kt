@@ -48,6 +48,8 @@ class PaymentFacade(
             val coupon = customerCoupon.coupon
 
             coupon.validatePeriod()
+            customerCoupon.markAsUsed()
+
             coupon.calculateDiscount(order.totalPrice)
         } ?: 0
 
