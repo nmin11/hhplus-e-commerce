@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.order
 
+import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
 
 @Service
@@ -21,5 +22,10 @@ class OrderService(
             throw IllegalStateException("결제 가능한 주문이 아닙니다. (현재 상태: ${order.status})")
         }
         return order
+    }
+
+    @Transactional
+    fun markAsPaid(order: Order) {
+        order.markAsPaid()
     }
 }

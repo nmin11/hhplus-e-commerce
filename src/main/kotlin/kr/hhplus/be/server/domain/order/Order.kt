@@ -25,6 +25,9 @@ class Order private constructor(
     @OneToMany(mappedBy = "order", cascade = [CascadeType.ALL], orphanRemoval = true)
     val orderItems: MutableList<OrderItem> = mutableListOf()
 
+    @Version
+    var version: Long = 0L
+
     companion object {
         fun create(customer: Customer): Order {
             return Order(customer)
