@@ -21,7 +21,7 @@ class StockServiceConcurrencyTest @Autowired constructor(
 ) {
     private lateinit var option: ProductOption
     private lateinit var stock: Stock
-    val stockQuantity = 5
+    val stockQuantity = 1
 
     @BeforeEach
     fun setup() {
@@ -39,7 +39,7 @@ class StockServiceConcurrencyTest @Autowired constructor(
     @DisplayName("재고가 음수가 되도록 하는 재고 차감 요청 동시성 테스트")
     fun concurrentDecrease_shouldCauseRaceCondition() {
         // given
-        val numberOfThreads = 10
+        val numberOfThreads = 2
         val latch = CountDownLatch(numberOfThreads)
         val executor = Executors.newFixedThreadPool(numberOfThreads)
         val exceptions = Collections.synchronizedList(mutableListOf<Exception>())

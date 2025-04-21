@@ -65,6 +65,6 @@ class BalanceServiceConcurrencyTest @Autowired constructor(
 
         assertThat(resultBalance).isEqualTo(1_000)
         assertThat(exceptions.count { it.message?.contains("잔액이 부족합니다") == true })
-            .isEqualTo(2) // 5번의 병렬 실행 중 3번은 성공하고 2번은 실패해야 함
+            .isEqualTo(numberOfThreads - 3) // 5번의 병렬 실행 중 3번은 성공하고 2번은 실패해야 함
     }
 }

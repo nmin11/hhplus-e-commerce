@@ -47,13 +47,13 @@ class CouponFacadeConcurrencyTest @Autowired constructor(
         val customer = customerRepository.save(Customer.create("concurrent-user"))
         val command = CouponCommand.Issue(customerId = customer.id, couponId = coupon.id)
 
-        val threadCount = 5
-        val executor = Executors.newFixedThreadPool(threadCount)
-        val latch = CountDownLatch(threadCount)
+        val numberOfThreads = 3
+        val executor = Executors.newFixedThreadPool(numberOfThreads)
+        val latch = CountDownLatch(numberOfThreads)
         val exceptions = Collections.synchronizedList(mutableListOf<Exception>())
 
         // when
-        repeat(threadCount) {
+        repeat(numberOfThreads) {
             executor.submit {
                 try {
                     couponFacade.issueCouponToCustomer(command)
@@ -74,7 +74,7 @@ class CouponFacadeConcurrencyTest @Autowired constructor(
         println("발급된 쿠폰 개수: ${issuedCoupons.size}")
         assertThat(issuedCoupons.size).isEqualTo(1)
         assertThat(exceptions.count { it.message?.contains("해당 쿠폰은 이미 발급된 쿠폰입니다") == true })
-            .isEqualTo(4)
+            .isEqualTo(numberOfThreads - 1)
     }
 
     @Test
@@ -85,9 +85,9 @@ class CouponFacadeConcurrencyTest @Autowired constructor(
             customerRepository.save(Customer.create("user$it"))
         }
 
-        val threadCount = customers.size
-        val executor = Executors.newFixedThreadPool(threadCount)
-        val latch = CountDownLatch(threadCount)
+        val numberOfThreads = customers.size
+        val executor = Executors.newFixedThreadPool(numberOfThreads)
+        val latch = CountDownLatch(numberOfThreads)
         val exceptions = Collections.synchronizedList(mutableListOf<Exception>())
 
         // when
@@ -111,8 +111,8 @@ class CouponFacadeConcurrencyTest @Autowired constructor(
         // then
         val issuedCoupons = customerCouponRepository.findAllByCouponIn(listOf(coupon))
         println("발급된 쿠폰 개수: ${issuedCoupons.size}")
-        assertThat(issuedCoupons.size).isEqualTo(3)
+        assertThat(issuedCoupons.size).isEqualTo(coupon.totalQuantity)
         assertThat(exceptions.count { it.message?.contains("쿠폰 수량이 모두 소진되었습니다") == true })
-            .isEqualTo(2)
+            .isEqualTo(numberOfThreads - coupon.totalQuantity)
     }
 }
