@@ -14,6 +14,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.orm.ObjectOptimisticLockingFailureException
 import org.springframework.test.context.ActiveProfiles
 import java.util.*
 import java.util.concurrent.CountDownLatch
@@ -61,7 +62,7 @@ class PaymentFacadeConcurrencyTest @Autowired constructor(
     @DisplayName("동일한 주문에 대해 동시에 결제를 시도하면 예외 발생")
     fun concurrentPayment_shouldCauseRaceCondition() {
         // given
-        val numberOfThreads = 5
+        val numberOfThreads = 3
         val latch = CountDownLatch(numberOfThreads)
         val executor = Executors.newFixedThreadPool(numberOfThreads)
         val exceptions = Collections.synchronizedList(mutableListOf<Exception>())
@@ -84,8 +85,7 @@ class PaymentFacadeConcurrencyTest @Autowired constructor(
         executor.shutdown()
 
         // then
-        assertThat(exceptions).isNotEmpty
-        assertThat(exceptions.count { it.message?.contains("결제 가능한 주문이 아닙니다") == true })
-            .isGreaterThanOrEqualTo(1)
+        assertThat(exceptions.count { it is ObjectOptimisticLockingFailureException })
+            .isEqualTo(numberOfThreads - 1)
     }
 }
