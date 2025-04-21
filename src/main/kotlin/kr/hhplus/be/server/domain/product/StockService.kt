@@ -21,8 +21,13 @@ class StockService(
 
     @Transactional
     fun decrease(productOptionId: Long, quantity: Int) {
-        val stock = getByProductOptionId(productOptionId)
+        val stock = getWithLockByProductOptionId(productOptionId)
         stock.decrease(quantity)
         stockRepository.save(stock)
+    }
+
+    private fun getWithLockByProductOptionId(productOptionId: Long): Stock {
+        return stockRepository.findWithLockByProductOptionId(productOptionId)
+            ?: throw IllegalArgumentException("재고 정보가 존재하지 않습니다.")
     }
 }
