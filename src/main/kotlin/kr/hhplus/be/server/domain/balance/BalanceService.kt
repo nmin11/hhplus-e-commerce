@@ -20,8 +20,13 @@ class BalanceService(
 
     @Transactional
     fun deduct(customerId: Long, amount: Int): Balance {
-        val balance = getByCustomerId(customerId)
+        val balance = getWithLockByCustomerId(customerId)
         balance.deduct(amount)
         return balanceRepository.save(balance)
+    }
+
+    private fun getWithLockByCustomerId(customerId: Long): Balance {
+        return balanceRepository.findWithLockByCustomerId(customerId)
+            ?: throw IllegalStateException("잔액 정보가 존재하지 않습니다.")
     }
 }
