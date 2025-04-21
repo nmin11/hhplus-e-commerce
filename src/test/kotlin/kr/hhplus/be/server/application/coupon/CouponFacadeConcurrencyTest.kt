@@ -33,7 +33,7 @@ class CouponFacadeConcurrencyTest @Autowired constructor(
             Coupon.createFixedDiscount(
                 name = "concurrent-coupon",
                 amount = 1_000,
-                quantity = 1,
+                quantity = 3,
                 startedAt = LocalDate.now().minusDays(1),
                 expiredAt = LocalDate.now().plusDays(1)
             )
@@ -74,14 +74,14 @@ class CouponFacadeConcurrencyTest @Autowired constructor(
         println("발급된 쿠폰 개수: ${issuedCoupons.size}")
         assertThat(issuedCoupons.size).isEqualTo(1)
         assertThat(exceptions.count { it.message?.contains("해당 쿠폰은 이미 발급된 쿠폰입니다") == true })
-            .isGreaterThan(0)
+            .isEqualTo(4)
     }
 
     @Test
     @DisplayName("여러 명의 사용자가 동일한 쿠폰을 동시 발급 받는 경우 예외 발생")
     fun multipleUsersIssueSameCoupon_shouldCauseRaceCondition() {
         // given
-        val customers = (1..3).map {
+        val customers = (1..5).map {
             customerRepository.save(Customer.create("user$it"))
         }
 
@@ -111,8 +111,8 @@ class CouponFacadeConcurrencyTest @Autowired constructor(
         // then
         val issuedCoupons = customerCouponRepository.findAllByCouponIn(listOf(coupon))
         println("발급된 쿠폰 개수: ${issuedCoupons.size}")
-        assertThat(issuedCoupons.size).isEqualTo(1)
+        assertThat(issuedCoupons.size).isEqualTo(3)
         assertThat(exceptions.count { it.message?.contains("쿠폰 수량이 모두 소진되었습니다") == true })
-            .isGreaterThan(0)
+            .isEqualTo(2)
     }
 }
