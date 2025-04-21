@@ -36,7 +36,7 @@ class BalanceServiceConcurrencyTest @Autowired constructor(
     @DisplayName("잔액이 음수가 되도록 하는 잔액 차감 요청 동시성 테스트")
     fun concurrentDeduct_shouldCauseRaceCondition() {
         // given
-        val numberOfThreads = 10
+        val numberOfThreads = 5
         val deductAmount = 3_000
         val latch = CountDownLatch(numberOfThreads)
         val executor = Executors.newFixedThreadPool(numberOfThreads)
@@ -65,6 +65,6 @@ class BalanceServiceConcurrencyTest @Autowired constructor(
 
         assertThat(resultBalance).isEqualTo(1_000)
         assertThat(exceptions.count { it.message?.contains("잔액이 부족합니다") == true })
-            .isGreaterThan(0)
+            .isEqualTo(2) // 5번의 병렬 실행 중 3번은 성공하고 2번은 실패해야 함
     }
 }
