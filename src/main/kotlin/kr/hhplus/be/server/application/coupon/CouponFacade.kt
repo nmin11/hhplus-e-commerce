@@ -15,7 +15,7 @@ class CouponFacade(
     @Transactional
     fun issueCouponToCustomer(command: CouponCommand.Issue): CouponResult.Issue {
         val customer = customerService.getById(command.customerId)
-        val coupon = couponService.getById(command.couponId)
+        val coupon = couponService.getWithLockById(command.couponId)
 
         // 쿠폰 사용 가능 기간 검사
         coupon.validatePeriod()
