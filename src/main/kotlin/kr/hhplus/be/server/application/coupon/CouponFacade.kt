@@ -17,9 +17,8 @@ class CouponFacade(
         val customer = customerService.getById(command.customerId)
         val coupon = couponService.getById(command.couponId)
 
-        // 쿠폰 사용 가능 기간 및 중복 발급 여부 검사
+        // 쿠폰 사용 가능 기간 검사
         coupon.validatePeriod()
-        customerCouponService.validateNotIssued(command.customerId, command.couponId)
 
         // 쿠폰 수량 검사 및 차감
         couponService.decreaseQuantity(coupon)

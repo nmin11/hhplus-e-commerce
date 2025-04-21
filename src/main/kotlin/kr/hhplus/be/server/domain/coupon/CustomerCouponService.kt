@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.domain.coupon
 
 import kr.hhplus.be.server.domain.customer.Customer
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -19,16 +20,13 @@ class CustomerCouponService(
         return customerCoupon.validateUsable()
     }
 
-    fun validateNotIssued(customerId: Long, couponId: Long) {
-        val existing = customerCouponRepository.findByCustomerIdAndCouponId(customerId, couponId)
-        if (existing != null) {
+    fun issue(customer: Customer, coupon: Coupon): CustomerCoupon {
+        try {
+            val customerCoupon = CustomerCoupon.issue(customer, coupon)
+            return customerCouponRepository.save(customerCoupon)
+        } catch (_: DataIntegrityViolationException) {
             throw IllegalStateException("해당 쿠폰은 이미 발급된 쿠폰입니다.")
         }
-    }
-
-    fun issue(customer: Customer, coupon: Coupon): CustomerCoupon {
-        val customerCoupon = CustomerCoupon.issue(customer, coupon)
-        return customerCouponRepository.save(customerCoupon)
     }
 
     @Transactional
