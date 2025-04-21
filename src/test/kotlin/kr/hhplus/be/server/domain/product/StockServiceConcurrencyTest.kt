@@ -21,16 +21,17 @@ class StockServiceConcurrencyTest @Autowired constructor(
 ) {
     private lateinit var option: ProductOption
     private lateinit var stock: Stock
+    val stockQuantity = 5
 
     @BeforeEach
     fun setup() {
-        val product = Product.create("insufficient-product", 5000)
+        val product = Product.create("insufficient-product", 5_000)
         productRepository.save(product)
 
         option = ProductOption.create(product, "insufficient-option", 0)
         productOptionRepository.save(option)
 
-        stock = Stock.create(option, 3)
+        stock = Stock.create(option, stockQuantity)
         stockRepository.save(stock)
     }
 
@@ -66,6 +67,6 @@ class StockServiceConcurrencyTest @Autowired constructor(
 
         assertThat(remainingStock).isEqualTo(0)
         assertThat(exceptions.count { it.message?.contains("재고가 부족합니다") == true })
-            .isGreaterThan(0)
+            .isEqualTo(numberOfThreads - stockQuantity)
     }
 }
