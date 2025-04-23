@@ -18,6 +18,9 @@ class Balance private constructor(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0L
 
+    @Version
+    var version: Long = 0L
+
     companion object {
         fun create(customer: Customer, amount: Int): Balance {
             return Balance(customer, amount)

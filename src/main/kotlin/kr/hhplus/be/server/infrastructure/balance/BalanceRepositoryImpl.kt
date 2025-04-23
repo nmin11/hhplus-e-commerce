@@ -12,6 +12,10 @@ class BalanceRepositoryImpl(
         return balanceJpaRepository.save(balance)
     }
 
+    override fun saveAndFlush(balance: Balance): Balance {
+        return balanceJpaRepository.saveAndFlush(balance)
+    }
+
     override fun findByCustomerId(customerId: Long): Balance? {
         return balanceJpaRepository.findByCustomerId(customerId)
     }

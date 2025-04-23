@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS balance (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     customer_id BIGINT NOT NULL,
     amount INT NOT NULL,
+    `version` BIGINT NOT NULL DEFAULT 0,
     created_at TIMESTAMP,
     updated_at TIMESTAMP,
 

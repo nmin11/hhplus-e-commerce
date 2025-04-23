@@ -56,7 +56,7 @@ class BalanceServiceTest {
             val customer = Customer.create(username = "tester")
             val balance = Balance.create(customer, amount = 100_000)
             every { balanceRepository.findByCustomerId(1L) } returns balance
-            every { balanceRepository.save(any()) } answers { firstArg() }
+            every { balanceRepository.saveAndFlush(any()) } answers { firstArg() }
 
             // when
             val result = balanceService.charge(1L, 50_000)
