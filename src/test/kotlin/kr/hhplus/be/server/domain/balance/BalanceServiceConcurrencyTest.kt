@@ -22,13 +22,14 @@ class BalanceServiceConcurrencyTest @Autowired constructor(
 ) {
     private lateinit var customer: Customer
     private lateinit var balance: Balance
+    val initAmount = 10_000
 
     @BeforeEach
     fun setup() {
         customer = Customer.create("concurrent-user")
         customerRepository.save(customer)
 
-        balance = Balance.create(customer, 10_000)
+        balance = Balance.create(customer, initAmount)
         balanceRepository.save(balance)
     }
 
@@ -66,5 +67,78 @@ class BalanceServiceConcurrencyTest @Autowired constructor(
         assertThat(resultBalance).isEqualTo(1_000)
         assertThat(exceptions.count { it.message?.contains("잔액이 부족합니다") == true })
             .isEqualTo(numberOfThreads - 3) // 5번의 병렬 실행 중 3번은 성공하고 2번은 실패해야 함
+    }
+
+    @Test
+    @DisplayName("2번의 동시 충전 요청 시 충돌이 발생해도 재시도 처리로 충전 완료")
+    fun concurrentCharge_shouldSucceedWithRetry() {
+        // given
+        val numberOfThreads = 2
+        val chargeAmount = 1_000
+        val latch = CountDownLatch(numberOfThreads)
+        val executor = Executors.newFixedThreadPool(numberOfThreads)
+        val exceptions = Collections.synchronizedList(mutableListOf<Exception>())
+
+        // when
+        repeat(numberOfThreads) {
+            executor.submit {
+                try {
+                    balanceService.charge(customer.id, chargeAmount)
+                } catch (e: Exception) {
+                    exceptions.add(e)
+                    println("❗예외 발생: ${e.message}")
+                } finally {
+                    latch.countDown()
+                }
+            }
+        }
+
+        latch.await()
+        executor.shutdown()
+
+        // then
+        val resultBalance = balanceService.getByCustomerId(customer.id).getAmount()
+        println("💰 최종 잔액: $resultBalance.")
+        assertThat(resultBalance).isEqualTo(initAmount + (chargeAmount * numberOfThreads))
+
+        val failureCount = exceptions.count { it.message?.contains("지금은 충전을 진행할 수 없습니다") == true }
+        assertThat(failureCount).isEqualTo(0)
+    }
+
+    @Test
+    @DisplayName("다수의 동시 충전 요청 시 충돌이 발생해서 일부 요청만 적용")
+    fun concurrentCharge_shouldHandleRetryAndFailure() {
+        // given
+        val numberOfThreads = 5
+        val chargeAmount = 1_000
+        val latch = CountDownLatch(numberOfThreads)
+        val executor = Executors.newFixedThreadPool(numberOfThreads)
+        val exceptions = Collections.synchronizedList(mutableListOf<Exception>())
+
+        // when
+        repeat(numberOfThreads) {
+            executor.submit {
+                try {
+                    balanceService.charge(customer.id, chargeAmount)
+                } catch (e: Exception) {
+                    exceptions.add(e)
+                    println("❗예외 발생: ${e.message}")
+                } finally {
+                    latch.countDown()
+                }
+            }
+        }
+
+        latch.await()
+        executor.shutdown()
+
+        // then
+        val resultBalance = balanceService.getByCustomerId(customer.id).getAmount()
+        println("💰 최종 잔액: $resultBalance.")
+
+        val chargedAmount = resultBalance - initAmount
+        val successCount = chargedAmount / 1_000
+        val failureCount = exceptions.count { it.message?.contains("지금은 충전을 진행할 수 없습니다") == true }
+        assertThat(successCount + failureCount).isEqualTo(numberOfThreads)
     }
 }
