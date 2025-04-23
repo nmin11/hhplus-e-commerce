@@ -1,6 +1,5 @@
 package kr.hhplus.be.server.domain.order
 
-import jakarta.transaction.Transactional
 import org.springframework.orm.ObjectOptimisticLockingFailureException
 import org.springframework.stereotype.Service
 
@@ -25,7 +24,6 @@ class OrderService(
         return order
     }
 
-    @Transactional
     fun markAsPaid(order: Order) {
         try {
             order.markAsPaid()

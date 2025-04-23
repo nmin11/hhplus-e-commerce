@@ -37,7 +37,6 @@ class CustomerCouponService(
         customerCouponRepository.saveAll(expiredCustomerCoupons)
     }
 
-    @Transactional
     fun markAsUsed(customerCoupon: CustomerCoupon) {
         try {
             customerCoupon.markAsUsed()
