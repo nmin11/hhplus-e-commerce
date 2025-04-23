@@ -19,7 +19,6 @@ class CouponService(
 
     fun decreaseQuantity(coupon: Coupon) {
         coupon.decreaseQuantity()
-        couponRepository.save(coupon)
     }
 
     fun getExpiredCoupons(referenceDate: LocalDate = LocalDate.now()): List<Coupon> {

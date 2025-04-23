@@ -54,7 +54,6 @@ class CustomerCoupon private constructor(
     fun expireIfAvailable() {
         if (status == CustomerCouponStatus.AVAILABLE) {
             status = CustomerCouponStatus.EXPIRED
-            updatedAt = LocalDateTime.now()
         }
     }
 
