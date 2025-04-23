@@ -1,5 +1,7 @@
 package kr.hhplus.be.server.domain.balance
 
+import kr.hhplus.be.server.support.exception.balance.BalanceChargeFailedException
+import kr.hhplus.be.server.support.exception.balance.BalanceNotFoundException
 import org.slf4j.LoggerFactory
 import org.springframework.orm.ObjectOptimisticLockingFailureException
 import org.springframework.retry.annotation.Backoff
@@ -16,7 +18,7 @@ class BalanceService(
 
     fun getByCustomerId(customerId: Long): Balance {
         return balanceRepository.findByCustomerId(customerId)
-            ?: throw IllegalStateException("잔액 정보가 존재하지 않습니다.")
+            ?: throw BalanceNotFoundException()
     }
 
     @Retryable(
@@ -33,7 +35,7 @@ class BalanceService(
     @Recover
     fun recoverCharge(e: ObjectOptimisticLockingFailureException, customerId: Long, amount: Int): Balance {
         log.warn("충전 재시도 실패: customerId=$customerId, amount=$amount, message=${e.javaClass.simpleName}")
-        throw IllegalStateException("지금은 충전을 진행할 수 없습니다. 잠시 후 다시 시도해주세요.")
+        throw BalanceChargeFailedException()
     }
 
     @Transactional

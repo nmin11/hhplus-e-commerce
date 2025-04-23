@@ -2,6 +2,8 @@ package kr.hhplus.be.server.domain.balance
 
 import kr.hhplus.be.server.domain.customer.Customer
 import kr.hhplus.be.server.domain.customer.CustomerRepository
+import kr.hhplus.be.server.support.exception.balance.BalanceChargeFailedException
+import kr.hhplus.be.server.support.exception.balance.BalanceInsufficientException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -104,7 +106,7 @@ class BalanceServiceConcurrencyTest @Autowired constructor(
         println("💰 최종 잔액: $resultBalance.")
         assertThat(resultBalance).isEqualTo(initAmount + (chargeAmount * numberOfThreads))
 
-        val failureCount = exceptions.count { it.message?.contains("지금은 충전을 진행할 수 없습니다") == true }
+        val failureCount = exceptions.count { it is BalanceChargeFailedException }
         assertThat(failureCount).isEqualTo(0)
     }
 
@@ -141,7 +143,7 @@ class BalanceServiceConcurrencyTest @Autowired constructor(
 
         val chargedAmount = resultBalance - initAmount
         val successCount = chargedAmount / 1_000
-        val failureCount = exceptions.count { it.message?.contains("지금은 충전을 진행할 수 없습니다") == true }
+        val failureCount = exceptions.count { it is BalanceChargeFailedException }
         assertThat(successCount + failureCount).isEqualTo(numberOfThreads)
     }
 }
