@@ -13,6 +13,7 @@ import kr.hhplus.be.server.domain.order.OrderItemInfo
 import kr.hhplus.be.server.domain.order.OrderRepository
 import kr.hhplus.be.server.domain.product.*
 import kr.hhplus.be.server.support.exception.coupon.CustomerCouponConflictException
+import kr.hhplus.be.server.support.exception.order.OrderConflictException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -94,7 +95,7 @@ class PaymentFacadeConcurrencyTest @Autowired constructor(
         executor.shutdown()
 
         // then
-        assertThat(exceptions.count { it.message?.contains("지금은 결제를 진행할 수 없습니다") == true })
+        assertThat(exceptions.count { it is OrderConflictException })
             .isEqualTo(numberOfThreads - 1)
     }
 

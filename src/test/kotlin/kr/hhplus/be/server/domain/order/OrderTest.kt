@@ -3,6 +3,8 @@ package kr.hhplus.be.server.domain.order
 import kr.hhplus.be.server.domain.customer.Customer
 import kr.hhplus.be.server.domain.product.Product
 import kr.hhplus.be.server.domain.product.ProductOption
+import kr.hhplus.be.server.support.exception.order.OrderItemEmptyException
+import kr.hhplus.be.server.support.exception.order.OrderNotPayableException
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.DisplayName
@@ -56,7 +58,7 @@ class OrderTest {
 
             // when & then
             assertThatThrownBy { Order.createWithItems(customer, emptyItems) }
-                .isInstanceOf(IllegalArgumentException::class.java)
+                .isInstanceOf(OrderItemEmptyException::class.java)
                 .hasMessage("주문 항목이 비어있습니다.")
         }
     }
@@ -102,8 +104,7 @@ class OrderTest {
 
             // when & then
             assertThatThrownBy { order.markAsPaid() }
-                .isInstanceOf(IllegalStateException::class.java)
-                .hasMessage("결제 가능한 상태가 아닙니다. (현재 상태: PAID)")
+                .isInstanceOf(OrderNotPayableException::class.java)
         }
     }
 }

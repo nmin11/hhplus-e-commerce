@@ -1,5 +1,8 @@
 package kr.hhplus.be.server.domain.order
 
+import kr.hhplus.be.server.support.exception.order.OrderConflictException
+import kr.hhplus.be.server.support.exception.order.OrderNotFoundException
+import kr.hhplus.be.server.support.exception.order.OrderNotPayableException
 import org.springframework.orm.ObjectOptimisticLockingFailureException
 import org.springframework.stereotype.Service
 
@@ -13,13 +16,13 @@ class OrderService(
 
     fun getById(id: Long): Order {
         return orderRepository.findById(id)
-            ?: throw IllegalArgumentException("주문 정보를 찾을 수 없습니다.")
+            ?: throw OrderNotFoundException()
     }
 
     fun getValidOrderForPayment(orderId: Long): Order {
         val order = getById(orderId)
         if (order.status != OrderStatus.CREATED) {
-            throw IllegalStateException("결제 가능한 주문이 아닙니다. (현재 상태: ${order.status})")
+            throw OrderNotPayableException(order.status.name)
         }
         return order
     }
@@ -29,7 +32,7 @@ class OrderService(
             order.markAsPaid()
             orderRepository.saveAndFlush(order)
         } catch (_: ObjectOptimisticLockingFailureException) {
-            throw IllegalStateException("지금은 결제를 진행할 수 없습니다. 잠시 후 다시 시도해주세요.")
+            throw OrderConflictException()
         }
     }
 }

@@ -3,6 +3,7 @@ package kr.hhplus.be.server.application.order
 import kr.hhplus.be.server.domain.customer.Customer
 import kr.hhplus.be.server.domain.customer.CustomerRepository
 import kr.hhplus.be.server.domain.product.*
+import kr.hhplus.be.server.support.exception.order.OrderItemEmptyException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.DisplayName
@@ -147,7 +148,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
         )
 
         // when
-        val exception = assertThrows<IllegalArgumentException> {
+        val exception = assertThrows<OrderItemEmptyException> {
             orderFacade.createOrder(command)
         }
 

@@ -11,6 +11,7 @@ import kr.hhplus.be.server.domain.order.OrderRepository
 import kr.hhplus.be.server.domain.product.*
 import kr.hhplus.be.server.support.exception.balance.BalanceInsufficientException
 import kr.hhplus.be.server.support.exception.coupon.CustomerCouponAlreadyUsedException
+import kr.hhplus.be.server.support.exception.order.OrderNotPayableException
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeAll
@@ -147,8 +148,7 @@ class PaymentFacadeIntegrationTest @Autowired constructor(
         // when & then
         assertThatThrownBy {
             paymentFacade.pay(command)
-        }.isInstanceOf(IllegalStateException::class.java)
-            .hasMessageContaining("결제 가능한 주문이 아닙니다")
+        }.isInstanceOf(OrderNotPayableException::class.java)
     }
 
     @Test
