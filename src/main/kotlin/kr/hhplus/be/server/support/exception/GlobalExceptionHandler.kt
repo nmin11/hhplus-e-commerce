@@ -36,4 +36,14 @@ class GlobalExceptionHandler {
                 message = ex.message ?: "서버 내부 오류입니다.",
             ))
     }
+
+    @ExceptionHandler(BusinessException::class)
+    fun handleBusiness(ex: BusinessException): ResponseEntity<ErrorResponse> {
+        return ResponseEntity
+            .status(ex.status)
+            .body(ErrorResponse(
+                code = ex.code,
+                message = ex.message
+            ))
+    }
 }
