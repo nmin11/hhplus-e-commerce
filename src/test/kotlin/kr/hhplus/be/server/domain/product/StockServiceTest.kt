@@ -111,7 +111,7 @@ class StockServiceTest {
             // given
             val optionId = 1L
             val stock = spyk(Stock.create(productOption = mockk(), quantity = 10))
-            every { stockRepository.findWithLockByProductOptionId(optionId) } returns stock
+            every { stockRepository.findByProductOptionIdWithLock(optionId) } returns stock
             every { stockRepository.save(stock) } returns stock
 
             // when
@@ -127,7 +127,7 @@ class StockServiceTest {
         fun whenStockNotFound_shouldThrowException() {
             // given
             val optionId = 1L
-            every { stockRepository.findWithLockByProductOptionId(optionId) } returns null
+            every { stockRepository.findByProductOptionIdWithLock(optionId) } returns null
 
             // when
             val exception = assertThrows<IllegalArgumentException> {

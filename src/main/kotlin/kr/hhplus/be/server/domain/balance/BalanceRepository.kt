@@ -4,5 +4,5 @@ interface BalanceRepository {
     fun save(balance: Balance): Balance
     fun saveAndFlush(balance: Balance): Balance
     fun findByCustomerId(customerId: Long): Balance?
-    fun findWithLockByCustomerId(customerId: Long): Balance?
+    fun findByCustomerIdWithLock(customerId: Long): Balance?
 }

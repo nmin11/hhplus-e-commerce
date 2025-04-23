@@ -13,5 +13,5 @@ interface CouponJpaRepository : JpaRepository<Coupon, Long> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT c FROM Coupon c WHERE c.id = :id")
-    fun findWithLockById(id: Long): Coupon
+    fun findByIdWithLock(id: Long): Coupon
 }

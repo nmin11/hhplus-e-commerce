@@ -21,7 +21,7 @@ class CouponRepositoryImpl(
         return couponJpaRepository.findAllByExpiredAtBefore(expiredAt)
     }
 
-    override fun findWithLockById(id: Long): Coupon? {
-        return couponJpaRepository.findWithLockById(id)
+    override fun findByIdWithLock(id: Long): Coupon? {
+        return couponJpaRepository.findByIdWithLock(id)
     }
 }

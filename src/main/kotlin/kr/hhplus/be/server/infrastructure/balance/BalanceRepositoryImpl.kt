@@ -20,7 +20,7 @@ class BalanceRepositoryImpl(
         return balanceJpaRepository.findByCustomerId(customerId)
     }
 
-    override fun findWithLockByCustomerId(customerId: Long): Balance? {
-        return balanceJpaRepository.findWithLockByCustomerId(customerId)
+    override fun findByCustomerIdWithLock(customerId: Long): Balance? {
+        return balanceJpaRepository.findByCustomerIdWithLock(customerId)
     }
 }

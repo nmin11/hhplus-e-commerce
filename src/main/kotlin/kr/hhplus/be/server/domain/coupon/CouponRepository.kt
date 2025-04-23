@@ -6,5 +6,5 @@ interface CouponRepository {
     fun save(coupon: Coupon): Coupon
     fun findById(id: Long): Coupon?
     fun findAllByExpiredAtBefore(expiredAt: LocalDate): List<Coupon>
-    fun findWithLockById(id: Long): Coupon?
+    fun findByIdWithLock(id: Long): Coupon?
 }

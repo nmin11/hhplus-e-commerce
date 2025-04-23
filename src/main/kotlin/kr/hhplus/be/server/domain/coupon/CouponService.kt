@@ -12,8 +12,8 @@ class CouponService(
             ?: throw IllegalArgumentException("쿠폰 정보가 존재하지 않습니다.")
     }
 
-    fun getWithLockById(couponId: Long): Coupon {
-        return couponRepository.findWithLockById(couponId)
+    fun getByIdWithLock(couponId: Long): Coupon {
+        return couponRepository.findByIdWithLock(couponId)
             ?: throw IllegalArgumentException("쿠폰 정보가 존재하지 않습니다.")
     }
 

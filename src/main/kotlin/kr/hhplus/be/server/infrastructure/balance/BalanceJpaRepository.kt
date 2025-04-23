@@ -12,5 +12,5 @@ interface BalanceJpaRepository : JpaRepository<Balance, Long> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT b FROM Balance b WHERE b.customer.id = :customerId")
-    fun findWithLockByCustomerId(customerId: Long): Balance?
+    fun findByCustomerIdWithLock(customerId: Long): Balance?
 }
