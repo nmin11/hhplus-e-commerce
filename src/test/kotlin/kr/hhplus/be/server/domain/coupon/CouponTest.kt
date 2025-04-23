@@ -1,5 +1,7 @@
 package kr.hhplus.be.server.domain.coupon
 
+import kr.hhplus.be.server.support.exception.coupon.CouponInsufficientException
+import kr.hhplus.be.server.support.exception.coupon.CouponInvalidPeriodException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -73,7 +75,7 @@ class CouponTest {
             )
 
             // when
-            val exception = assertThrows<IllegalStateException> {
+            val exception = assertThrows<CouponInsufficientException> {
                 coupon.decreaseQuantity()
             }
 
@@ -135,7 +137,7 @@ class CouponTest {
             )
 
             // when
-            val exception = assertThrows<IllegalStateException> {
+            val exception = assertThrows<CouponInvalidPeriodException> {
                 coupon.calculateDiscount(10_000)
             }
 
@@ -173,7 +175,7 @@ class CouponTest {
             )
 
             // when
-            val exception = assertThrows<IllegalStateException> {
+            val exception = assertThrows<CouponInvalidPeriodException> {
                 coupon.validatePeriod()
             }
 

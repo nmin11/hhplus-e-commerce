@@ -6,5 +6,5 @@ import org.springframework.http.HttpStatus
 class BalanceInsufficientException : BusinessException(
     code = "BALANCE_INSUFFICIENT",
     message = "잔액이 부족합니다.",
-    status = HttpStatus.BAD_REQUEST
+    status = HttpStatus.CONFLICT
 )

@@ -4,6 +4,10 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kr.hhplus.be.server.domain.customer.Customer
+import kr.hhplus.be.server.support.exception.coupon.CustomerCouponAlreadyIssuedException
+import kr.hhplus.be.server.support.exception.coupon.CustomerCouponAlreadyUsedException
+import kr.hhplus.be.server.support.exception.coupon.CustomerCouponExpiredException
+import kr.hhplus.be.server.support.exception.coupon.CustomerCouponNotFoundException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -88,7 +92,7 @@ class CustomerCouponServiceTest {
         fun throwException_whenNotIssued() {
             every { customerCouponRepository.findByCustomerIdAndCouponId(customerId, couponId) } returns null
 
-            val exception = assertThrows<IllegalArgumentException> {
+            val exception = assertThrows<CustomerCouponNotFoundException> {
                 customerCouponService.validateIssuedCoupon(customerId, couponId)
             }
 
@@ -113,7 +117,7 @@ class CustomerCouponServiceTest {
 
             every { customerCouponRepository.findByCustomerIdAndCouponId(customerId, couponId) } returns customerCoupon
 
-            val exception = assertThrows<IllegalStateException> {
+            val exception = assertThrows<CustomerCouponAlreadyUsedException> {
                 customerCouponService.validateIssuedCoupon(customerId, couponId)
             }
 
@@ -138,7 +142,7 @@ class CustomerCouponServiceTest {
 
             every { customerCouponRepository.findByCustomerIdAndCouponId(customerId, couponId) } returns customerCoupon
 
-            val exception = assertThrows<IllegalStateException> {
+            val exception = assertThrows<CustomerCouponExpiredException> {
                 customerCouponService.validateIssuedCoupon(customerId, couponId)
             }
 
@@ -174,7 +178,7 @@ class CustomerCouponServiceTest {
         }
 
         @Test
-        @DisplayName("쿠폰 중복 발급 시 IllegalStateException 예외 발생")
+        @DisplayName("쿠폰 중복 발급 시 예외 발생")
         fun throwException_whenDuplicateIssue() {
             // given
             val customer = Customer.create("tester")
@@ -189,7 +193,7 @@ class CustomerCouponServiceTest {
             every { customerCouponRepository.save(any()) } throws DataIntegrityViolationException("중복 발급")
 
             // when & then
-            val exception = assertThrows<IllegalStateException> {
+            val exception = assertThrows<CustomerCouponAlreadyIssuedException> {
                 customerCouponService.issue(customer, coupon)
             }
 

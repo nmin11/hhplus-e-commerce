@@ -1,6 +1,8 @@
 package kr.hhplus.be.server.domain.coupon
 
 import kr.hhplus.be.server.domain.customer.Customer
+import kr.hhplus.be.server.support.exception.coupon.CustomerCouponAlreadyUsedException
+import kr.hhplus.be.server.support.exception.coupon.CustomerCouponExpiredException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -103,7 +105,7 @@ class CustomerCouponTest {
             }
 
             // when
-            val exception = assertThrows<IllegalStateException> {
+            val exception = assertThrows<CustomerCouponAlreadyUsedException> {
                 customerCoupon.markAsUsed()
             }
 
@@ -120,7 +122,7 @@ class CustomerCouponTest {
             }
 
             // when
-            val exception = assertThrows<IllegalStateException> {
+            val exception = assertThrows<CustomerCouponExpiredException> {
                 customerCoupon.markAsUsed()
             }
 
@@ -153,7 +155,7 @@ class CustomerCouponTest {
             }
 
             // when
-            val exception = assertThrows<IllegalStateException> {
+            val exception = assertThrows<CustomerCouponAlreadyUsedException> {
                 customerCoupon.validateUsable()
             }
 
@@ -170,7 +172,7 @@ class CustomerCouponTest {
             }
 
             // when
-            val exception = assertThrows<IllegalStateException> {
+            val exception = assertThrows<CustomerCouponExpiredException> {
                 customerCoupon.validateUsable()
             }
 

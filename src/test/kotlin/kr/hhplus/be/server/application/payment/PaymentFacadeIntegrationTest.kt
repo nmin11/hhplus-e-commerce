@@ -10,6 +10,7 @@ import kr.hhplus.be.server.domain.order.OrderItemInfo
 import kr.hhplus.be.server.domain.order.OrderRepository
 import kr.hhplus.be.server.domain.product.*
 import kr.hhplus.be.server.support.exception.balance.BalanceInsufficientException
+import kr.hhplus.be.server.support.exception.coupon.CustomerCouponAlreadyUsedException
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeAll
@@ -214,8 +215,7 @@ class PaymentFacadeIntegrationTest @Autowired constructor(
 
         // when & then
         assertThatThrownBy { paymentFacade.pay(command) }
-            .isInstanceOf(IllegalStateException::class.java)
-            .hasMessageContaining("사용된 쿠폰")
+            .isInstanceOf(CustomerCouponAlreadyUsedException::class.java)
     }
 
     @Test
@@ -241,6 +241,5 @@ class PaymentFacadeIntegrationTest @Autowired constructor(
         // when & then
         assertThatThrownBy { paymentFacade.pay(command) }
             .isInstanceOf(BalanceInsufficientException::class.java)
-            .hasMessageContaining("잔액이 부족합니다")
     }
 }

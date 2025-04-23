@@ -2,8 +2,9 @@ package kr.hhplus.be.server.domain.coupon
 
 import jakarta.persistence.*
 import kr.hhplus.be.server.domain.common.BaseEntity
+import kr.hhplus.be.server.support.exception.coupon.CouponInsufficientException
+import kr.hhplus.be.server.support.exception.coupon.CouponInvalidPeriodException
 import java.time.LocalDate
-import java.time.LocalDateTime
 
 @Entity
 @Table(name = "coupon")
@@ -86,7 +87,7 @@ class Coupon private constructor(
 
     fun decreaseQuantity() {
         if (currentQuantity <= 0) {
-            throw IllegalStateException("쿠폰 수량이 모두 소진되었습니다.")
+            throw CouponInsufficientException()
         }
 
         currentQuantity -= 1
@@ -99,7 +100,7 @@ class Coupon private constructor(
 
     fun validatePeriod(now: LocalDate = LocalDate.now()) {
         if (now.isBefore(startedAt) || now.isAfter(expiredAt)) {
-            throw IllegalStateException("유효하지 않은 쿠폰입니다.")
+            throw CouponInvalidPeriodException()
         }
     }
 }
