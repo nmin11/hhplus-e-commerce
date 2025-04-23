@@ -1,5 +1,7 @@
 package kr.hhplus.be.server.domain.product
 
+import kr.hhplus.be.server.support.exception.product.ProductOptionInvalidExtraPriceException
+import kr.hhplus.be.server.support.exception.product.ProductOptionNameBlankException
 import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
@@ -23,7 +25,7 @@ class ProductOptionTest {
     @Test
     @DisplayName("옵션명이 공백일 경우 예외 발생")
     fun create_throwException_whenOptionNameIsBlank() {
-        val exception = assertThrows(IllegalArgumentException::class.java) {
+        val exception = assertThrows(ProductOptionNameBlankException::class.java) {
             ProductOption.create(product, " ", 1000)
         }
 
@@ -33,7 +35,7 @@ class ProductOptionTest {
     @Test
     @DisplayName("추가 가격이 음수일 경우 예외 발생")
     fun create_throwException_whenExtraPriceIsNegative() {
-        val exception = assertThrows(IllegalArgumentException::class.java) {
+        val exception = assertThrows(ProductOptionInvalidExtraPriceException::class.java) {
             ProductOption.create(product, "M", -500)
         }
 

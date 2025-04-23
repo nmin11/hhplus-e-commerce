@@ -1,6 +1,8 @@
 package kr.hhplus.be.server.domain.product
 
 import jakarta.persistence.*
+import kr.hhplus.be.server.support.exception.product.StockInsufficientException
+import kr.hhplus.be.server.support.exception.product.StockInvalidQuantityException
 import org.hibernate.annotations.UpdateTimestamp
 import java.time.LocalDateTime
 
@@ -23,16 +25,14 @@ class Stock private constructor(
 
     companion object {
         fun create(productOption: ProductOption, quantity: Int): Stock {
-            require(quantity >= 0) { "재고 수량은 0 이상이어야 합니다." }
+            if (quantity < 0) throw StockInvalidQuantityException()
 
             return Stock(productOption, quantity)
         }
     }
 
     fun decrease(quantityToDecrease: Int) {
-        if (quantity < quantityToDecrease) {
-            throw IllegalStateException("재고가 부족합니다.")
-        }
+        if (quantity < quantityToDecrease) throw StockInsufficientException()
 
         quantity -= quantityToDecrease
     }

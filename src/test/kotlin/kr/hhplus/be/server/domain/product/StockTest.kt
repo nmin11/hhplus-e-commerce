@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.product
 
+import kr.hhplus.be.server.support.exception.product.StockInvalidQuantityException
 import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.DisplayName
@@ -24,7 +25,7 @@ class StockTest {
     @DisplayName("재고 수량이 0 미만이면 예외 발생")
     fun create_throwException_whenQuantityIsNegative() {
         // when
-        val exception = assertThrows(IllegalArgumentException::class.java) {
+        val exception = assertThrows(StockInvalidQuantityException::class.java) {
             Stock.create(option, -5)
         }
 

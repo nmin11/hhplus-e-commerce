@@ -4,6 +4,8 @@ import kr.hhplus.be.server.domain.customer.Customer
 import kr.hhplus.be.server.domain.customer.CustomerRepository
 import kr.hhplus.be.server.domain.product.*
 import kr.hhplus.be.server.support.exception.order.OrderItemEmptyException
+import kr.hhplus.be.server.support.exception.product.ProductOptionMismatchException
+import kr.hhplus.be.server.support.exception.product.StockInsufficientException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.DisplayName
@@ -106,7 +108,7 @@ class OrderFacadeIntegrationTest @Autowired constructor(
         )
 
         // when
-        val exception = assertThrows<IllegalStateException> {
+        val exception = assertThrows<ProductOptionMismatchException> {
             orderFacade.createOrder(command)
         }
 
@@ -130,12 +132,12 @@ class OrderFacadeIntegrationTest @Autowired constructor(
         )
 
         // when
-        val exception = assertThrows<IllegalStateException> {
+        val exception = assertThrows<StockInsufficientException> {
             orderFacade.createOrder(command)
         }
 
         // then
-        assertThat(exception.message).isEqualTo("재고가 10개 남아 있어서 주문이 불가능합니다.")
+        assertThat(exception.message).isEqualTo("재고가 부족합니다.")
     }
 
     @Test

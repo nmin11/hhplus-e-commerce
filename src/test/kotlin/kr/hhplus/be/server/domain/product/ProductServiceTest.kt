@@ -2,6 +2,7 @@ package kr.hhplus.be.server.domain.product
 
 import io.mockk.every
 import io.mockk.mockk
+import kr.hhplus.be.server.support.exception.product.ProductNotFoundException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -78,14 +79,13 @@ class ProductServiceTest {
             every { productRepository.findById(productId) } returns null
 
             // when
-            val exception = assertThrows<IllegalArgumentException> {
+            val exception = assertThrows<ProductNotFoundException> {
                 productService.getById(productId)
             }
 
             // then
             assertThat(exception)
-                .isInstanceOf(IllegalArgumentException::class.java)
-                .hasMessage("상품 정보가 존재하지 않습니다.")
+                .isInstanceOf(ProductNotFoundException::class.java)
         }
     }
 }

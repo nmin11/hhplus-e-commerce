@@ -12,6 +12,7 @@ import kr.hhplus.be.server.domain.product.*
 import kr.hhplus.be.server.support.exception.balance.BalanceInsufficientException
 import kr.hhplus.be.server.support.exception.coupon.CustomerCouponAlreadyUsedException
 import kr.hhplus.be.server.support.exception.order.OrderNotPayableException
+import kr.hhplus.be.server.support.exception.product.StockInsufficientException
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeAll
@@ -179,8 +180,7 @@ class PaymentFacadeIntegrationTest @Autowired constructor(
 
         // when & then
         assertThatThrownBy { paymentFacade.pay(command) }
-            .isInstanceOf(IllegalStateException::class.java)
-            .hasMessage("재고가 0개 남아 있어서 주문이 불가능합니다.")
+            .isInstanceOf(StockInsufficientException::class.java)
     }
 
     @Test

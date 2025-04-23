@@ -1,5 +1,7 @@
 package kr.hhplus.be.server.domain.product
 
+import kr.hhplus.be.server.support.exception.product.StockInsufficientException
+import kr.hhplus.be.server.support.exception.product.StockNotFoundException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -9,13 +11,13 @@ class StockService(
 ) {
     fun getByProductOptionId(productOptionId: Long): Stock {
         return stockRepository.findByProductOptionId(productOptionId)
-            ?: throw IllegalArgumentException("재고 정보가 존재하지 않습니다.")
+            ?: throw StockNotFoundException()
     }
 
     fun validate(productOptionId: Long, requiredQuantity: Int) {
         val stock = getByProductOptionId(productOptionId)
         if (stock.quantity < requiredQuantity) {
-            throw IllegalStateException("재고가 ${stock.quantity}개 남아 있어서 주문이 불가능합니다.")
+            throw StockInsufficientException()
         }
     }
 
@@ -28,6 +30,6 @@ class StockService(
 
     private fun getByProductOptionIdWithLock(productOptionId: Long): Stock {
         return stockRepository.findByProductOptionIdWithLock(productOptionId)
-            ?: throw IllegalArgumentException("재고 정보가 존재하지 않습니다.")
+            ?: throw StockNotFoundException()
     }
 }
