@@ -2,6 +2,7 @@ package kr.hhplus.be.server.domain.coupon
 
 import kr.hhplus.be.server.domain.customer.Customer
 import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.orm.ObjectOptimisticLockingFailureException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -34,5 +35,15 @@ class CustomerCouponService(
         val expiredCustomerCoupons = customerCouponRepository.findAllByCouponIn(coupons)
         expiredCustomerCoupons.forEach { it.expireIfAvailable() }
         customerCouponRepository.saveAll(expiredCustomerCoupons)
+    }
+
+    @Transactional
+    fun markAsUsed(customerCoupon: CustomerCoupon) {
+        try {
+            customerCoupon.markAsUsed()
+            customerCouponRepository.saveAndFlush(customerCoupon)
+        } catch (_: ObjectOptimisticLockingFailureException) {
+            throw IllegalStateException("지금은 결제를 진행할 수 없습니다. 잠시 후 다시 시도해주세요.")
+        }
     }
 }

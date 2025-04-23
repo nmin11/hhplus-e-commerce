@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.domain.order
 
 import jakarta.transaction.Transactional
+import org.springframework.orm.ObjectOptimisticLockingFailureException
 import org.springframework.stereotype.Service
 
 @Service
@@ -26,6 +27,11 @@ class OrderService(
 
     @Transactional
     fun markAsPaid(order: Order) {
-        order.markAsPaid()
+        try {
+            order.markAsPaid()
+            orderRepository.saveAndFlush(order)
+        } catch (_: ObjectOptimisticLockingFailureException) {
+            throw IllegalStateException("지금은 결제를 진행할 수 없습니다. 잠시 후 다시 시도해주세요.")
+        }
     }
 }

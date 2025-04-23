@@ -18,7 +18,6 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.orm.ObjectOptimisticLockingFailureException
 import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDate
 import java.util.*
@@ -94,7 +93,7 @@ class PaymentFacadeConcurrencyTest @Autowired constructor(
         executor.shutdown()
 
         // then
-        assertThat(exceptions.count { it is ObjectOptimisticLockingFailureException })
+        assertThat(exceptions.count { it.message?.contains("지금은 결제를 진행할 수 없습니다") == true })
             .isEqualTo(numberOfThreads - 1)
     }
 
@@ -106,14 +105,14 @@ class PaymentFacadeConcurrencyTest @Autowired constructor(
         // 1. 하나의 쿠폰 생성 및 발급
         val coupon = couponRepository.save(
             Coupon.createFixedDiscount(
-                name = "동시성쿠폰",
+                name = "concurrency-coupon",
                 amount = 1_000,
                 quantity = 10,
                 startedAt = LocalDate.now().minusDays(1),
                 expiredAt = LocalDate.now().plusDays(1)
             )
         )
-        val customerCoupon = customerCouponRepository.save(
+        customerCouponRepository.save(
             CustomerCoupon.issue(customer, coupon)
         )
 
@@ -155,7 +154,7 @@ class PaymentFacadeConcurrencyTest @Autowired constructor(
         executor.shutdown()
 
         // then
-        assertThat(exceptions.count { it is ObjectOptimisticLockingFailureException })
+        assertThat(exceptions.count { it.message?.contains("지금은 결제를 진행할 수 없습니다") == true })
             .isEqualTo(numberOfThreads - 1)
     }
 }
