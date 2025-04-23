@@ -21,6 +21,10 @@ spring:
       hibernate.timezone.default_storage: NORMALIZE_UTC
       hibernate.jdbc.time_zone: UTC
 
+external:
+  data-platform:
+    url: https://67f65cb942d6c71cca61b523.mockapi.io/order
+
 ---
 spring:
   config:
