@@ -12,7 +12,7 @@
 
 | Lock 대상 테이블 | 시나리오 키워드 | 예상 문제 | 적용한 Lock 방식 |
 |:------------------:|:----------------------:|:-------------------------:|:-----------------------------:|
-| `balance`           | 사용자 잔액 동시 차감 | 잔액 음수 저장 가능성          | **Pessimistic Write Lock** |
+| `balance`           | 사용자 잔액 동시 차감 | 잔액 음수 저장 가능성          | **Optimistic Lock** |
 | `balance`           | 사용자 잔액 동시 충전 | 일부 금액 누락 가능성            | **Optimistic Lock + Retry** |
 | `coupon`            | 쿠폰 수량 동시 차감   | 수량 초과 발급 가능성            | **Pessimistic Write Lock** |
 | `stock`             | 재고 동시 차감        | 재고 음수 발생 가능성            | **Pessimistic Write Lock** |
@@ -20,9 +20,10 @@
 | `customer_coupon`   | 쿠폰 상태 전이        | 쿠폰 중복 사용 가능성            | **Optimistic Lock**     |
 
 본 프로젝트에서 발생 가능한 동시성 이슈들을 위와 같이 표로 정리했습니다.  
-잔액 차감, 재고 차감, 쿠폰 발급 같이 서비스의 핵심 자원에 대한 차감 로직은 정합성 및 원자성이 보장되어야 한다고 판단해 **비관적 쓰기 락** 방식을 적용했습니다.  
-반면에 객체의 상태 값을 참조하는 로직이 있는 경우에는 **낙관적 락**을 활용해 상태 전이가 정확히 한 번만 일어나도록 적용했습니다.  
-잔액 충전의 경우에는 반드시 정합성과 원자성을 보장하기 보다는, 재시도가 가능한 로직이라고 판단하여 **낙관적 락 + 재시도 로직**의 방식을 활용했습니다.
+잔액 차감은 결제 시점에 발생하는데, 동시에 여러 결제가 발생하는 경우가 드문데다가 또한 비정상적인 케이스라고 볼 수 있기 때문에 **재시도 로직이 없는 낙관적 락**을 적용했습니다.  
+잔액 충전의 경우에는 반드시 정합성과 원자성을 보장하기 보다는, 재시도가 가능한 로직이라고 판단하여 **낙관적 락 + 재시도 로직**의 방식을 적용했습니다.  
+재고 차감, 쿠폰 발급 같이 서비스의 핵심 자원에 대한 차감 로직은 정합성 및 원자성이 보장되어야 한다고 판단해 **비관적 쓰기 락** 방식을 적용했습니다.  
+반면에 객체의 상태 값을 참조하는 로직이 있는 경우(주문 상태, 사용자 보유 쿠폰의 상태)에는 **낙관적 락**을 활용해 상태 전이가 정확히 한 번만 일어나도록 적용했습니다.
 
 <br>
 
@@ -45,27 +46,32 @@ fun deduct(customerId: Long, amount: Int): Balance {
 }
 ```
 
-- `getByCustomerId` 메서드로 조회된 Balance 객체는 별도의 Lock 없이 여러 트랜잭션에서 동시 접근 가능
+- 현재 트랜잭션 충돌에 대한 감지가 없는 상태
 - 여러 트랜잭션이 동시에 차감 요청을 할 경우, 잔액이 부족함에도 차감이 모두 성공할 가능성이 있음
 
 ### 해결 (TO-BE)
 
 ```kotlin
-@Lock(LockModeType.PESSIMISTIC_WRITE)
-@Query("SELECT b FROM Balance b WHERE b.customer.id = :customerId")
-fun findByCustomerIdWithLock(customerId: Long): Balance?
+@Version
+var version: Long = 0L
 ```
 
 ```kotlin
-private fun getByCustomerIdWithLock(customerId: Long): Balance {
-    return balanceRepository.findByCustomerIdWithLock(customerId)
-        ?: throw IllegalStateException("잔액 정보가 존재하지 않습니다.")
+@Transactional
+fun deduct(customerId: Long, amount: Int): Balance {
+    try {
+        val balance = getByCustomerId(customerId)
+        balance.deduct(amount)
+        return balanceRepository.saveAndFlush(balance)
+    } catch (_: ObjectOptimisticLockingFailureException) {
+        throw IllegalStateException("지금은 결제를 진행할 수 없습니다. 잠시 후 다시 시도해주세요.")
+    }
 }
 ```
 
-- `getByCustomerId` 메서드 대신 `getByCustomerIdWithLock` 메서드를 활용하도록 변경
-- **비관적 쓰기 락**을 통해 잔액 차감의 정합성 보장
-- 이에 따라 여러 트랜잭션이 동시에 차감 요청을 해도 Lock이 걸려서 직렬화 처리됨
+- `version` 필드와 함께 **낙관적 락** 적용
+- 결제 동시 요청으로 인한 잔액 차감은 비정상적인 케이스이므로 Retry 로직은 제외
+- `saveAndFlush` 메서드를 활용해 낙관적 락 충돌 예외를 감지하도록 작성
 
 <br>
 
