@@ -108,8 +108,8 @@ class BalanceServiceTest {
         fun shouldSubtractAmount_whenSufficient() {
             val customer = Customer.create(username = "tester")
             val balance = Balance.create(customer, amount = 100_000)
-            every { balanceRepository.findByCustomerIdWithLock(1L) } returns balance
-            every { balanceRepository.save(any()) } answers { firstArg() }
+            every { balanceRepository.findByCustomerId(1L) } returns balance
+            every { balanceRepository.saveAndFlush(any()) } answers { firstArg() }
 
             val result = balanceService.deduct(1L, 30_000)
 
@@ -121,7 +121,7 @@ class BalanceServiceTest {
         fun shouldThrow_whenAmountInvalid() {
             val customer = Customer.create(username = "tester")
             val balance = Balance.create(customer, amount = 100_000)
-            every { balanceRepository.findByCustomerIdWithLock(1L) } returns balance
+            every { balanceRepository.findByCustomerId(1L) } returns balance
             val invalidAmounts = listOf(0, -10_000)
 
             for (amount in invalidAmounts) {
@@ -138,7 +138,7 @@ class BalanceServiceTest {
         @Test
         @DisplayName("잔액 정보가 존재하지 않으면 예외 발생")
         fun shouldThrow_whenBalanceNotFound() {
-            every { balanceRepository.findByCustomerIdWithLock(1L) } returns null
+            every { balanceRepository.findByCustomerId(1L) } returns null
 
             val exception = assertThrows<IllegalStateException> {
                 balanceService.deduct(1L, 10_000)
@@ -154,7 +154,7 @@ class BalanceServiceTest {
         fun shouldThrow_whenInsufficientBalance() {
             val customer = Customer.create(username = "tester")
             val balance = Balance.create(customer, amount = 20_000)
-            every { balanceRepository.findByCustomerIdWithLock(1L) } returns balance
+            every { balanceRepository.findByCustomerId(1L) } returns balance
 
             val exception = assertThrows<IllegalStateException> {
                 balanceService.deduct(1L, 30_000)

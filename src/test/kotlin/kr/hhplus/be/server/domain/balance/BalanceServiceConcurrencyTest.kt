@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import java.util.*
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.Executors
 
 @SpringBootTest
@@ -37,8 +38,9 @@ class BalanceServiceConcurrencyTest @Autowired constructor(
     @DisplayName("잔액이 음수가 되도록 하는 잔액 차감 요청 동시성 테스트")
     fun concurrentDeduct_shouldCauseRaceCondition() {
         // given
-        val numberOfThreads = 5
-        val deductAmount = 3_000
+        val numberOfThreads = 3
+        val deductAmount = 5_000
+        val barrier = CyclicBarrier(numberOfThreads)
         val latch = CountDownLatch(numberOfThreads)
         val executor = Executors.newFixedThreadPool(numberOfThreads)
         val exceptions = Collections.synchronizedList(mutableListOf<Exception>())
@@ -47,6 +49,7 @@ class BalanceServiceConcurrencyTest @Autowired constructor(
         repeat(numberOfThreads) {
             executor.submit {
                 try {
+                    barrier.await() // 동시 실행 보장
                     balanceService.deduct(customer.id, deductAmount)
                 } catch (e: Exception) {
                     exceptions.add(e)
@@ -64,9 +67,9 @@ class BalanceServiceConcurrencyTest @Autowired constructor(
         val resultBalance = balanceService.getByCustomerId(customer.id).getAmount()
         println("💰 최종 잔액: $resultBalance.")
 
-        assertThat(resultBalance).isEqualTo(1_000)
-        assertThat(exceptions.count { it.message?.contains("잔액이 부족합니다") == true })
-            .isEqualTo(numberOfThreads - 3) // 5번의 병렬 실행 중 3번은 성공하고 2번은 실패해야 함
+        assertThat(resultBalance).isEqualTo(5_000)
+        assertThat(exceptions.count { it.message?.contains("지금은 결제를 진행할 수 없습니다") == true })
+            .isEqualTo(numberOfThreads - 1)
     }
 
     @Test

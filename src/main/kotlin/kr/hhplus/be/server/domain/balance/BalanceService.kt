@@ -38,13 +38,12 @@ class BalanceService(
 
     @Transactional
     fun deduct(customerId: Long, amount: Int): Balance {
-        val balance = getByCustomerIdWithLock(customerId)
-        balance.deduct(amount)
-        return balanceRepository.save(balance)
-    }
-
-    private fun getByCustomerIdWithLock(customerId: Long): Balance {
-        return balanceRepository.findByCustomerIdWithLock(customerId)
-            ?: throw IllegalStateException("잔액 정보가 존재하지 않습니다.")
+        try {
+            val balance = getByCustomerId(customerId)
+            balance.deduct(amount)
+            return balanceRepository.saveAndFlush(balance)
+        } catch (_: ObjectOptimisticLockingFailureException) {
+            throw IllegalStateException("지금은 결제를 진행할 수 없습니다. 잠시 후 다시 시도해주세요.")
+        }
     }
 }

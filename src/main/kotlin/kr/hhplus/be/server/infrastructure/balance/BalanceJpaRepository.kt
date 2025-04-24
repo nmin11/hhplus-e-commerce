@@ -9,8 +9,4 @@ import org.springframework.data.jpa.repository.Query
 interface BalanceJpaRepository : JpaRepository<Balance, Long> {
     fun save(balance: Balance): Balance
     fun findByCustomerId(customerId: Long): Balance?
-
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("SELECT b FROM Balance b WHERE b.customer.id = :customerId")
-    fun findByCustomerIdWithLock(customerId: Long): Balance?
 }
