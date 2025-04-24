@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.domain.balance
 
 import kr.hhplus.be.server.support.exception.balance.BalanceChargeFailedException
+import kr.hhplus.be.server.support.exception.balance.BalanceDeductFailedException
 import kr.hhplus.be.server.support.exception.balance.BalanceNotFoundException
 import org.slf4j.LoggerFactory
 import org.springframework.orm.ObjectOptimisticLockingFailureException
@@ -45,7 +46,7 @@ class BalanceService(
             balance.deduct(amount)
             return balanceRepository.saveAndFlush(balance)
         } catch (_: ObjectOptimisticLockingFailureException) {
-            throw IllegalStateException("지금은 결제를 진행할 수 없습니다. 잠시 후 다시 시도해주세요.")
+            throw BalanceDeductFailedException()
         }
     }
 }
