@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.application.product
 
+import kr.hhplus.be.server.support.exception.product.StatisticInvalidPeriodConditionException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
 import java.time.LocalDate
@@ -20,13 +21,13 @@ class ProductCriteriaTest {
         @DisplayName("두 개 이상의 조건이 주어졌을 때 예외 발생")
         fun init_shouldFail_whenMultipleConditionsProvided() {
             // when & then
-            assertThrows<IllegalArgumentException> {
+            assertThrows<StatisticInvalidPeriodConditionException> {
                 ProductCriteria.PeriodCondition(days = 3, weeks = 1)
             }
-            assertThrows<IllegalArgumentException> {
+            assertThrows<StatisticInvalidPeriodConditionException> {
                 ProductCriteria.PeriodCondition(days = 3, months = 1)
             }
-            assertThrows<IllegalArgumentException> {
+            assertThrows<StatisticInvalidPeriodConditionException> {
                 ProductCriteria.PeriodCondition(days = 3, weeks = 1, months = 2)
             }
         }
