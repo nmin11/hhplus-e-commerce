@@ -4,7 +4,6 @@ import kr.hhplus.be.server.domain.customer.Customer
 import kr.hhplus.be.server.domain.customer.CustomerRepository
 import kr.hhplus.be.server.support.exception.balance.BalanceChargeFailedException
 import kr.hhplus.be.server.support.exception.balance.BalanceDeductFailedException
-import kr.hhplus.be.server.support.exception.balance.BalanceInsufficientException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
