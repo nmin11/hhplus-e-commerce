@@ -2,6 +2,7 @@ package kr.hhplus.be.server.support.customercontext
 
 import io.mockk.every
 import io.mockk.mockk
+import kr.hhplus.be.server.support.exception.customer.CustomerContextMissingException
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.DisplayName
@@ -39,7 +40,7 @@ class CustomerContextInterceptorTest {
         // cleanup
         interceptor.afterCompletion(request, response, handler, null)
         assertThatThrownBy { CustomerContextHolder.get() }
-            .isInstanceOf(IllegalStateException::class.java)
+            .isInstanceOf(CustomerContextMissingException::class.java)
     }
 
     @Test
@@ -56,6 +57,6 @@ class CustomerContextInterceptorTest {
         // then
         assertThat(proceed).isTrue()
         assertThatThrownBy { CustomerContextHolder.get() }
-            .isInstanceOf(IllegalStateException::class.java)
+            .isInstanceOf(CustomerContextMissingException::class.java)
     }
 }

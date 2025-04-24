@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.support.exception
 
+import kr.hhplus.be.server.support.exception.customer.CustomerContextMissingException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -35,6 +36,12 @@ class GlobalExceptionHandler {
                 code = "INTERNAL_SERVER_ERROR",
                 message = ex.message ?: "서버 내부 오류입니다.",
             ))
+    }
+
+    @ExceptionHandler(CustomerContextMissingException::class)
+    fun handleMissingCustomerContext(ex: CustomerContextMissingException): ResponseEntity<ErrorResponse> {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body(ErrorResponse("MISSING_CUSTOMER_CONTEXT", ex.message ?: "고객 정보가 없습니다."))
     }
 
     @ExceptionHandler(BusinessException::class)
