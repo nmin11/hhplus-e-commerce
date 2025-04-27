@@ -2,6 +2,8 @@ package kr.hhplus.be.server.domain.product
 
 import jakarta.persistence.*
 import kr.hhplus.be.server.domain.common.BaseEntity
+import kr.hhplus.be.server.support.exception.product.ProductInvalidBasePriceException
+import kr.hhplus.be.server.support.exception.product.ProductNameBlankException
 
 @Entity
 @Table(
@@ -20,8 +22,8 @@ class Product private constructor(
 
     companion object {
         fun create(name: String, basePrice: Int): Product {
-            require(name.isNotBlank()) { "상품 이름은 공백일 수 없습니다." }
-            require(basePrice >= 0) { "기본 가격은 0 이상이어야 합니다." }
+            if (name.isBlank()) throw ProductNameBlankException()
+            if (basePrice < 0) throw ProductInvalidBasePriceException()
             return Product(name, basePrice)
         }
     }

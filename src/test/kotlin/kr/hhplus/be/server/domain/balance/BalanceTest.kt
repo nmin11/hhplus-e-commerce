@@ -1,6 +1,8 @@
 package kr.hhplus.be.server.domain.balance
 
 import kr.hhplus.be.server.domain.customer.Customer
+import kr.hhplus.be.server.support.exception.balance.BalanceInsufficientException
+import kr.hhplus.be.server.support.exception.balance.BalanceInvalidAmountException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -32,11 +34,11 @@ class BalanceTest {
             val invalidAmounts = listOf(0, -1_000)
 
             for (amount in invalidAmounts) {
-                val exception = assertThrows<IllegalArgumentException> {
+                val exception = assertThrows<BalanceInvalidAmountException> {
                     balance.charge(amount)
                 }
 
-                assertThat(exception.message).isEqualTo("충전 금액은 0보다 커야 합니다.")
+                assertThat(exception.message).contains("0보다 커야 합니다")
             }
         }
     }
@@ -63,11 +65,11 @@ class BalanceTest {
             val invalidAmounts = listOf(0, -5_000)
 
             for (amount in invalidAmounts) {
-                val exception = assertThrows<IllegalArgumentException> {
+                val exception = assertThrows<BalanceInvalidAmountException> {
                     balance.deduct(amount)
                 }
 
-                assertThat(exception.message).isEqualTo("차감 금액은 0보다 커야 합니다.")
+                assertThat(exception.message).contains("0보다 커야 합니다")
             }
         }
 
@@ -76,7 +78,7 @@ class BalanceTest {
         fun throwException_whenInsufficientBalance() {
             val balance = Balance.create(customer, 5_000)
 
-            val exception = assertThrows<IllegalStateException> {
+            val exception = assertThrows<BalanceInsufficientException> {
                 balance.deduct(10_000)
             }
 

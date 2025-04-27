@@ -2,6 +2,7 @@ package kr.hhplus.be.server.domain.customer
 
 import jakarta.persistence.*
 import kr.hhplus.be.server.domain.common.BaseEntity
+import kr.hhplus.be.server.support.exception.customer.CustomerInvalidNameException
 
 @Entity
 @Table(name = "customer")
@@ -15,7 +16,7 @@ class Customer private constructor(
 
     companion object {
         fun create(username: String): Customer {
-            require(username.isNotBlank()) { "사용자 이름은 비어있을 수 없습니다." }
+            if (username.isBlank()) throw CustomerInvalidNameException()
             return Customer(username)
         }
     }

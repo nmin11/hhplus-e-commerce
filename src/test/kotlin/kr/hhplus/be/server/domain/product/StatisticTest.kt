@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.product
 
+import kr.hhplus.be.server.support.exception.product.StatisticInvalidSalesCountException
 import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
@@ -23,7 +24,7 @@ class StatisticTest {
     @Test
     @DisplayName("판매 수량이 0 이하일 경우 예외 발생")
     fun create_throwException_whenSalesCountIsInvalid() {
-        val exception = assertThrows(IllegalArgumentException::class.java) {
+        val exception = assertThrows(StatisticInvalidSalesCountException::class.java) {
             Statistic.create(product, 0)
         }
 

@@ -3,7 +3,8 @@ package kr.hhplus.be.server.domain.balance
 import jakarta.persistence.*
 import kr.hhplus.be.server.domain.common.BaseEntity
 import kr.hhplus.be.server.domain.customer.Customer
-import java.time.LocalDateTime
+import kr.hhplus.be.server.support.exception.balance.BalanceInsufficientException
+import kr.hhplus.be.server.support.exception.balance.BalanceInvalidAmountException
 
 @Entity
 @Table(name = "balance")
@@ -28,13 +29,13 @@ class Balance private constructor(
     }
 
     fun charge(amount: Int) {
-        require(amount > 0) { "충전 금액은 0보다 커야 합니다." }
+        if (amount <= 0) throw BalanceInvalidAmountException()
         this.amount += amount
     }
 
     fun deduct(amount: Int) {
-        require(amount > 0) { "차감 금액은 0보다 커야 합니다." }
-        if (this.amount < amount) throw IllegalStateException("잔액이 부족합니다.")
+        if (amount <= 0) throw BalanceInvalidAmountException()
+        if (this.amount < amount) throw BalanceInsufficientException()
         this.amount -= amount
     }
 

@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.application.product
 
+import kr.hhplus.be.server.support.exception.product.StatisticInvalidPeriodConditionException
 import java.time.LocalDate
 
 sealed class ProductCriteria {
@@ -10,8 +11,8 @@ sealed class ProductCriteria {
     ) {
         init {
             val nonNullCount = listOf(days, weeks, months).count { it != null }
-            require(nonNullCount == 1) {
-                "days, weeks, months 중 하나만 지정해야 합니다."
+            if (nonNullCount != 1) {
+                throw StatisticInvalidPeriodConditionException()
             }
         }
 

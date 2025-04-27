@@ -4,6 +4,8 @@ import jakarta.persistence.*
 import kr.hhplus.be.server.domain.common.BaseEntity
 import kr.hhplus.be.server.domain.customer.Customer
 import kr.hhplus.be.server.domain.product.ProductOption
+import kr.hhplus.be.server.support.exception.order.OrderItemEmptyException
+import kr.hhplus.be.server.support.exception.order.OrderNotPayableException
 
 @Entity
 @Table(name = "`order`")
@@ -35,7 +37,7 @@ class Order private constructor(
 
         fun createWithItems(customer: Customer, items: List<OrderItemInfo>): Order {
             if (items.isEmpty()) {
-                throw IllegalArgumentException("주문 항목이 비어있습니다.")
+                throw OrderItemEmptyException()
             }
 
             val order = Order(customer)
@@ -53,7 +55,7 @@ class Order private constructor(
 
     fun markAsPaid() {
         if (this.status != OrderStatus.CREATED) {
-            throw IllegalStateException("결제 가능한 상태가 아닙니다. (현재 상태: $status)")
+            throw OrderNotPayableException(this.status.name)
         }
 
         this.status = OrderStatus.PAID

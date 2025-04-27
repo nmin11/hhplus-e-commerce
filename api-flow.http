@@ -1,0 +1,100 @@
+@customerId = 1001
+
+@coupon1Id = 5001
+@coupon2Id = 5002
+@coupon3Id = 5003
+@coupon11Id = 5011
+
+@productId1 = 2001
+@productId2 = 2002
+
+@optionS1 = 3001
+@optionM1 = 3002
+@optionL1 = 3003
+
+@optionS2 = 3004
+@optionM2 = 3005
+@optionL2 = 3006
+
+### 1. 고객 잔액 충전
+PATCH http://localhost:8080/balances/charge
+Content-Type: application/json
+
+{
+  "customerId": {{customerId}},
+  "amount": 100000
+}
+
+###
+
+### 2. 상품 목록 조회
+GET http://localhost:8080/products
+
+###
+
+### 3. 상품 상세 조회
+GET http://localhost:8080/products/{{productId1}}
+
+###
+
+### 4. 인기 상품 조회
+GET http://localhost:8080/products/popular?days=3
+
+###
+
+### 5. 주문 생성
+POST http://localhost:8080/orders
+Content-Type: application/json
+
+{
+  "customerId": {{customerId}},
+  "items": [
+    {
+      "productId": {{productId1}},
+      "productOptionId": {{optionS1}},
+      "quantity": 1
+    },
+    {
+      "productId": {{productId2}},
+      "productOptionId": {{optionM2}},
+      "quantity": 1
+    }
+  ]
+}
+
+###
+
+### 6. 결제 생성
+POST http://localhost:8080/payments
+Content-Type: application/json
+
+{
+  "orderId": 1,
+  "couponId": {{coupon1Id}}
+}
+
+###
+
+### 7. 쿠폰 발급
+POST http://localhost:8080/coupons/issue
+Content-Type: application/json
+
+{
+  "customerId": {{customerId}},
+  "couponId": {{coupon11Id}}
+}
+
+###
+
+### 8. 보유 쿠폰 목록
+GET http://localhost:8080/coupons/customer/{{customerId}}
+
+###
+
+### 9. 잔액 조회
+GET http://localhost:8080/balances/{{customerId}}
+
+###
+
+### 10. 잔액 히스토리 조회
+GET http://localhost:8080/balances/{{customerId}}/balance-histories

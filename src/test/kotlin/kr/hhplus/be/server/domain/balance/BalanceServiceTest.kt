@@ -3,6 +3,9 @@ package kr.hhplus.be.server.domain.balance
 import io.mockk.every
 import io.mockk.mockk
 import kr.hhplus.be.server.domain.customer.Customer
+import kr.hhplus.be.server.support.exception.balance.BalanceInsufficientException
+import kr.hhplus.be.server.support.exception.balance.BalanceInvalidAmountException
+import kr.hhplus.be.server.support.exception.balance.BalanceNotFoundException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
 
@@ -36,13 +39,13 @@ class BalanceServiceTest {
             every { balanceRepository.findByCustomerId(customerId) } returns null
 
             // when
-            val exception = assertThrows<IllegalStateException> {
+            val exception = assertThrows<BalanceNotFoundException> {
                 balanceService.getByCustomerId(customerId)
             }
 
             // then
             assertThat(exception)
-                .isInstanceOf(IllegalStateException::class.java)
+                .isInstanceOf(BalanceNotFoundException::class.java)
                 .hasMessage("잔액 정보가 존재하지 않습니다.")
         }
     }
@@ -75,14 +78,14 @@ class BalanceServiceTest {
 
             for (amount in invalidAmounts) {
                 // when
-                val exception = assertThrows<IllegalArgumentException> {
+                val exception = assertThrows<BalanceInvalidAmountException> {
                     balanceService.charge(1L, amount)
                 }
 
                 // then
                 assertThat(exception)
-                    .isInstanceOf(IllegalArgumentException::class.java)
-                    .hasMessage("충전 금액은 0보다 커야 합니다.")
+                    .isInstanceOf(BalanceInvalidAmountException::class.java)
+                    .message().contains("0보다 커야 합니다")
             }
         }
 
@@ -91,12 +94,12 @@ class BalanceServiceTest {
         fun shouldThrow_whenBalanceNotFound() {
             every { balanceRepository.findByCustomerId(1L) } returns null
 
-            val exception = assertThrows<IllegalStateException> {
+            val exception = assertThrows<BalanceNotFoundException> {
                 balanceService.charge(1L, 10_000)
             }
 
             assertThat(exception)
-                .isInstanceOf(IllegalStateException::class.java)
+                .isInstanceOf(BalanceNotFoundException::class.java)
                 .hasMessage("잔액 정보가 존재하지 않습니다.")
         }
     }
@@ -125,13 +128,13 @@ class BalanceServiceTest {
             val invalidAmounts = listOf(0, -10_000)
 
             for (amount in invalidAmounts) {
-                val exception = assertThrows<IllegalArgumentException> {
+                val exception = assertThrows<BalanceInvalidAmountException> {
                     balanceService.deduct(1L, amount)
                 }
 
                 assertThat(exception)
-                    .isInstanceOf(IllegalArgumentException::class.java)
-                    .hasMessage("차감 금액은 0보다 커야 합니다.")
+                    .isInstanceOf(BalanceInvalidAmountException::class.java)
+                    .message().contains("0보다 커야 합니다")
             }
         }
 
@@ -140,12 +143,12 @@ class BalanceServiceTest {
         fun shouldThrow_whenBalanceNotFound() {
             every { balanceRepository.findByCustomerId(1L) } returns null
 
-            val exception = assertThrows<IllegalStateException> {
+            val exception = assertThrows<BalanceNotFoundException> {
                 balanceService.deduct(1L, 10_000)
             }
 
             assertThat(exception)
-                .isInstanceOf(IllegalStateException::class.java)
+                .isInstanceOf(BalanceNotFoundException::class.java)
                 .hasMessage("잔액 정보가 존재하지 않습니다.")
         }
 
@@ -156,12 +159,12 @@ class BalanceServiceTest {
             val balance = Balance.create(customer, amount = 20_000)
             every { balanceRepository.findByCustomerId(1L) } returns balance
 
-            val exception = assertThrows<IllegalStateException> {
+            val exception = assertThrows<BalanceInsufficientException> {
                 balanceService.deduct(1L, 30_000)
             }
 
             assertThat(exception)
-                .isInstanceOf(IllegalStateException::class.java)
+                .isInstanceOf(BalanceInsufficientException::class.java)
                 .hasMessage("잔액이 부족합니다.")
         }
     }

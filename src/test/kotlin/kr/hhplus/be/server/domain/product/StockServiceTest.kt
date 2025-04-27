@@ -4,6 +4,8 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
 import io.mockk.verify
+import kr.hhplus.be.server.support.exception.product.StockInsufficientException
+import kr.hhplus.be.server.support.exception.product.StockNotFoundException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -40,14 +42,13 @@ class StockServiceTest {
             every { stockRepository.findByProductOptionId(optionId) } returns null
 
             // when
-            val exception = assertThrows<IllegalArgumentException> {
+            val exception = assertThrows<StockNotFoundException> {
                 stockService.getByProductOptionId(optionId)
             }
 
             // then
             assertThat(exception)
-                .isInstanceOf(IllegalArgumentException::class.java)
-                .hasMessage("재고 정보가 존재하지 않습니다.")
+                .isInstanceOf(StockNotFoundException::class.java)
         }
     }
 
@@ -73,14 +74,13 @@ class StockServiceTest {
             every { stockRepository.findByProductOptionId(optionId) } returns null
 
             // when
-            val exception = assertThrows<IllegalArgumentException> {
+            val exception = assertThrows<StockNotFoundException> {
                 stockService.validate(optionId, requiredQuantity = 3)
             }
 
             // then
             assertThat(exception)
-                .isInstanceOf(IllegalArgumentException::class.java)
-                .hasMessage("재고 정보가 존재하지 않습니다.")
+                .isInstanceOf(StockNotFoundException::class.java)
         }
 
         @Test
@@ -92,14 +92,13 @@ class StockServiceTest {
             every { stockRepository.findByProductOptionId(optionId) } returns stock
 
             // when
-            val exception = assertThrows<IllegalStateException> {
+            val exception = assertThrows<StockInsufficientException> {
                 stockService.validate(optionId, requiredQuantity = 5)
             }
 
             // then
             assertThat(exception)
-                .isInstanceOf(IllegalStateException::class.java)
-                .hasMessage("재고가 2개 남아 있어서 주문이 불가능합니다.")
+                .isInstanceOf(StockInsufficientException::class.java)
         }
     }
 
@@ -130,14 +129,13 @@ class StockServiceTest {
             every { stockRepository.findByProductOptionIdWithLock(optionId) } returns null
 
             // when
-            val exception = assertThrows<IllegalArgumentException> {
+            val exception = assertThrows<StockNotFoundException> {
                 stockService.decrease(optionId, 1)
             }
 
             // then
             assertThat(exception)
-                .isInstanceOf(IllegalArgumentException::class.java)
-                .hasMessage("재고 정보가 존재하지 않습니다.")
+                .isInstanceOf(StockNotFoundException::class.java)
         }
     }
 }

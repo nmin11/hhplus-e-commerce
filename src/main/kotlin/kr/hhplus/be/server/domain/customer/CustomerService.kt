@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.customer
 
+import kr.hhplus.be.server.support.exception.customer.CustomerNotFoundException
 import org.springframework.stereotype.Service
 
 @Service
@@ -8,12 +9,12 @@ class CustomerService(
 ) {
     fun validateCustomerExistence(customerId: Long) {
         if (!customerRepository.existsById(customerId)) {
-            throw IllegalArgumentException("사용자를 찾을 수 없습니다.")
+            throw CustomerNotFoundException()
         }
     }
 
     fun getById(id: Long): Customer {
         return customerRepository.findById(id)
-            ?: throw IllegalArgumentException("사용자를 찾을 수 없습니다.")
+            ?: throw CustomerNotFoundException()
     }
 }

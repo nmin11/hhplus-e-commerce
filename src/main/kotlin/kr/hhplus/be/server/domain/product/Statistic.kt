@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.domain.product
 
 import jakarta.persistence.*
+import kr.hhplus.be.server.support.exception.product.StatisticInvalidSalesCountException
 import java.time.LocalDateTime
 
 @Entity
@@ -21,7 +22,7 @@ class Statistic private constructor(
 
     companion object {
         fun create(product: Product, salesCount: Int): Statistic {
-            require(salesCount > 0) { "판매 수량은 0보다 커야 합니다." }
+            if (salesCount <= 0) throw StatisticInvalidSalesCountException()
 
             return Statistic(product, salesCount)
         }

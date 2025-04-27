@@ -3,6 +3,9 @@ package kr.hhplus.be.server.domain.product
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
+import kr.hhplus.be.server.support.exception.product.ProductMissingIdException
+import kr.hhplus.be.server.support.exception.product.ProductOptionMismatchException
+import kr.hhplus.be.server.support.exception.product.ProductOptionNotFoundException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -62,14 +65,13 @@ class ProductOptionServiceTest {
             every { productOptionRepository.findById(optionId) } returns null
 
             // when
-            val exception = assertThrows<IllegalArgumentException> {
+            val exception = assertThrows<ProductOptionNotFoundException> {
                 productOptionService.getById(optionId)
             }
 
             // then
             assertThat(exception)
-                .isInstanceOf(IllegalArgumentException::class.java)
-                .hasMessage("상품 옵션 정보가 존재하지 않습니다.")
+                .isInstanceOf(ProductOptionNotFoundException::class.java)
         }
     }
 
@@ -100,13 +102,13 @@ class ProductOptionServiceTest {
             val productId = null
 
             // when
-            val exception = assertThrows<IllegalArgumentException> {
+            val exception = assertThrows<ProductMissingIdException> {
                 productOptionService.validateOptionBelongsToProduct(optionId, productId)
             }
 
             // then
             assertThat(exception)
-                .isInstanceOf(IllegalArgumentException::class.java)
+                .isInstanceOf(ProductMissingIdException::class.java)
                 .hasMessage("상품 ID 또는 상품 옵션 ID가 존재하지 않습니다.")
         }
 
@@ -117,14 +119,13 @@ class ProductOptionServiceTest {
             every { productOptionRepository.findById(optionId) } returns null
 
             // when
-            val exception = assertThrows<IllegalArgumentException> {
+            val exception = assertThrows<ProductOptionNotFoundException> {
                 productOptionService.validateOptionBelongsToProduct(optionId, productId)
             }
 
             // then
             assertThat(exception)
-                .isInstanceOf(IllegalArgumentException::class.java)
-                .hasMessage("상품 옵션이 존재하지 않습니다.")
+                .isInstanceOf(ProductOptionNotFoundException::class.java)
         }
 
         @Test
@@ -136,13 +137,13 @@ class ProductOptionServiceTest {
             every { productOptionRepository.findById(optionId) } returns option
 
             // when
-            val exception = assertThrows<IllegalStateException> {
+            val exception = assertThrows<ProductOptionMismatchException> {
                 productOptionService.validateOptionBelongsToProduct(optionId, productId)
             }
 
             // then
             assertThat(exception)
-                .isInstanceOf(IllegalStateException::class.java)
+                .isInstanceOf(ProductOptionMismatchException::class.java)
                 .hasMessage("상품 옵션이 해당 상품에 속하지 않습니다.")
         }
     }

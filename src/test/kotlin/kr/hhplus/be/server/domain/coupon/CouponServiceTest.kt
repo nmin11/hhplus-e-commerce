@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.domain.coupon
 
 import io.mockk.*
+import kr.hhplus.be.server.support.exception.coupon.CouponNotFoundException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -43,7 +44,7 @@ class CouponServiceTest {
             every { couponRepository.findById(any()) } returns null
 
             // when
-            val exception = assertThrows<IllegalArgumentException> {
+            val exception = assertThrows<CouponNotFoundException> {
                 couponService.getById(999L)
             }
 

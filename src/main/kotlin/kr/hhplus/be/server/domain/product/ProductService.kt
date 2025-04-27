@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.product
 
+import kr.hhplus.be.server.support.exception.product.ProductNotFoundException
 import org.springframework.stereotype.Service
 
 @Service
@@ -16,6 +17,6 @@ class ProductService(
 
     fun getById(id: Long): Product {
         return productRepository.findById(id)
-            ?: throw IllegalArgumentException("상품 정보가 존재하지 않습니다.")
+            ?: throw ProductNotFoundException()
     }
 }

@@ -6,6 +6,9 @@ import kr.hhplus.be.server.domain.coupon.CustomerCoupon
 import kr.hhplus.be.server.domain.coupon.CustomerCouponRepository
 import kr.hhplus.be.server.domain.customer.Customer
 import kr.hhplus.be.server.domain.customer.CustomerRepository
+import kr.hhplus.be.server.support.exception.coupon.CouponInsufficientException
+import kr.hhplus.be.server.support.exception.coupon.CouponInvalidPeriodException
+import kr.hhplus.be.server.support.exception.coupon.CustomerCouponAlreadyIssuedException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.DisplayName
@@ -81,7 +84,7 @@ class CouponFacadeIntegrationTest @Autowired constructor(
         )
 
         // when
-        val exception = assertThrows<IllegalStateException> {
+        val exception = assertThrows<CouponInsufficientException> {
             couponFacade.issueCouponToCustomer(command)
         }
 
@@ -108,7 +111,7 @@ class CouponFacadeIntegrationTest @Autowired constructor(
         )
 
         // when
-        val exception = assertThrows<IllegalStateException> {
+        val exception = assertThrows<CouponInvalidPeriodException> {
             couponFacade.issueCouponToCustomer(command)
         }
 
@@ -138,7 +141,7 @@ class CouponFacadeIntegrationTest @Autowired constructor(
         )
 
         // when
-        val exception = assertThrows<IllegalStateException> {
+        val exception = assertThrows<CustomerCouponAlreadyIssuedException> {
             couponFacade.issueCouponToCustomer(command)
         }
 

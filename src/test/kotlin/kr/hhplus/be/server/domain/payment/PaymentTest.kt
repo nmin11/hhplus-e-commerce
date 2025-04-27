@@ -4,6 +4,9 @@ import java.time.LocalDate
 import kr.hhplus.be.server.domain.coupon.Coupon
 import kr.hhplus.be.server.domain.customer.Customer
 import kr.hhplus.be.server.domain.order.Order
+import kr.hhplus.be.server.support.exception.payment.PaymentDiscountExceedsTotalPriceException
+import kr.hhplus.be.server.support.exception.payment.PaymentInvalidDiscountAmountException
+import kr.hhplus.be.server.support.exception.payment.PaymentInvalidOriginalAmountException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.DisplayName
@@ -60,7 +63,7 @@ class PaymentTest {
         @Test
         @DisplayName("할인 금액이 음수일 경우 예외 발생")
         fun throwException_whenDiscountIsNegative() {
-            val exception = assertThrows(IllegalArgumentException::class.java) {
+            val exception = assertThrows(PaymentInvalidDiscountAmountException::class.java) {
                 Payment.create(order, customer, 30000, -1000)
             }
 
@@ -70,7 +73,7 @@ class PaymentTest {
         @Test
         @DisplayName("할인 금액이 원가보다 클 경우 예외 발생")
         fun throwException_whenDiscountExceedsOriginal() {
-            val exception = assertThrows(IllegalArgumentException::class.java) {
+            val exception = assertThrows(PaymentDiscountExceedsTotalPriceException::class.java) {
                 Payment.create(order, customer, 30000, 40000)
             }
 
@@ -80,7 +83,7 @@ class PaymentTest {
         @Test
         @DisplayName("원가가 음수일 경우 예외 발생")
         fun throwException_whenOriginalPriceIsNegative() {
-            val exception = assertThrows(IllegalArgumentException::class.java) {
+            val exception = assertThrows(PaymentInvalidOriginalAmountException::class.java) {
                 Payment.create(order, customer, -1, 0)
             }
 

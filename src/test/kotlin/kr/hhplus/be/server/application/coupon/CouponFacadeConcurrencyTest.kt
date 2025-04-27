@@ -5,6 +5,7 @@ import kr.hhplus.be.server.domain.coupon.CouponRepository
 import kr.hhplus.be.server.domain.coupon.CustomerCouponRepository
 import kr.hhplus.be.server.domain.customer.Customer
 import kr.hhplus.be.server.domain.customer.CustomerRepository
+import kr.hhplus.be.server.support.exception.coupon.CouponInsufficientException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -112,7 +113,7 @@ class CouponFacadeConcurrencyTest @Autowired constructor(
         val issuedCoupons = customerCouponRepository.findAllByCouponIn(listOf(coupon))
         println("발급된 쿠폰 개수: ${issuedCoupons.size}")
         assertThat(issuedCoupons.size).isEqualTo(coupon.totalQuantity)
-        assertThat(exceptions.count { it.message?.contains("쿠폰 수량이 모두 소진되었습니다") == true })
+        assertThat(exceptions.count { it is CouponInsufficientException })
             .isEqualTo(numberOfThreads - coupon.totalQuantity)
     }
 }

@@ -12,6 +12,53 @@ ON DUPLICATE KEY UPDATE
   amount = VALUES(amount),
   updated_at = NOW();
 
+-- 쿠폰 20개 생성
+INSERT INTO coupon (id, name, discount_type, discount_amount, current_quantity, total_quantity, started_at, expired_at, created_at, updated_at)
+VALUES
+(5001, '웰컴 쿠폰 1000원', 'FIXED', 1000, 100, 100, NOW(), DATE_ADD(NOW(), INTERVAL 10 DAY), NOW(), NOW()),
+(5002, '봄맞이 10% 할인', 'RATE', 10, 200, 200, NOW(), DATE_ADD(NOW(), INTERVAL 10 DAY), NOW(), NOW()),
+(5003, '여름 세일 2000원', 'FIXED', 2000, 150, 150, NOW(), DATE_ADD(NOW(), INTERVAL 10 DAY), NOW(), NOW()),
+(5004, '겨울 15% 할인', 'RATE', 15, 50, 50, NOW(), DATE_ADD(NOW(), INTERVAL 10 DAY), NOW(), NOW()),
+(5005, '신규가입 5%', 'RATE', 5, 300, 300, NOW(), DATE_ADD(NOW(), INTERVAL 10 DAY), NOW(), NOW()),
+(5006, '블랙프라이데이 3000원', 'FIXED', 3000, 80, 80, NOW(), DATE_ADD(NOW(), INTERVAL 10 DAY), NOW(), NOW()),
+(5007, '무료배송 쿠폰', 'FIXED', 2500, 120, 120, NOW(), DATE_ADD(NOW(), INTERVAL 10 DAY), NOW(), NOW()),
+(5008, '한정 수량 20% 할인', 'RATE', 20, 30, 30, NOW(), DATE_ADD(NOW(), INTERVAL 10 DAY), NOW(), NOW()),
+(5009, '회원 전용 1000원', 'FIXED', 1000, 60, 60, NOW(), DATE_ADD(NOW(), INTERVAL 10 DAY), NOW(), NOW()),
+(5010, '시즌오프 3000원', 'FIXED', 3000, 70, 70, NOW(), DATE_ADD(NOW(), INTERVAL 10 DAY), NOW(), NOW()),
+(5011, '이벤트 8%', 'RATE', 8, 200, 200, NOW(), DATE_ADD(NOW(), INTERVAL 10 DAY), NOW(), NOW()),
+(5012, '장바구니 할인 1500원', 'FIXED', 1500, 90, 90, NOW(), DATE_ADD(NOW(), INTERVAL 10 DAY), NOW(), NOW()),
+(5013, '중복 가능 쿠폰 5%', 'RATE', 5, 100, 100, NOW(), DATE_ADD(NOW(), INTERVAL 10 DAY), NOW(), NOW()),
+(5014, '즉시할인 500원', 'FIXED', 500, 120, 120, NOW(), DATE_ADD(NOW(), INTERVAL 10 DAY), NOW(), NOW()),
+(5015, '럭키세븐 777원', 'FIXED', 777, 77, 77, NOW(), DATE_ADD(NOW(), INTERVAL 10 DAY), NOW(), NOW()),
+(5016, '카테고리 할인 2000원', 'FIXED', 2000, 130, 130, NOW(), DATE_ADD(NOW(), INTERVAL 10 DAY), NOW(), NOW()),
+(5017, '기념일 9% 할인', 'RATE', 9, 110, 110, NOW(), DATE_ADD(NOW(), INTERVAL 10 DAY), NOW(), NOW()),
+(5018, '선물용 10% 할인', 'RATE', 10, 85, 85, NOW(), DATE_ADD(NOW(), INTERVAL 10 DAY), NOW(), NOW()),
+(5019, '결제 할인 1000원', 'FIXED', 1000, 95, 95, NOW(), DATE_ADD(NOW(), INTERVAL 10 DAY), NOW(), NOW()),
+(5020, '후기 작성 쿠폰 1500원', 'FIXED', 1500, 50, 50, NOW(), DATE_ADD(NOW(), INTERVAL 10 DAY), NOW(), NOW())
+ON DUPLICATE KEY UPDATE
+  name = VALUES(name),
+  discount_type = VALUES(discount_type),
+  discount_amount = VALUES(discount_amount),
+  current_quantity = VALUES(current_quantity),
+  total_quantity = VALUES(total_quantity),
+  started_at = VALUES(started_at),
+  expired_at = VALUES(expired_at),
+  updated_at = NOW();
+
+-- Admin 사용자에게 쿠폰 10개 발급
+INSERT INTO customer_coupon (customer_id, coupon_id, status, version, issued_at, updated_at)
+VALUES
+(1001, 5001, 'AVAILABLE', 0, NOW(), NOW()),
+(1001, 5002, 'AVAILABLE', 0, NOW(), NOW()),
+(1001, 5003, 'AVAILABLE', 0, NOW(), NOW()),
+(1001, 5004, 'AVAILABLE', 0, NOW(), NOW()),
+(1001, 5005, 'AVAILABLE', 0, NOW(), NOW()),
+(1001, 5006, 'AVAILABLE', 0, NOW(), NOW()),
+(1001, 5007, 'AVAILABLE', 0, NOW(), NOW()),
+(1001, 5008, 'AVAILABLE', 0, NOW(), NOW()),
+(1001, 5009, 'AVAILABLE', 0, NOW(), NOW()),
+(1001, 5010, 'AVAILABLE', 0, NOW(), NOW());
+
 -- 상품 20개 생성
 INSERT INTO product (id, name, base_price, created_at, updated_at) VALUES
 (2001, '티셔츠', 10000, NOW(), NOW()),

@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.coupon
 
+import kr.hhplus.be.server.support.exception.coupon.CouponNotFoundException
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -9,12 +10,12 @@ class CouponService(
 ) {
     fun getById(couponId: Long): Coupon {
         return couponRepository.findById(couponId)
-            ?: throw IllegalArgumentException("쿠폰 정보가 존재하지 않습니다.")
+            ?: throw CouponNotFoundException()
     }
 
     fun getByIdWithLock(couponId: Long): Coupon {
         return couponRepository.findByIdWithLock(couponId)
-            ?: throw IllegalArgumentException("쿠폰 정보가 존재하지 않습니다.")
+            ?: throw CouponNotFoundException()
     }
 
     fun decreaseQuantity(coupon: Coupon) {

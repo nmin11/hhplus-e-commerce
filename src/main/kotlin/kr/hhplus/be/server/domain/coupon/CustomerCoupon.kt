@@ -2,7 +2,8 @@ package kr.hhplus.be.server.domain.coupon
 
 import jakarta.persistence.*
 import kr.hhplus.be.server.domain.customer.Customer
-import org.hibernate.annotations.CreationTimestamp
+import kr.hhplus.be.server.support.exception.coupon.CustomerCouponAlreadyUsedException
+import kr.hhplus.be.server.support.exception.coupon.CustomerCouponExpiredException
 import org.hibernate.annotations.UpdateTimestamp
 import java.time.LocalDateTime
 
@@ -69,10 +70,10 @@ class CustomerCoupon private constructor(
 
     private fun checkValidation() {
         if (status == CustomerCouponStatus.USED) {
-            throw IllegalStateException("이미 사용된 쿠폰입니다.")
+            throw CustomerCouponAlreadyUsedException()
         }
         if (status == CustomerCouponStatus.EXPIRED) {
-            throw IllegalStateException("사용 기간이 만료된 쿠폰입니다.")
+            throw CustomerCouponExpiredException()
         }
     }
 }

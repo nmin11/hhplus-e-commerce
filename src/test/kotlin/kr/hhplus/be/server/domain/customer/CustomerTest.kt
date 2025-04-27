@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.customer
 
+import kr.hhplus.be.server.support.exception.customer.CustomerInvalidNameException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -27,7 +28,7 @@ class CustomerTest {
 
             invalidUsernames.forEach { name ->
                 // when
-                val exception = assertThrows<IllegalArgumentException> {
+                val exception = assertThrows<CustomerInvalidNameException> {
                     Customer.create(name)
                 }
 

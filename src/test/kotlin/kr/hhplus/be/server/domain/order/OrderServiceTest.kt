@@ -4,6 +4,8 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kr.hhplus.be.server.domain.customer.Customer
+import kr.hhplus.be.server.support.exception.order.OrderNotFoundException
+import kr.hhplus.be.server.support.exception.order.OrderNotPayableException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -63,13 +65,13 @@ class OrderServiceTest {
             every { orderRepository.findById(orderId) } returns null
 
             // when
-            val exception = assertThrows<IllegalArgumentException> {
+            val exception = assertThrows<OrderNotFoundException> {
                 orderService.getById(orderId)
             }
 
             // then
             assertThat(exception)
-                .isInstanceOf(IllegalArgumentException::class.java)
+                .isInstanceOf(OrderNotFoundException::class.java)
                 .hasMessage("주문 정보를 찾을 수 없습니다.")
         }
     }
@@ -111,13 +113,13 @@ class OrderServiceTest {
             every { orderRepository.findById(orderId) } returns order
 
             // when
-            val exception = assertThrows<IllegalStateException> {
+            val exception = assertThrows<OrderNotPayableException> {
                 orderService.getValidOrderForPayment(orderId)
             }
 
             // then
             assertThat(exception)
-                .hasMessage("결제 가능한 주문이 아닙니다. (현재 상태: ${order.status})")
+                .hasMessage("결제 가능한 주문이 아닙니다. (현재 상태: ${order.status.name})")
         }
 
         @Test
@@ -128,7 +130,7 @@ class OrderServiceTest {
             every { orderRepository.findById(orderId) } returns null
 
             // when
-            val exception = assertThrows<IllegalArgumentException> {
+            val exception = assertThrows<OrderNotFoundException> {
                 orderService.getValidOrderForPayment(orderId)
             }
 

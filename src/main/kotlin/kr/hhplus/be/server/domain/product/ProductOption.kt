@@ -2,6 +2,8 @@ package kr.hhplus.be.server.domain.product
 
 import jakarta.persistence.*
 import kr.hhplus.be.server.domain.common.BaseEntity
+import kr.hhplus.be.server.support.exception.product.ProductOptionInvalidExtraPriceException
+import kr.hhplus.be.server.support.exception.product.ProductOptionNameBlankException
 
 @Entity
 @Table(
@@ -26,9 +28,8 @@ class ProductOption private constructor(
 
     companion object {
         fun create(product: Product, optionName: String, extraPrice: Int): ProductOption {
-            require(optionName.isNotBlank()) { "옵션 이름은 공백일 수 없습니다." }
-            require(extraPrice >= 0) { "추가 가격은 0 이상이어야 합니다." }
-
+            if (optionName.isBlank()) throw ProductOptionNameBlankException()
+            if (extraPrice < 0) throw ProductOptionInvalidExtraPriceException()
             return ProductOption(product, optionName, extraPrice)
         }
     }

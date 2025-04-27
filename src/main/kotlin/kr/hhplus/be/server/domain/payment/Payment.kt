@@ -4,6 +4,9 @@ import jakarta.persistence.*
 import kr.hhplus.be.server.domain.coupon.Coupon
 import kr.hhplus.be.server.domain.customer.Customer
 import kr.hhplus.be.server.domain.order.Order
+import kr.hhplus.be.server.support.exception.payment.PaymentDiscountExceedsTotalPriceException
+import kr.hhplus.be.server.support.exception.payment.PaymentInvalidDiscountAmountException
+import kr.hhplus.be.server.support.exception.payment.PaymentInvalidOriginalAmountException
 import java.time.LocalDateTime
 
 @Entity
@@ -44,9 +47,9 @@ class Payment private constructor(
             discountAmount: Int,
             coupon: Coupon? = null
         ): Payment {
-            require(originalPrice >= 0) { "기존 금액은 0 이상이어야 합니다." }
-            require(discountAmount >= 0) { "할인 금액은 0 이상이어야 합니다." }
-            require(discountAmount <= originalPrice) { "할인 금액은 총 주문 금액보다 낮아야 합니다." }
+            if (originalPrice < 0) throw PaymentInvalidOriginalAmountException()
+            if (discountAmount < 0) throw PaymentInvalidDiscountAmountException()
+            if (discountAmount > originalPrice) throw PaymentDiscountExceedsTotalPriceException()
 
             val discountedPrice = originalPrice - discountAmount
 

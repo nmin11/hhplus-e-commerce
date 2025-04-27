@@ -1,5 +1,7 @@
 package kr.hhplus.be.server.domain.product
 
+import kr.hhplus.be.server.support.exception.product.ProductInvalidBasePriceException
+import kr.hhplus.be.server.support.exception.product.ProductNameBlankException
 import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
@@ -24,7 +26,7 @@ class ProductTest {
     @Test
     @DisplayName("이름이 공백일 경우 예외 발생")
     fun create_throwException_whenNameIsBlank() {
-        val exception = assertThrows(IllegalArgumentException::class.java) {
+        val exception = assertThrows(ProductNameBlankException::class.java) {
             Product.create(" ", 30000)
         }
 
@@ -34,7 +36,7 @@ class ProductTest {
     @Test
     @DisplayName("기본 가격이 음수일 경우 예외 발생")
     fun create_throwException_whenBasePriceIsNegative() {
-        val exception = assertThrows(IllegalArgumentException::class.java) {
+        val exception = assertThrows(ProductInvalidBasePriceException::class.java) {
             Product.create("청바지", -1)
         }
 

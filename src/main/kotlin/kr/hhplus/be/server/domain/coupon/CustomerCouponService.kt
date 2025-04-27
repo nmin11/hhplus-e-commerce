@@ -1,6 +1,9 @@
 package kr.hhplus.be.server.domain.coupon
 
 import kr.hhplus.be.server.domain.customer.Customer
+import kr.hhplus.be.server.support.exception.coupon.CustomerCouponAlreadyIssuedException
+import kr.hhplus.be.server.support.exception.coupon.CustomerCouponConflictException
+import kr.hhplus.be.server.support.exception.coupon.CustomerCouponNotFoundException
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.orm.ObjectOptimisticLockingFailureException
 import org.springframework.stereotype.Service
@@ -16,7 +19,7 @@ class CustomerCouponService(
 
     fun validateIssuedCoupon(customerId: Long, couponId: Long): CustomerCoupon {
         val customerCoupon = customerCouponRepository.findByCustomerIdAndCouponId(customerId, couponId)
-            ?: throw IllegalArgumentException("해당 쿠폰은 고객에게 발급되지 않았습니다.")
+            ?: throw CustomerCouponNotFoundException()
 
         return customerCoupon.validateUsable()
     }
@@ -26,7 +29,7 @@ class CustomerCouponService(
             val customerCoupon = CustomerCoupon.issue(customer, coupon)
             return customerCouponRepository.save(customerCoupon)
         } catch (_: DataIntegrityViolationException) {
-            throw IllegalStateException("해당 쿠폰은 이미 발급된 쿠폰입니다.")
+            throw CustomerCouponAlreadyIssuedException()
         }
     }
 
@@ -42,7 +45,7 @@ class CustomerCouponService(
             customerCoupon.markAsUsed()
             customerCouponRepository.saveAndFlush(customerCoupon)
         } catch (_: ObjectOptimisticLockingFailureException) {
-            throw IllegalStateException("지금은 결제를 진행할 수 없습니다. 잠시 후 다시 시도해주세요.")
+            throw CustomerCouponConflictException()
         }
     }
 }
