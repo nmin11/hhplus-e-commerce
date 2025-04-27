@@ -9,6 +9,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.springframework.dao.DataIntegrityViolationException
 import java.time.LocalDate
 
 class CustomerCouponServiceTest {
@@ -146,49 +147,6 @@ class CustomerCouponServiceTest {
     }
 
     @Nested
-    inner class ValidateNotIssued {
-        private val customerId = 1L
-        private val couponId = 1L
-
-        @Test
-        @DisplayName("쿠폰이 아직 발급되지 않은 경우 예외 없이 통과")
-        fun doesNotThrow_whenCouponNotIssued() {
-            // given
-            every { customerCouponRepository.findByCustomerIdAndCouponId(customerId, couponId) } returns null
-
-            // when & then
-            customerCouponService.validateNotIssued(customerId, couponId)
-        }
-
-        @Test
-        @DisplayName("쿠폰이 이미 발급된 경우 예외 발생")
-        fun throwsException_whenCouponAlreadyIssued() {
-            // given
-            val customer = Customer.create("tester")
-            val coupon = Coupon.createFixedDiscount(
-                name = "할인쿠폰",
-                amount = 3000,
-                quantity = 100,
-                startedAt = LocalDate.now().minusDays(1),
-                expiredAt = LocalDate.now().plusDays(1)
-            )
-
-            val issued = CustomerCoupon.issue(customer, coupon)
-
-            every { customerCouponRepository.findByCustomerIdAndCouponId(customerId, couponId) } returns issued
-
-            // when
-            val exception = assertThrows<IllegalStateException> {
-                customerCouponService.validateNotIssued(customerId, couponId)
-            }
-
-            // then
-            assertThat(exception)
-                .hasMessage("해당 쿠폰은 이미 발급된 쿠폰입니다.")
-        }
-    }
-
-    @Nested
     inner class Issue {
         @Test
         @DisplayName("쿠폰을 발급하고 저장된 객체 반환")
@@ -212,6 +170,30 @@ class CustomerCouponServiceTest {
 
             // then
             assertThat(result).isEqualTo(saved)
+            verify(exactly = 1) { customerCouponRepository.save(any()) }
+        }
+
+        @Test
+        @DisplayName("쿠폰 중복 발급 시 IllegalStateException 예외 발생")
+        fun throwException_whenDuplicateIssue() {
+            // given
+            val customer = Customer.create("tester")
+            val coupon = Coupon.createFixedDiscount(
+                name = "웰컴쿠폰",
+                amount = 1000,
+                quantity = 100,
+                startedAt = LocalDate.now().minusDays(1),
+                expiredAt = LocalDate.now().plusDays(1)
+            )
+
+            every { customerCouponRepository.save(any()) } throws DataIntegrityViolationException("중복 발급")
+
+            // when & then
+            val exception = assertThrows<IllegalStateException> {
+                customerCouponService.issue(customer, coupon)
+            }
+
+            assertThat(exception.message).isEqualTo("해당 쿠폰은 이미 발급된 쿠폰입니다.")
             verify(exactly = 1) { customerCouponRepository.save(any()) }
         }
     }

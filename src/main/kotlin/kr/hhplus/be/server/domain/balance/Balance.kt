@@ -18,6 +18,9 @@ class Balance private constructor(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0L
 
+    @Version
+    var version: Long = 0L
+
     companion object {
         fun create(customer: Customer, amount: Int): Balance {
             return Balance(customer, amount)
@@ -27,14 +30,12 @@ class Balance private constructor(
     fun charge(amount: Int) {
         require(amount > 0) { "충전 금액은 0보다 커야 합니다." }
         this.amount += amount
-        updatedAt = LocalDateTime.now()
     }
 
     fun deduct(amount: Int) {
         require(amount > 0) { "차감 금액은 0보다 커야 합니다." }
         if (this.amount < amount) throw IllegalStateException("잔액이 부족합니다.")
         this.amount -= amount
-        updatedAt = LocalDateTime.now()
     }
 
     fun getAmount(): Int = amount

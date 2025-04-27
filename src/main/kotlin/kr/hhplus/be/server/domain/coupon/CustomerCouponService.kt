@@ -1,6 +1,8 @@
 package kr.hhplus.be.server.domain.coupon
 
 import kr.hhplus.be.server.domain.customer.Customer
+import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.orm.ObjectOptimisticLockingFailureException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -19,16 +21,13 @@ class CustomerCouponService(
         return customerCoupon.validateUsable()
     }
 
-    fun validateNotIssued(customerId: Long, couponId: Long) {
-        val existing = customerCouponRepository.findByCustomerIdAndCouponId(customerId, couponId)
-        if (existing != null) {
+    fun issue(customer: Customer, coupon: Coupon): CustomerCoupon {
+        try {
+            val customerCoupon = CustomerCoupon.issue(customer, coupon)
+            return customerCouponRepository.save(customerCoupon)
+        } catch (_: DataIntegrityViolationException) {
             throw IllegalStateException("해당 쿠폰은 이미 발급된 쿠폰입니다.")
         }
-    }
-
-    fun issue(customer: Customer, coupon: Coupon): CustomerCoupon {
-        val customerCoupon = CustomerCoupon.issue(customer, coupon)
-        return customerCouponRepository.save(customerCoupon)
     }
 
     @Transactional
@@ -36,5 +35,14 @@ class CustomerCouponService(
         val expiredCustomerCoupons = customerCouponRepository.findAllByCouponIn(coupons)
         expiredCustomerCoupons.forEach { it.expireIfAvailable() }
         customerCouponRepository.saveAll(expiredCustomerCoupons)
+    }
+
+    fun markAsUsed(customerCoupon: CustomerCoupon) {
+        try {
+            customerCoupon.markAsUsed()
+            customerCouponRepository.saveAndFlush(customerCoupon)
+        } catch (_: ObjectOptimisticLockingFailureException) {
+            throw IllegalStateException("지금은 결제를 진행할 수 없습니다. 잠시 후 다시 시도해주세요.")
+        }
     }
 }

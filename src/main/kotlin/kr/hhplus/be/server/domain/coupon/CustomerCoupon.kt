@@ -32,6 +32,9 @@ class CustomerCoupon private constructor(
     @Column(name = "status", nullable = false, length = 20)
     var status = CustomerCouponStatus.AVAILABLE
 
+    @Version
+    var version: Long = 0L
+
     @Column(name = "issued_at", nullable = false, updatable = false)
     val issuedAt: LocalDateTime = LocalDateTime.now()
 
@@ -51,17 +54,25 @@ class CustomerCoupon private constructor(
     fun expireIfAvailable() {
         if (status == CustomerCouponStatus.AVAILABLE) {
             status = CustomerCouponStatus.EXPIRED
-            updatedAt = LocalDateTime.now()
         }
     }
 
+    fun markAsUsed() {
+        checkValidation()
+        status = CustomerCouponStatus.USED
+    }
+
     fun validateUsable(): CustomerCoupon {
+        checkValidation()
+        return this
+    }
+
+    private fun checkValidation() {
         if (status == CustomerCouponStatus.USED) {
             throw IllegalStateException("이미 사용된 쿠폰입니다.")
         }
         if (status == CustomerCouponStatus.EXPIRED) {
             throw IllegalStateException("사용 기간이 만료된 쿠폰입니다.")
         }
-        return this
     }
 }

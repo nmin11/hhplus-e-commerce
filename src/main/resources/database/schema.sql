@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS balance (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     customer_id BIGINT NOT NULL,
     amount INT NOT NULL,
+    `version` BIGINT NOT NULL DEFAULT 0,
     created_at TIMESTAMP,
     updated_at TIMESTAMP,
 
@@ -37,7 +38,7 @@ CREATE TABLE IF NOT EXISTS balance_history (
 
 CREATE TABLE IF NOT EXISTS product (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(50) NOT NULL UNIQUE,
+    name VARCHAR(50) NOT NULL,
     base_price INT NOT NULL,
     created_at TIMESTAMP,
     updated_at TIMESTAMP
@@ -95,6 +96,7 @@ CREATE TABLE IF NOT EXISTS customer_coupon (
     customer_id BIGINT NOT NULL,
     coupon_id BIGINT NOT NULL,
     status VARCHAR(20) NOT NULL, -- 'ISSUED' || 'USED' || 'EXPIRED'
+    `version` BIGINT NOT NULL DEFAULT 0,
     issued_at TIMESTAMP,
     updated_at TIMESTAMP,
 
@@ -110,6 +112,7 @@ CREATE TABLE IF NOT EXISTS `order` (
     customer_id BIGINT NOT NULL,
     total_price INT NOT NULL,
     status VARCHAR(20) NOT NULL, -- 'PENDING' || 'PAID' || 'CANCELLED'
+    `version` BIGINT NOT NULL DEFAULT 0,
     created_at TIMESTAMP,
     updated_at TIMESTAMP,
 

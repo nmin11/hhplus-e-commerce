@@ -69,7 +69,6 @@ class CouponServiceTest {
 
             // then
             verify(exactly = 1) { coupon.decreaseQuantity() }
-            verify(exactly = 1) { couponRepository.save(coupon) }
         }
     }
 

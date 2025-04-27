@@ -48,6 +48,8 @@ class PaymentFacade(
             val coupon = customerCoupon.coupon
 
             coupon.validatePeriod()
+            customerCouponService.markAsUsed(customerCoupon)
+
             coupon.calculateDiscount(order.totalPrice)
         } ?: 0
 
@@ -75,7 +77,7 @@ class PaymentFacade(
             discountAmount = discountAmount
         )
         paymentService.create(payment)
-        order.markAsPaid()
+        orderService.markAsPaid(order)
 
         // 8. 통계 반영
         order.orderItems.forEach { item ->

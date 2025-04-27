@@ -80,6 +80,56 @@ class CustomerCouponTest {
     }
 
     @Nested
+    inner class MarkAsUsed {
+        @Test
+        @DisplayName("AVAILABLE 상태에서 markAsUsed 호출 시 USED로 변경된다")
+        fun shouldMarkAsUsedWhenAvailable() {
+            // given
+            val customerCoupon = CustomerCoupon.issue(customer, coupon)
+
+            // when
+            customerCoupon.markAsUsed()
+
+            // then
+            assertThat(customerCoupon.status).isEqualTo(CustomerCouponStatus.USED)
+        }
+
+        @Test
+        @DisplayName("USED 상태에서 markAsUsed 호출 시 예외 발생")
+        fun shouldThrowIfAlreadyUsed() {
+            // given
+            val customerCoupon = CustomerCoupon.issue(customer, coupon).apply {
+                status = CustomerCouponStatus.USED
+            }
+
+            // when
+            val exception = assertThrows<IllegalStateException> {
+                customerCoupon.markAsUsed()
+            }
+
+            // then
+            assertThat(exception.message).isEqualTo("이미 사용된 쿠폰입니다.")
+        }
+
+        @Test
+        @DisplayName("EXPIRED 상태에서 markAsUsed 호출 시 예외 발생")
+        fun shouldThrowIfExpired() {
+            // given
+            val customerCoupon = CustomerCoupon.issue(customer, coupon).apply {
+                status = CustomerCouponStatus.EXPIRED
+            }
+
+            // when
+            val exception = assertThrows<IllegalStateException> {
+                customerCoupon.markAsUsed()
+            }
+
+            // then
+            assertThat(exception.message).isEqualTo("사용 기간이 만료된 쿠폰입니다.")
+        }
+    }
+
+    @Nested
     inner class ValidateUsable {
         @Test
         @DisplayName("AVAILABLE 상태이면 반환된다")

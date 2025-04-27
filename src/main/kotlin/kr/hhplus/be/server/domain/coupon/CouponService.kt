@@ -12,9 +12,13 @@ class CouponService(
             ?: throw IllegalArgumentException("쿠폰 정보가 존재하지 않습니다.")
     }
 
+    fun getByIdWithLock(couponId: Long): Coupon {
+        return couponRepository.findByIdWithLock(couponId)
+            ?: throw IllegalArgumentException("쿠폰 정보가 존재하지 않습니다.")
+    }
+
     fun decreaseQuantity(coupon: Coupon) {
         coupon.decreaseQuantity()
-        couponRepository.save(coupon)
     }
 
     fun getExpiredCoupons(referenceDate: LocalDate = LocalDate.now()): List<Coupon> {

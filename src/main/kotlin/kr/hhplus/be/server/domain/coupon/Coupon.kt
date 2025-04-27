@@ -90,7 +90,6 @@ class Coupon private constructor(
         }
 
         currentQuantity -= 1
-        updatedAt = LocalDateTime.now()
     }
 
     fun calculateDiscount(totalPrice: Int): Int {
