@@ -53,7 +53,9 @@ dependencies {
 
 	// DB
 	implementation("org.springframework.boot:spring-boot-starter-jooq")
+	implementation("org.springframework.boot:spring-boot-starter-data-redis")
 	implementation("org.jooq:jooq")
+	implementation("org.redisson:redisson-spring-boot-starter:3.45.1")
 
 	jooqGenerator("com.mysql:mysql-connector-j")
 
