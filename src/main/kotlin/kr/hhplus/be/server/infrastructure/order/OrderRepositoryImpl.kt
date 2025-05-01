@@ -12,10 +12,6 @@ class OrderRepositoryImpl(
         return orderJpaRepository.save(order)
     }
 
-    override fun saveAndFlush(order: Order): Order {
-        return orderJpaRepository.saveAndFlush(order)
-    }
-
     override fun findById(id: Long): Order? {
         return orderJpaRepository.findById(id).orElse(null)
     }

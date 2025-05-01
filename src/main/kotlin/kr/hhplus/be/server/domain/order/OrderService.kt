@@ -1,6 +1,5 @@
 package kr.hhplus.be.server.domain.order
 
-import kr.hhplus.be.server.support.exception.order.OrderConflictException
 import kr.hhplus.be.server.support.exception.order.OrderNotFoundException
 import kr.hhplus.be.server.support.exception.order.OrderNotPayableException
 import org.springframework.orm.ObjectOptimisticLockingFailureException
@@ -28,11 +27,7 @@ class OrderService(
     }
 
     fun markAsPaid(order: Order) {
-        try {
-            order.markAsPaid()
-            orderRepository.saveAndFlush(order)
-        } catch (_: ObjectOptimisticLockingFailureException) {
-            throw OrderConflictException()
-        }
+        order.markAsPaid()
+        orderRepository.save(order)
     }
 }

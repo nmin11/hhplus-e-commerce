@@ -112,7 +112,6 @@ CREATE TABLE IF NOT EXISTS `order` (
     customer_id BIGINT NOT NULL,
     total_price INT NOT NULL,
     status VARCHAR(20) NOT NULL, -- 'PENDING' || 'PAID' || 'CANCELLED'
-    `version` BIGINT NOT NULL DEFAULT 0,
     created_at TIMESTAMP,
     updated_at TIMESTAMP,
 
