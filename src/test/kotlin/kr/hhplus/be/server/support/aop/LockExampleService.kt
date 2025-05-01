@@ -28,4 +28,9 @@ class LockExampleService {
     fun runSpinWithRestrictedWaitTime(id: Long): String {
         return "spin-$id"
     }
+
+    @DistributedLock(resourceName = "id", key = "#id", lockType = LockType.PUBSUB, fallbackToDatabaseLock = true)
+    fun runPubSubWithFallback(id: Long): String {
+        return "pubsub-fallback-$id"
+    }
 }

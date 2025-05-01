@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.support.aop
 
 import com.ninjasquad.springmockk.SpykBean
+import io.lettuce.core.RedisConnectionException
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
@@ -198,5 +199,25 @@ class DistributedLockAspectIntegrationTest {
         // then
         assertThat(result).isEqualTo("pubsub-7")
         verify { rLock.unlock() }
+    }
+
+    @Test
+    @DisplayName("Redis 장애 발생 시 fallback 설정이 되어 있다면 DB 락 로직을 실행")
+    fun fallbackToDbLock_whenRedisUnavailable_shouldProceedWithDbLock() {
+        // given
+        val lockId = 8L
+        val lockKey = "LOCK:id:$lockId"
+
+        // Redis 락 시도 중 장애 발생
+        every {
+            redissonClient.getLock(lockKey).tryLock(any(), any(), any())
+        } throws RedisConnectionException("Redis not reachable")
+
+        // when
+        val result = lockExampleService.runPubSubWithFallback(lockId)
+
+        // then
+        assertThat(result).isEqualTo("pubsub-fallback-$lockId")
+        verify(exactly = 1) { requireNewTransactionExecutor.proceed(any()) }
     }
 }
