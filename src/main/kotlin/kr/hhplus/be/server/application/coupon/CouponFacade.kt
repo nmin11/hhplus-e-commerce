@@ -15,7 +15,12 @@ class CouponFacade(
     private val customerCouponService: CustomerCouponService
 ) {
     @Transactional
-    @DistributedLock(resourceName = "couponId", key = "#command.couponId", lockType = LockType.SPIN)
+    @DistributedLock(
+        resourceName = "couponId",
+        key = "#command.couponId",
+        lockType = LockType.SPIN,
+        fallbackToDatabaseLock = true
+    )
     fun issueCouponToCustomer(command: CouponCommand.Issue): CouponResult.Issue {
         val customer = customerService.getById(command.customerId)
         val coupon = couponService.getByIdWithLock(command.couponId)
