@@ -36,7 +36,7 @@ class DistributedLockAspect(
         )
 
         val lockKey = buildLockKey(distributedLock.resourceName, dynamicKey)
-        val lockTemplate = lockTemplateRouter.route(distributedLock.lockType)
+        val lockTemplate = lockTemplateRouter.route(distributedLock.lockType) // Spin Lock or Pub/Sub Lock 구현체
 
         var acquired = false
         return try {
