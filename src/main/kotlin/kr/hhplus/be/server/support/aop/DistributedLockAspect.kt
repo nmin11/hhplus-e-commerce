@@ -1,0 +1,78 @@
+package kr.hhplus.be.server.support.aop
+
+import kr.hhplus.be.server.support.lock.DistributedLock
+import kr.hhplus.be.server.support.lock.LockTemplateRouter
+import kr.hhplus.be.server.support.spel.CustomSpringELParser
+import kr.hhplus.be.server.support.transaction.RequireNewTransactionExecutor
+import org.aspectj.lang.ProceedingJoinPoint
+import org.aspectj.lang.annotation.Around
+import org.aspectj.lang.annotation.Aspect
+import org.aspectj.lang.reflect.MethodSignature
+import org.slf4j.LoggerFactory
+import org.springframework.core.annotation.Order
+import org.springframework.stereotype.Component
+
+@Aspect
+@Order(AopOrder.DISTRIBUTED_ROCK)
+@Component
+class DistributedLockAspect(
+    private val lockTemplateRouter: LockTemplateRouter,
+    private val requireNewTransactionExecutor: RequireNewTransactionExecutor
+) {
+    private val log = LoggerFactory.getLogger(DistributedLockAspect::class.java)
+
+    @Around("@annotation(kr.hhplus.be.server.support.lock.DistributedLock)")
+    fun lock(joinPoint: ProceedingJoinPoint): Any {
+        val signature = joinPoint.signature as MethodSignature
+        val method = signature.method
+        val distributedLock = method.getAnnotation(DistributedLock::class.java)
+            ?: throw IllegalArgumentException("DistributedLock annotation must be present on method: ${method.name}")
+
+        val dynamicKey = CustomSpringELParser.getDynamicValue(
+            signature.parameterNames,
+            joinPoint.args,
+            distributedLock.key,
+            String::class.java
+        )
+
+        val lockKey = buildLockKey(distributedLock.resourceName, dynamicKey)
+        val lockTemplate = lockTemplateRouter.route(distributedLock.lockType)
+
+        var acquired = false
+        return try {
+            acquired = lockTemplate.lock(
+                lockKey,
+                distributedLock.waitTime,
+                distributedLock.leaseTime,
+                distributedLock.timeUnit
+            )
+
+            if (!acquired) {
+                log.info("❌ Failed to acquire lock for key: {}", lockKey)
+                throw IllegalStateException("Failed to acquire lock for key: $lockKey")
+            } else {
+                log.info("\uD83D\uDD12 Lock acquired for key: {}", lockKey)
+                requireNewTransactionExecutor.proceed(joinPoint)
+            }
+        } catch (e: InterruptedException) {
+            throw e
+        } finally {
+            try {
+                if (acquired) {
+                    lockTemplate.unlock(lockKey)
+                    log.info("\uD83D\uDD13 Lock released for key: {}", lockKey)
+                }
+            } catch (_: IllegalMonitorStateException) {
+                log.info(
+                    "Lock Already Unlocked - serviceName: {}, key: {}",
+                    method.name,
+                    lockKey
+                )
+            }
+        }
+    }
+
+    private fun buildLockKey(resourceName: String, dynamicKey: String): String {
+        return "LOCK:$resourceName:$dynamicKey"
+    }
+}
