@@ -10,5 +10,6 @@ annotation class DistributedLock(
     val lockType: LockType,
     val waitTime: Long = 3L,
     val leaseTime: Long = 3L,
-    val timeUnit: TimeUnit = TimeUnit.SECONDS
+    val timeUnit: TimeUnit = TimeUnit.SECONDS,
+    val fallbackToDatabaseLock: Boolean = false
 )

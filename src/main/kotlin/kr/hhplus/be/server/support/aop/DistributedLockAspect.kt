@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.support.aop
 
+import io.lettuce.core.RedisConnectionException
 import kr.hhplus.be.server.support.lock.DistributedLock
 import kr.hhplus.be.server.support.lock.LockTemplateRouter
 import kr.hhplus.be.server.support.spel.CustomSpringELParser
@@ -56,6 +57,13 @@ class DistributedLockAspect(
             }
         } catch (e: InterruptedException) {
             throw e
+        } catch (e: RedisConnectionException) {
+            if (distributedLock.fallbackToDatabaseLock) {
+                log.warn("❗ Redis 연결 실패 → DB Lock fallback 실행")
+                return requireNewTransactionExecutor.proceed(joinPoint)
+            } else {
+                throw e
+            }
         } finally {
             try {
                 if (acquired) {
