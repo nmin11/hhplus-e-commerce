@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.support.exception
 
+import kr.hhplus.be.server.support.exception.common.DistributedLockAcquisitionException
 import kr.hhplus.be.server.support.exception.customer.CustomerContextMissingException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -42,6 +43,16 @@ class GlobalExceptionHandler {
     fun handleMissingCustomerContext(ex: CustomerContextMissingException): ResponseEntity<ErrorResponse> {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
             .body(ErrorResponse("MISSING_CUSTOMER_CONTEXT", ex.message ?: "고객 정보가 없습니다."))
+    }
+
+    @ExceptionHandler(DistributedLockAcquisitionException::class)
+    fun handleLockFail(ex: DistributedLockAcquisitionException): ResponseEntity<ErrorResponse> {
+        return ResponseEntity
+            .status(HttpStatus.CONFLICT)
+            .body(ErrorResponse(
+                code = "LOCK_CONFLICT",
+                message = ex.message ?: "Lock 획득에 실패했습니다.",
+            ))
     }
 
     @ExceptionHandler(BusinessException::class)

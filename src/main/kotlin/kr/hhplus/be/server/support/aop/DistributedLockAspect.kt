@@ -1,6 +1,8 @@
 package kr.hhplus.be.server.support.aop
 
 import io.lettuce.core.RedisConnectionException
+import kr.hhplus.be.server.support.exception.common.DistributedLockAcquisitionException
+import kr.hhplus.be.server.support.exception.common.MissingAnnotationException
 import kr.hhplus.be.server.support.lock.DistributedLock
 import kr.hhplus.be.server.support.lock.LockTemplateRouter
 import kr.hhplus.be.server.support.spel.CustomSpringELParser
@@ -27,7 +29,7 @@ class DistributedLockAspect(
         val signature = joinPoint.signature as MethodSignature
         val method = signature.method
         val distributedLock = method.getAnnotation(DistributedLock::class.java)
-            ?: throw IllegalArgumentException("DistributedLock annotation must be present on method: ${method.name}")
+            ?: throw MissingAnnotationException(method.name)
 
         val dynamicKey = CustomSpringELParser.getDynamicValue(
             signature.parameterNames,
@@ -50,7 +52,7 @@ class DistributedLockAspect(
 
             if (!acquired) {
                 log.info("❌ Failed to acquire lock for key: {}", lockKey)
-                throw IllegalStateException("Failed to acquire lock for key: $lockKey")
+                throw DistributedLockAcquisitionException(lockKey)
             } else {
                 log.info("\uD83D\uDD12 Lock acquired for key: {}", lockKey)
                 requireNewTransactionExecutor.proceed(joinPoint)

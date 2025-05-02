@@ -8,6 +8,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import io.mockk.verifyOrder
 import kr.hhplus.be.server.infrastructure.redis.RedisRepository
+import kr.hhplus.be.server.support.exception.common.DistributedLockAcquisitionException
 import kr.hhplus.be.server.support.lock.LockTemplateRouter
 import kr.hhplus.be.server.support.lock.LockType
 import kr.hhplus.be.server.support.lock.RedisPubSubLockTemplate
@@ -131,12 +132,12 @@ class DistributedLockAspectIntegrationTest {
         every { redisRepository.setIfAbsent(lockKey, any(), any()) } returns false
 
         // when
-        val exception = assertThrows<IllegalStateException> {
+        val exception = assertThrows<DistributedLockAcquisitionException> {
             lockExampleService.runSpinWithRestrictedWaitTime(lockId)
         }
 
         // then
-        assertThat(exception.message).contains("Failed to acquire lock")
+        assertThat(exception.message).contains("Lock 획득에 실패했습니다")
         verifyOrder {
             lockTemplateRouter.route(LockType.SPIN)
             spinLockTemplate.lock(lockKey, 150L, 3_000L, TimeUnit.MILLISECONDS)
@@ -158,12 +159,12 @@ class DistributedLockAspectIntegrationTest {
         every { redissonClient.getLock(lockKey).tryLock(any(), any(), any()) } returns false
 
         // when
-        val exception = assertThrows<IllegalStateException> {
+        val exception = assertThrows<DistributedLockAcquisitionException> {
             lockExampleService.runPubSub(lockId)
         }
 
         // then
-        assertThat(exception.message).contains("Failed to acquire lock")
+        assertThat(exception.message).contains("Lock 획득에 실패했습니다")
         verify(exactly = 0) { pubSubLockTemplate.unlock(lockKey) }
     }
 
