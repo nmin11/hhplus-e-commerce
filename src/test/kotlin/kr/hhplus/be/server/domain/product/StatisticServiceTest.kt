@@ -1,6 +1,8 @@
 package kr.hhplus.be.server.domain.product
 
+import io.mockk.Runs
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
 import io.mockk.verify
 import kr.hhplus.be.server.infrastructure.product.PopularProductRecord
@@ -9,13 +11,14 @@ import kr.hhplus.be.server.support.cache.InMemoryCache
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import java.time.Duration
 import java.time.LocalDate
 
 class StatisticServiceTest {
     private val statisticRepository = mockk<StatisticRepository>()
     private val inMemoryCache = mockk<InMemoryCache>()
     private val redisRepository = mockk<RedisRepository>()
-    private val statisticService = StatisticService(statisticRepository, inMemoryCache, redisRepository)
+    private val statisticService = StatisticService(statisticRepository, redisRepository)
 
     @Test
     @DisplayName("통계 정보를 저장하고 반환")
@@ -72,5 +75,47 @@ class StatisticServiceTest {
 
         // then
         assertThat(result).isEqualTo(result)
+    }
+
+    @Test
+    @DisplayName("인기 상품 목록을 조회하여 캐시에 저장")
+    fun cachePopularProducts_shouldSaveListToRedis() {
+        // given
+        val since = LocalDate.now().minusDays(3)
+        val startOfDay = since.atStartOfDay()
+
+        val stat1 = PopularProductRecord(
+            id = 2001L,
+            name = "청바지",
+            basePrice = 10_000,
+            totalSales = 12
+        )
+        val stat2 = PopularProductRecord(
+            id = 2002L,
+            name = "셔츠",
+            basePrice = 12_000,
+            totalSales = 9
+        )
+
+        val records = listOf(stat1, stat2)
+        val infos = records.map { ProductInfo.Popular.from(it) }
+        val cached = infos.map { PopularProductCacheEntry.from(it) }
+
+        every {
+            statisticRepository.findTop5ProductSales(startOfDay)
+        } returns records
+
+        every {
+            redisRepository.save("product:popular:3d", cached, Duration.ofHours(13))
+        } just Runs
+
+        // when
+        statisticService.cachePopularProducts(since)
+
+        // then
+        verify(exactly = 1) {
+            statisticRepository.findTop5ProductSales(startOfDay)
+            redisRepository.save("product:popular:3d", cached, Duration.ofHours(13))
+        }
     }
 }
