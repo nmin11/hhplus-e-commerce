@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.infrastructure.redis
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.data.redis.core.script.RedisScript
 import org.springframework.stereotype.Repository
@@ -7,7 +8,8 @@ import java.time.Duration
 
 @Repository
 class RedisRepositoryImpl(
-    private val stringRedisTemplate: StringRedisTemplate
+    private val stringRedisTemplate: StringRedisTemplate,
+    private val objectMapper: ObjectMapper
 ) : RedisRepository {
     override fun setIfAbsent(key: String, value: String, expire: Duration): Boolean {
         val result = stringRedisTemplate
@@ -35,5 +37,16 @@ class RedisRepositoryImpl(
         )
 
         return result == 1L
+    }
+
+    override fun <T> save(key: String, value: T, ttl: Duration) {
+        val json = objectMapper.writeValueAsString(value)
+        stringRedisTemplate.opsForValue().set(key, json, ttl)
+    }
+
+    override fun <T> findList(key: String, clazz: Class<T>): List<T> {
+        val json = stringRedisTemplate.opsForValue().get(key) ?: return emptyList()
+        val type = objectMapper.typeFactory.constructCollectionType(List::class.java, clazz)
+        return objectMapper.readValue(json, type)
     }
 }
