@@ -1,6 +1,5 @@
 package kr.hhplus.be.server.support.aop
 
-import kr.hhplus.be.server.support.aop.DistributedLock
 import kr.hhplus.be.server.support.lock.LockType
 import org.springframework.stereotype.Component
 import java.util.concurrent.TimeUnit
