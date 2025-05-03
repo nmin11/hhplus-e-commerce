@@ -4,6 +4,8 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kr.hhplus.be.server.infrastructure.product.PopularProductRecord
+import kr.hhplus.be.server.infrastructure.redis.RedisRepository
+import kr.hhplus.be.server.support.cache.InMemoryCache
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -11,7 +13,9 @@ import java.time.LocalDate
 
 class StatisticServiceTest {
     private val statisticRepository = mockk<StatisticRepository>()
-    private val statisticService = StatisticService(statisticRepository)
+    private val inMemoryCache = mockk<InMemoryCache>()
+    private val redisRepository = mockk<RedisRepository>()
+    private val statisticService = StatisticService(statisticRepository, inMemoryCache, redisRepository)
 
     @Test
     @DisplayName("통계 정보를 저장하고 반환")
@@ -50,10 +54,18 @@ class StatisticServiceTest {
             totalSales = 9
         )
         val records = listOf(stat1, stat2)
+        val infos = records.map { ProductInfo.Popular.from(it) }
+        val cached = infos.map { PopularProductCacheEntry.from(it) }
 
         every {
             statisticRepository.findTop5ProductSales(startOfDay)
         } returns records
+        every {
+            inMemoryCache.getList("product:popular:3d", PopularProductCacheEntry::class.java)
+        } returns cached
+        every {
+            redisRepository.findList("product:popular:3d", PopularProductCacheEntry::class.java)
+        } returns cached
 
         // when
         val result = statisticService.getTop5PopularProductStatistics(since)

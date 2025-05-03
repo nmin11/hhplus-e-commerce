@@ -3,11 +3,14 @@ package kr.hhplus.be.server.application.product
 import kr.hhplus.be.server.domain.product.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.data.redis.core.RedisTemplate
+import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.test.context.ActiveProfiles
 
 @SpringBootTest
@@ -18,6 +21,7 @@ class ProductFacadeIntegrationTest @Autowired constructor(
     private val productRepository: ProductRepository,
     private val productOptionRepository: ProductOptionRepository,
     private val statisticRepository: StatisticRepository,
+    private val stringRedisTemplate: StringRedisTemplate
 ) {
     private lateinit var product: Product
     private lateinit var option1: ProductOption
@@ -33,6 +37,11 @@ class ProductFacadeIntegrationTest @Autowired constructor(
 
         productOptionRepository.save(option1)
         productOptionRepository.save(option2)
+    }
+
+    @BeforeEach
+    fun clearCache() {
+        stringRedisTemplate.delete("product:popular:3d")
     }
 
     @Test
