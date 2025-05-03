@@ -61,6 +61,9 @@ dependencies {
 
 	runtimeOnly("com.mysql:mysql-connector-j")
 
+	// Cache
+	implementation("com.github.ben-manes.caffeine:caffeine:3.2.0")
+
 	// Docs
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6")
 
