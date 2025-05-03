@@ -16,4 +16,10 @@ class StatisticService(
         val records = statisticRepository.findTop5ProductSales(startOfDay)
         return records.map { ProductInfo.Popular.from(it) }
     }
+
+    fun cachePopularProducts(since: LocalDate) {
+        val popularProducts = getTop5PopularProductStatistics(since)
+        val cachedPopularProducts = popularProducts.map { PopularProductCacheEntry.from(it) }
+        redisRepository.save(CACHE_KEY, cachedPopularProducts, TTL)
+    }
 }
