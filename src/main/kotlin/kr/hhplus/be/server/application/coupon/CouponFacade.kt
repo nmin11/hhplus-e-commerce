@@ -1,6 +1,6 @@
 package kr.hhplus.be.server.application.coupon
 
-import kr.hhplus.be.server.support.lock.DistributedLock
+import kr.hhplus.be.server.support.aop.DistributedLock
 import kr.hhplus.be.server.domain.coupon.CouponService
 import kr.hhplus.be.server.domain.coupon.CustomerCouponService
 import kr.hhplus.be.server.domain.customer.CustomerService

@@ -1,5 +1,6 @@
-package kr.hhplus.be.server.support.lock
+package kr.hhplus.be.server.support.aop
 
+import kr.hhplus.be.server.support.lock.LockType
 import java.util.concurrent.TimeUnit
 
 @Target(AnnotationTarget.FUNCTION)

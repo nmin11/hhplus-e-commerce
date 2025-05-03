@@ -12,7 +12,7 @@ import kr.hhplus.be.server.domain.payment.PaymentService
 import kr.hhplus.be.server.domain.product.Statistic
 import kr.hhplus.be.server.domain.product.StatisticService
 import kr.hhplus.be.server.domain.product.StockService
-import kr.hhplus.be.server.support.lock.DistributedLock
+import kr.hhplus.be.server.support.aop.DistributedLock
 import kr.hhplus.be.server.support.lock.LockType
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional

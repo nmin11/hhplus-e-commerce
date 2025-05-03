@@ -2,8 +2,6 @@ package kr.hhplus.be.server.support.aop
 
 import io.lettuce.core.RedisConnectionException
 import kr.hhplus.be.server.support.exception.common.DistributedLockAcquisitionException
-import kr.hhplus.be.server.support.exception.common.MissingAnnotationException
-import kr.hhplus.be.server.support.lock.DistributedLock
 import kr.hhplus.be.server.support.lock.LockTemplateRouter
 import kr.hhplus.be.server.support.spel.CustomSpringELParser
 import kr.hhplus.be.server.support.transaction.RequireNewTransactionExecutor
@@ -24,12 +22,10 @@ class DistributedLockAspect(
 ) {
     private val log = LoggerFactory.getLogger(DistributedLockAspect::class.java)
 
-    @Around("@annotation(kr.hhplus.be.server.support.lock.DistributedLock)")
-    fun lock(joinPoint: ProceedingJoinPoint): Any {
+    @Around("@annotation(distributedLock)")
+    fun lock(joinPoint: ProceedingJoinPoint, distributedLock: DistributedLock): Any {
         val signature = joinPoint.signature as MethodSignature
         val method = signature.method
-        val distributedLock = method.getAnnotation(DistributedLock::class.java)
-            ?: throw MissingAnnotationException(method.name)
 
         val dynamicKey = CustomSpringELParser.getDynamicValue(
             signature.parameterNames,
