@@ -22,7 +22,7 @@
 
 MySQL Workbench의 VISUAL EXPAIN 사용 방법은 Line 기술 블로그에도 잘 설명되어 있는데, 쿼리를 작성하고 아래 이미지에 표시된 버튼을 눌러보는 것만으로 간단하게 활용할 수 있습니다.
 
-![how-to-use-visual-explain](./bottleneck-query-optimization//how-to-use-visual-explain.png)
+![how-to-use-visual-explain](./bottleneck-query-optimization/how-to-use-visual-explain.png)
 
 - 테스트 환경 관련 추가 설명
   - `data.sql` 파일을 활용해 dummy data를 삽입해주는 방식을 사용했습니다.
