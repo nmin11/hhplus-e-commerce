@@ -12,6 +12,15 @@ services:
     volumes:
       - ./data/mysql/:/var/lib/mysql
 
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass root
+    networks:
+      - default
+
 networks:
   default:
     driver: bridge
