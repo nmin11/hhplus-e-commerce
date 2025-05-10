@@ -15,7 +15,6 @@ import kr.hhplus.be.server.domain.product.StockService
 import kr.hhplus.be.server.support.aop.DistributedLock
 import kr.hhplus.be.server.support.lock.LockType
 import org.springframework.stereotype.Component
-import org.springframework.transaction.annotation.Transactional
 
 @Component
 class PaymentFacade(
@@ -30,7 +29,6 @@ class PaymentFacade(
     private val paymentCommandFactory: PaymentCommandFactory,
     private val dataPlatformSender: DataPlatformSender
 ) {
-    @Transactional
     @DistributedLock(resourceName = "orderId", key = "#command.orderId", lockType = LockType.PUBSUB)
     fun pay(command: PaymentCommand): PaymentResult {
         // 1. 주문 조회 및 상태 확인
