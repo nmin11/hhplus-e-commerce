@@ -46,21 +46,25 @@ class DistributedLockAspect(
                 distributedLock.timeUnit
             )
 
-            if (!acquired) {
-                log.info("❌ Failed to acquire lock for key: {}", lockKey)
-                throw DistributedLockAcquisitionException(lockKey)
-            } else {
-                log.info("\uD83D\uDD12 Lock acquired for key: {}", lockKey)
-                requireNewTransactionExecutor.proceed(joinPoint)
+            when {
+                acquired -> {
+                    log.info("\uD83D\uDD12 Lock acquired for key: {}", lockKey)
+                    requireNewTransactionExecutor.proceed(joinPoint)
+                }
+                else -> {
+                    log.info("❌ Failed to acquire lock for key: {}", lockKey)
+                    throw DistributedLockAcquisitionException(lockKey)
+                }
             }
         } catch (e: InterruptedException) {
             throw e
         } catch (e: RedisConnectionException) {
-            if (distributedLock.fallbackToDatabaseLock) {
-                log.warn("❗ Redis 연결 실패 → DB Lock fallback 실행")
-                return requireNewTransactionExecutor.proceed(joinPoint)
-            } else {
-                throw e
+            when {
+                distributedLock.fallbackToDatabaseLock -> {
+                    log.warn("❗ Redis 연결 실패 → DB Lock fallback 실행")
+                    return requireNewTransactionExecutor.proceed(joinPoint)
+                }
+                else -> throw  e
             }
         } finally {
             try {
