@@ -2,6 +2,7 @@ package kr.hhplus.be.server.domain.coupon
 
 import kr.hhplus.be.server.support.exception.coupon.CouponNotFoundException
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 
 @Service
@@ -18,6 +19,7 @@ class CouponService(
             ?: throw CouponNotFoundException()
     }
 
+    @Transactional
     fun decreaseQuantity(coupon: Coupon) {
         coupon.decreaseQuantity()
     }

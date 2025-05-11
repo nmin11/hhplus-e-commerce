@@ -3,6 +3,7 @@ package kr.hhplus.be.server.domain.product
 import kr.hhplus.be.server.infrastructure.redis.RedisRepository
 import kr.hhplus.be.server.support.aop.LayeredCacheable
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.Duration
 import java.time.LocalDate
 
@@ -16,6 +17,7 @@ class StatisticService(
         private val TTL = Duration.ofHours(13L)
     }
 
+    @Transactional
     fun record(statistic: Statistic): Statistic {
         return statisticRepository.save(statistic)
     }

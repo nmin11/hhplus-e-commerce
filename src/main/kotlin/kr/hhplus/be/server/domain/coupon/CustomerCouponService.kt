@@ -24,6 +24,7 @@ class CustomerCouponService(
         return customerCoupon.validateUsable()
     }
 
+    @Transactional
     fun issue(customer: Customer, coupon: Coupon): CustomerCoupon {
         try {
             val customerCoupon = CustomerCoupon.issue(customer, coupon)
@@ -40,6 +41,7 @@ class CustomerCouponService(
         customerCouponRepository.saveAll(expiredCustomerCoupons)
     }
 
+    @Transactional
     fun markAsUsed(customerCoupon: CustomerCoupon) {
         try {
             customerCoupon.markAsUsed()
