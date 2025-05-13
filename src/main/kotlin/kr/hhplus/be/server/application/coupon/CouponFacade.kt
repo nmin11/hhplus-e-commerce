@@ -6,6 +6,7 @@ import kr.hhplus.be.server.domain.coupon.CustomerCouponService
 import kr.hhplus.be.server.domain.customer.CustomerService
 import kr.hhplus.be.server.support.lock.LockType
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
 
 @Component
 class CouponFacade(
@@ -13,6 +14,7 @@ class CouponFacade(
     private val customerService: CustomerService,
     private val customerCouponService: CustomerCouponService
 ) {
+    @Transactional
     @DistributedLock(
         resourceName = "couponId",
         key = "#command.couponId",
