@@ -5,6 +5,19 @@
 -- FK는 데드락 이슈를 고려하여 설정하지 않고, 대신 논리적 FK 개념으로 INDEX 사용
     -- 추후 FK 사용 가능성을 고려해 FK 설정 관련 쿼리를 주석 처리
 
+DROP TABLE IF EXISTS payment;
+DROP TABLE IF EXISTS order_item;
+DROP TABLE IF EXISTS `order`;
+DROP TABLE IF EXISTS customer_coupon;
+DROP TABLE IF EXISTS coupon;
+DROP TABLE IF EXISTS statistic;
+DROP TABLE IF EXISTS stock;
+DROP TABLE IF EXISTS product_option;
+DROP TABLE IF EXISTS product;
+DROP TABLE IF EXISTS balance_history;
+DROP TABLE IF EXISTS balance;
+DROP TABLE IF EXISTS customer;
+
 CREATE TABLE IF NOT EXISTS customer (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL,
