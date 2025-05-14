@@ -27,8 +27,10 @@ class ProductRankService(
 
     fun getProductRanks(since: LocalDate, periodKey: String): List<ProductInfo.Rank> {
         val today = LocalDate.now()
+        log.info("today: ${today.format(dateFormatter)}")
         val redisKey = DST_KEY_PATTERN.format(periodKey, today.format(dateFormatter))
         val betweenDays = ChronoUnit.DAYS.between(since, today)
+        log.info("betweenDays: $betweenDays")
 
         return if (redisRepository.exists(redisKey)) {
             log.info("✅ [Cache Hit]")
@@ -87,7 +89,7 @@ class ProductRankService(
     ) {
         val betweenDays = ChronoUnit.DAYS.between(since, today)
 
-        val sourceKeys = (1..betweenDays).map {
+        val sourceKeys = (0..betweenDays - 1).map {
             val date = today.minusDays(it)
             SRC_KEY_PATTERN.format(date.format(dateFormatter))
         }

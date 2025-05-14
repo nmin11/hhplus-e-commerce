@@ -63,9 +63,9 @@ class ProductRankServiceTest {
             every { redisSortedSetRepository.getTopNWithScores(redisKey, 5) } returns emptyList()
 
             val expectedKeys = listOf(
+                today,
                 today.minusDays(1),
-                today.minusDays(2),
-                today.minusDays(3),
+                today.minusDays(2)
             ).map {
                 "product:sales:${it.format(DateTimeFormatter.ofPattern("yyyyMMdd"))}"
             }
