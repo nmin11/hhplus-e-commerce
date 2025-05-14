@@ -1,7 +1,6 @@
 package kr.hhplus.be.server.domain.product
 
 import kr.hhplus.be.server.infrastructure.redis.RedisRepository
-import kr.hhplus.be.server.support.aop.LayeredCacheable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Duration
@@ -22,7 +21,6 @@ class StatisticService(
         return statisticRepository.save(statistic)
     }
 
-    @LayeredCacheable(resourceName = "product", displayName = "popular")
     fun getTop5PopularProductStatistics(since: LocalDate): List<ProductInfo.Popular> {
         val startOfDay = since.atStartOfDay()
         val records = statisticRepository.findTop5ProductSales(startOfDay)
