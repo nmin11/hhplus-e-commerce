@@ -1,7 +1,7 @@
 package kr.hhplus.be.server.application.payment
 
 import kr.hhplus.be.server.application.dataplatform.DataPlatformSender
-import kr.hhplus.be.server.application.product.ProductCommandFactory
+import kr.hhplus.be.server.event.ProductEventFactory
 import kr.hhplus.be.server.domain.balance.BalanceHistory
 import kr.hhplus.be.server.domain.balance.BalanceHistoryService
 import kr.hhplus.be.server.domain.balance.BalanceService
@@ -28,7 +28,7 @@ class PaymentFacade(
     private val orderService: OrderService,
     private val paymentCommandFactory: PaymentCommandFactory,
     private val paymentService: PaymentService,
-    private val productCommandFactory: ProductCommandFactory,
+    private val productCommandFactory: ProductEventFactory,
     private val statisticService: StatisticService,
     private val stockService: StockService,
     private val eventPublisher: ApplicationEventPublisher,

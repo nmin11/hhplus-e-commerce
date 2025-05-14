@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.application.product
+package kr.hhplus.be.server.interfaces.product
 
 import kr.hhplus.be.server.domain.product.ProductRankService
 import org.springframework.scheduling.annotation.Scheduled

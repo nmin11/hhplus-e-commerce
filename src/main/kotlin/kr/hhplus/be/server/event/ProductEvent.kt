@@ -1,6 +1,6 @@
-package kr.hhplus.be.server.application.product
+package kr.hhplus.be.server.event
 
-sealed class ProductCommand {
+sealed class ProductEvent {
     data class SalesUpdated(
         val items: List<SoldItem>
     )

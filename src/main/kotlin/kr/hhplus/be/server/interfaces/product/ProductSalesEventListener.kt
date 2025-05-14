@@ -1,5 +1,6 @@
-package kr.hhplus.be.server.application.product
+package kr.hhplus.be.server.interfaces.product
 
+import kr.hhplus.be.server.event.ProductEvent
 import kr.hhplus.be.server.infrastructure.redis.RedisRepository
 import kr.hhplus.be.server.infrastructure.redis.RedisSortedSetRepository
 import org.springframework.stereotype.Component
@@ -10,7 +11,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @Component
-class ProductSalesEventHandler(
+class ProductSalesEventListener(
     private val redisRepository: RedisRepository,
     private val redisSortedSetRepository: RedisSortedSetRepository
 ) {
@@ -20,7 +21,7 @@ class ProductSalesEventHandler(
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    fun handle(command: ProductCommand.SalesUpdated) {
+    fun handle(command: ProductEvent.SalesUpdated) {
         val today = dateFormatter.format(LocalDate.now())
         val redisKey = "product:sales:$today"
 
