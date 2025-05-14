@@ -8,6 +8,22 @@ import java.time.Duration
 class RedisSortedSetRepositoryImpl(
     private val stringRedisTemplate: StringRedisTemplate
 ) : RedisSortedSetRepository {
+    override fun getTopNWithScores(
+        key: String,
+        count: Long
+    ): List<Pair<String, Double>> {
+        val tuples = stringRedisTemplate
+            .opsForZSet()
+            .reverseRangeWithScores(key, 0, count - 1L)
+            .orEmpty()
+
+        return tuples.mapNotNull { tuple ->
+            val value = tuple.value ?: return@mapNotNull null
+            val score = tuple.score ?: return@mapNotNull null
+            value to score
+        }
+    }
+
     override fun add(key: String, member: String, score: Double, ttl: Duration?) {
         stringRedisTemplate
             .opsForZSet()
