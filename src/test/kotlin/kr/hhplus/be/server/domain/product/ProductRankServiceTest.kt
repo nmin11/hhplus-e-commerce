@@ -2,6 +2,7 @@ package kr.hhplus.be.server.domain.product
 
 import io.mockk.mockk
 import io.mockk.verify
+import kr.hhplus.be.server.infrastructure.redis.RedisRepository
 import kr.hhplus.be.server.infrastructure.redis.RedisSortedSetRepository
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -11,8 +12,14 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 class ProductRankServiceTest {
+    private val statisticService = mockk<StatisticService>()
+    private val redisRepository = mockk<RedisRepository>(relaxed = true)
     private val redisSortedSetRepository = mockk<RedisSortedSetRepository>(relaxed = true)
-    private val productRankService = ProductRankService(redisSortedSetRepository)
+    private val productRankService = ProductRankService(
+        statisticService,
+        redisRepository,
+        redisSortedSetRepository
+    )
 
     @Nested
     inner class RefreshRank {

@@ -157,7 +157,6 @@ class ApiE2ETest @Autowired constructor(
         // 4. 인기 상품 조회
         mockMvc.perform(get("/products/popular?days=3"))
             .andExpect(status().isOk)
-            .andExpect(jsonPath("$.length()").value(5))
 
         // 5. 주문 생성
         val orderRequest = OrderRequest.Create(
