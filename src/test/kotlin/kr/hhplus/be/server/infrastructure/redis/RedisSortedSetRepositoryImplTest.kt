@@ -13,12 +13,12 @@ import java.time.Duration
 
 class RedisSortedSetRepositoryImplTest {
     private lateinit var redisTemplate: StringRedisTemplate
-    private lateinit var redisZSetRepo: RedisSortedSetRepositoryImpl
+    private lateinit var redisZSetRepository: RedisSortedSetRepositoryImpl
 
     @BeforeEach
-    fun setUp() {
+    fun setup() {
         redisTemplate = mockk()
-        redisZSetRepo = RedisSortedSetRepositoryImpl(redisTemplate)
+        redisZSetRepository = RedisSortedSetRepositoryImpl(redisTemplate)
     }
 
     @Nested
@@ -33,7 +33,7 @@ class RedisSortedSetRepositoryImplTest {
             every { redisTemplate.expire("zSetKey", Duration.ofHours(1)) } returns true
 
             // when
-            redisZSetRepo.add("zSetKey", "productId", 10.0, Duration.ofHours(1))
+            redisZSetRepository.add("zSetKey", "productId", 10.0, Duration.ofHours(1))
 
             // then
             verify { ops.add("zSetKey", "productId", 10.0) }
@@ -49,7 +49,7 @@ class RedisSortedSetRepositoryImplTest {
             every { ops.add("zSetKey", "productId", 10.0) } returns true
 
             // when
-            redisZSetRepo.add("zSetKey", "productId", 10.0, null)
+            redisZSetRepository.add("zSetKey", "productId", 10.0, null)
 
             // then
             verify { ops.add("zSetKey", "productId", 10.0) }
@@ -68,10 +68,54 @@ class RedisSortedSetRepositoryImplTest {
             every { ops.incrementScore("zSetKey", "productId", 5.0) } returns 15.0
 
             // when
-            redisZSetRepo.incrementScore("zSetKey", "productId", 5.0)
+            redisZSetRepository.incrementScore("zSetKey", "productId", 5.0)
 
             // then
             verify { ops.incrementScore("zSetKey", "productId", 5.0) }
+        }
+    }
+
+    @Nested
+    inner class UnionAndStore {
+        @Test
+        @DisplayName("여러 ZSet을 병합하여 새로운 키로 저장하고 TTL 설정")
+        fun unionMultipleZSetsWithTtl() {
+            // given
+            val ops = mockk<ZSetOperations<String, String>>()
+            every { redisTemplate.opsForZSet() } returns ops
+            every { ops.unionAndStore("key1", listOf("key2", "key3"), "dstKey") } returns 3L
+            every { redisTemplate.expire("dstKey", Duration.ofMinutes(30)) } returns true
+
+            val sourceKeys = listOf("key1", "key2", "key3")
+            val destinationKey = "dstKey"
+            val ttl = Duration.ofMinutes(30)
+
+            // when
+            redisZSetRepository.unionAndStore(sourceKeys, destinationKey, ttl)
+
+            // then
+            verify { ops.unionAndStore("key1", listOf("key2", "key3"), "dstKey") }
+            verify { redisTemplate.expire("dstKey", ttl) }
+        }
+
+        @Test
+        @DisplayName("TTL이 null일 경우 expire를 호출하지 않음")
+        fun unionZSetsWithoutTtl() {
+            // given
+            val ops = mockk<ZSetOperations<String, String>>()
+            every { redisTemplate.opsForZSet() } returns ops
+            every { ops.unionAndStore("key1", listOf("key2"), "dstKey") } returns 2L
+
+            val sourceKeys = listOf("key1", "key2")
+            val destinationKey = "dstKey"
+            val ttl: Duration? = null
+
+            // when
+            redisZSetRepository.unionAndStore(sourceKeys, destinationKey, ttl)
+
+            // then
+            verify { ops.unionAndStore("key1", listOf("key2"), "dstKey") }
+            verify(exactly = 0) { redisTemplate.expire(any(), any()) }
         }
     }
 }

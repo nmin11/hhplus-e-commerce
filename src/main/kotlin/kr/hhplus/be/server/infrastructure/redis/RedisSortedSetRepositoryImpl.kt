@@ -21,4 +21,16 @@ class RedisSortedSetRepositoryImpl(
             .opsForZSet()
             .incrementScore(key, member, score)
     }
+
+    override fun unionAndStore(
+        sourceKeys: List<String>,
+        destinationKey: String,
+        ttl: Duration?
+    ) {
+        stringRedisTemplate
+            .opsForZSet()
+            .unionAndStore(sourceKeys.first(), sourceKeys.drop(1), destinationKey)
+
+        ttl?.let { stringRedisTemplate.expire(destinationKey, it) }
+    }
 }
