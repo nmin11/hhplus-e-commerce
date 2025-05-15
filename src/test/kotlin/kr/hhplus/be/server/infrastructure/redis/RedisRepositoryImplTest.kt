@@ -76,6 +76,49 @@ class RedisRepositoryImplTest {
     }
 
     @Nested
+    inner class ExecuteWithLua {
+        @Test
+        @DisplayName("스크립트 실행 결과가 null이 아니면 해당 값을 반환")
+        fun returnResultWhenScriptExecutesSuccessfully() {
+            // given
+            val scriptBody = "return 1"
+            val redisScript = RedisScript.of(scriptBody, Long::class.java)
+            val keys = listOf("key1")
+            val args = listOf("arg1")
+
+            every {
+                redisTemplate.execute(redisScript, keys, *args.toTypedArray())
+            } returns 1L
+
+            // when
+            val result: Long? = redisRepository.executeWithLua(redisScript, keys, args)
+
+            // then
+            assertThat(result).isEqualTo(1L)
+        }
+
+        @Test
+        @DisplayName("스크립트 실행 결과가 null 이면 0L을 반환")
+        fun returnZeroWhenScriptReturnsNull() {
+            // given
+            val scriptBody = "return nil"
+            val redisScript = RedisScript.of(scriptBody, Long::class.java)
+            val keys = listOf("key1")
+            val args = listOf("arg1")
+
+            every {
+                redisTemplate.execute(redisScript, keys, *args.toTypedArray())
+            } returns 0L
+
+            // when
+            val result: Long = redisRepository.executeWithLua(redisScript, keys, args) ?: 0L
+
+            // then
+            assertThat(result).isEqualTo(0L)
+        }
+    }
+
+    @Nested
     inner class ReleaseWithLua {
         @Test
         @DisplayName("key가 일치할 때 삭제 성공")
