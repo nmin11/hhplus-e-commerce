@@ -14,11 +14,15 @@ class CouponFacade(
 ) {
     @Transactional
     fun issueCouponToCustomer(command: CouponCommand.Issue): CouponResult.Issue {
-        val customer = customerService.getById(command.customerId)
-        val coupon = couponService.getByIdWithLock(command.couponId)
+        val (couponId, customerId) = command
+        val customer = customerService.getById(customerId)
+        val coupon = couponService.getById(couponId)
 
         // 쿠폰 사용 가능 기간 검사
         coupon.validatePeriod()
+
+        // Redis를 활용한 쿠폰 발급 처리
+        couponService.issueWithRedis(couponId, customerId)
 
         // 쿠폰 수량 검사 및 차감
         couponService.decreaseQuantity(coupon)
