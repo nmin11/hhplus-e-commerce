@@ -9,7 +9,9 @@ import kr.hhplus.be.server.support.exception.coupon.CouponNotFoundException
 import kr.hhplus.be.server.support.exception.coupon.CustomerCouponAlreadyIssuedException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.Duration
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Service
 class CouponService(
@@ -36,16 +38,22 @@ class CouponService(
         coupon.decreaseQuantity()
     }
 
-    fun issueWithRedis(couponId: Long, customerId: Long) {
+    fun issueWithRedis(coupon: Coupon, customerId: Long) {
         val script = luaScriptRegistry.getScript(LuaScriptId.COUPON_ISSUE, Long::class.java)
+        val now = LocalDateTime.now()
+        val expireAt = coupon.expiredAt.atStartOfDay()
+        val ttl = Duration.between(now, expireAt).coerceAtLeast(Duration.ZERO)
 
         val resultCode = redisRepository.executeWithLua(
             script,
             keys = listOf(
-                "coupon:stock:$couponId",
-                "coupon:issued:$couponId"
+                "coupon:stock:${coupon.id}",
+                "coupon:issued:${coupon.id}"
             ),
-            args = listOf(customerId.toString())
+            args = listOf(
+                customerId.toString(),
+                ttl.seconds.toString()
+            )
         )
 
         val result = CouponInfo.IssueResult.fromCode(resultCode)

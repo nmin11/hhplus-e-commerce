@@ -22,7 +22,7 @@ class CouponFacade(
         coupon.validatePeriod()
 
         // Redis를 활용한 쿠폰 발급 처리
-        couponService.issueWithRedis(couponId, customerId)
+        couponService.issueWithRedis(coupon, customerId)
 
         // 쿠폰 수량 검사 및 차감
         couponService.decreaseQuantity(coupon)

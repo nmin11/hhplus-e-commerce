@@ -16,7 +16,9 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.data.redis.core.script.RedisScript
+import java.time.Duration
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 class CouponServiceTest {
     private val couponRepository = mockk<CouponRepository>()
@@ -126,19 +128,38 @@ class CouponServiceTest {
         private val stockKey = "coupon:stock:$couponId"
         private val issuedKey = "coupon:issued:$couponId"
         private val keys = listOf(stockKey, issuedKey)
-        private val args = listOf(customerId.toString())
+
+        private fun mockCoupon(): Coupon {
+            val coupon = mockk<Coupon>(relaxed = true)
+            every { coupon.id } returns couponId
+            every { coupon.expiredAt } returns LocalDate.now().plusDays(1)
+            return coupon
+        }
 
         @Test
         @DisplayName("쿠폰 발급 성공 시 예외 없이 통과")
         fun shouldSucceed_whenRedisReturnsSuccess() {
             // given
+            val coupon = mockCoupon()
+            val ttl = Duration.between(
+                LocalDateTime.now(),
+                coupon.expiredAt.atStartOfDay()
+            ).coerceAtLeast(Duration.ZERO).seconds
+            val args = listOf(customerId.toString(), ttl.toString())
+
             val script = mockk<RedisScript<Long>>()
             every { luaScriptRegistry.getScript(LuaScriptId.COUPON_ISSUE, Long::class.java) } returns script
-            every { redisRepository.executeWithLua(script, keys, args) } returns 1L
+            every {
+                redisRepository.executeWithLua(
+                    eq(script),
+                    eq(keys),
+                    match { it[0] == customerId.toString() }
+                )
+            } returns 1L
 
             // when & then
             assertThatCode {
-                couponService.issueWithRedis(couponId, customerId)
+                couponService.issueWithRedis(coupon, customerId)
             }.doesNotThrowAnyException()
         }
 
@@ -146,13 +167,24 @@ class CouponServiceTest {
         @DisplayName("쿠폰 정보가 존재하지 않을 경우 예외 발생")
         fun shouldThrow_whenCouponNotExist() {
             // given
+            val coupon = mockCoupon()
+            val ttl = Duration.between(LocalDateTime.now(), coupon.expiredAt.atStartOfDay())
+                .coerceAtLeast(Duration.ZERO).seconds
+            val args = listOf(customerId.toString(), ttl.toString())
+
             val script = mockk<RedisScript<Long>>()
             every { luaScriptRegistry.getScript(LuaScriptId.COUPON_ISSUE, Long::class.java) } returns script
-            every { redisRepository.executeWithLua(script, keys, args) } returns -1L
+            every {
+                redisRepository.executeWithLua(
+                    eq(script),
+                    eq(keys),
+                    match { it[0] == customerId.toString() }
+                )
+            } returns -1L
 
             // when & then
             assertThatThrownBy {
-                couponService.issueWithRedis(couponId, customerId)
+                couponService.issueWithRedis(coupon, customerId)
             }.isInstanceOf(CouponNotFoundException::class.java)
         }
 
@@ -160,13 +192,24 @@ class CouponServiceTest {
         @DisplayName("이미 발급된 쿠폰일 경우 예외 발생")
         fun shouldThrow_whenAlreadyIssued() {
             // given
+            val coupon = mockCoupon()
+            val ttl = Duration.between(LocalDateTime.now(), coupon.expiredAt.atStartOfDay())
+                .coerceAtLeast(Duration.ZERO).seconds
+            val args = listOf(customerId.toString(), ttl.toString())
+
             val script = mockk<RedisScript<Long>>()
             every { luaScriptRegistry.getScript(LuaScriptId.COUPON_ISSUE, Long::class.java) } returns script
-            every { redisRepository.executeWithLua(script, keys, args) } returns -2L
+            every {
+                redisRepository.executeWithLua(
+                    eq(script),
+                    eq(keys),
+                    match { it[0] == customerId.toString() }
+                )
+            } returns -2L
 
             // when & then
             assertThatThrownBy {
-                couponService.issueWithRedis(couponId, customerId)
+                couponService.issueWithRedis(coupon, customerId)
             }.isInstanceOf(CustomerCouponAlreadyIssuedException::class.java)
         }
 
@@ -174,13 +217,24 @@ class CouponServiceTest {
         @DisplayName("쿠폰 수량 부족 시 예외 발생")
         fun shouldThrow_whenCouponInsufficient() {
             // given
+            val coupon = mockCoupon()
+            val ttl = Duration.between(LocalDateTime.now(), coupon.expiredAt.atStartOfDay())
+                .coerceAtLeast(Duration.ZERO).seconds
+            val args = listOf(customerId.toString(), ttl.toString())
+
             val script = mockk<RedisScript<Long>>()
             every { luaScriptRegistry.getScript(LuaScriptId.COUPON_ISSUE, Long::class.java) } returns script
-            every { redisRepository.executeWithLua(script, keys, args) } returns -3L
+            every {
+                redisRepository.executeWithLua(
+                    eq(script),
+                    eq(keys),
+                    match { it[0] == customerId.toString() }
+                )
+            } returns -3L
 
             // when & then
             assertThatThrownBy {
-                couponService.issueWithRedis(couponId, customerId)
+                couponService.issueWithRedis(coupon, customerId)
             }.isInstanceOf(CouponInsufficientException::class.java)
         }
 
@@ -188,13 +242,18 @@ class CouponServiceTest {
         @DisplayName("기타 예외 상황 발생 관련 케이스")
         fun shouldThrow_whenUnknownErrorOccurs() {
             // given
+            val coupon = mockCoupon()
+            val ttl = Duration.between(LocalDateTime.now(), coupon.expiredAt.atStartOfDay())
+                .coerceAtLeast(Duration.ZERO).seconds
+            val args = listOf(customerId.toString(), ttl.toString())
+
             val script = mockk<RedisScript<Long>>()
             every { luaScriptRegistry.getScript(LuaScriptId.COUPON_ISSUE, Long::class.java) } returns script
             every { redisRepository.executeWithLua(script, keys, args) } returns -999L
 
             // when & then
             assertThatThrownBy {
-                couponService.issueWithRedis(couponId, customerId)
+                couponService.issueWithRedis(coupon, customerId)
             }.isInstanceOf(CouponIssueFailedException::class.java)
         }
     }
