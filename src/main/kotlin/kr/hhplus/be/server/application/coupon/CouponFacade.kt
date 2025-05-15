@@ -1,10 +1,8 @@
 package kr.hhplus.be.server.application.coupon
 
-import kr.hhplus.be.server.support.aop.DistributedLock
 import kr.hhplus.be.server.domain.coupon.CouponService
 import kr.hhplus.be.server.domain.coupon.CustomerCouponService
 import kr.hhplus.be.server.domain.customer.CustomerService
-import kr.hhplus.be.server.support.lock.LockType
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
@@ -15,12 +13,6 @@ class CouponFacade(
     private val customerCouponService: CustomerCouponService
 ) {
     @Transactional
-    @DistributedLock(
-        resourceName = "couponId",
-        key = "#command.couponId",
-        lockType = LockType.SPIN,
-        fallbackToDatabaseLock = true
-    )
     fun issueCouponToCustomer(command: CouponCommand.Issue): CouponResult.Issue {
         val customer = customerService.getById(command.customerId)
         val coupon = couponService.getByIdWithLock(command.couponId)
