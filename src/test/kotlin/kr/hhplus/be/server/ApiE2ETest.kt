@@ -13,18 +13,21 @@ import kr.hhplus.be.server.interfaces.coupon.CouponRequest
 import kr.hhplus.be.server.interfaces.order.OrderRequest
 import kr.hhplus.be.server.interfaces.payment.PaymentRequest
 import org.hamcrest.CoreMatchers.hasItems
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import java.time.Duration
 import java.time.LocalDate
 
 @SpringBootTest
@@ -41,7 +44,8 @@ class ApiE2ETest @Autowired constructor(
     val stockRepository: StockRepository,
     val orderRepository: OrderRepository,
     val couponRepository: CouponRepository,
-    val customerCouponRepository: CustomerCouponRepository
+    val customerCouponRepository: CustomerCouponRepository,
+    val stringRedisTemplate: StringRedisTemplate
 ) {
     private lateinit var customer: Customer
     private lateinit var coupon1: Coupon
@@ -51,6 +55,7 @@ class ApiE2ETest @Autowired constructor(
     private lateinit var optionM: ProductOption
     private lateinit var optionL: ProductOption
     private lateinit var order: Order
+    private lateinit var issuedKey: String
 
     @BeforeEach
     fun setup() {
@@ -125,8 +130,31 @@ class ApiE2ETest @Autowired constructor(
         couponRepository.save(coupon1)
         couponRepository.save(coupon2)
 
+        stringRedisTemplate.opsForValue().set(
+            "coupon:stock:${coupon1.id}",
+            coupon1.totalQuantity.toString(),
+            Duration.ofMinutes(1)
+        )
+        stringRedisTemplate.opsForValue().set(
+            "coupon:stock:${coupon2.id}",
+            coupon2.totalQuantity.toString(),
+            Duration.ofMinutes(1)
+        )
+
         val customerCoupon1 = CustomerCoupon.issue(customer, coupon1)
         customerCouponRepository.save(customerCoupon1)
+
+        issuedKey = "coupon:issued:${coupon1.id}"
+        stringRedisTemplate.opsForSet().add(
+            issuedKey,
+            customer.id.toString()
+        )
+        stringRedisTemplate.expire(issuedKey, Duration.ofMinutes(1))
+    }
+
+    @AfterEach
+    fun cleanUp() {
+        stringRedisTemplate.delete(issuedKey)
     }
 
     @Test

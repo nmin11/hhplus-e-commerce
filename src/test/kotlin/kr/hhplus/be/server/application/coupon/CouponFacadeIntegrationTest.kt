@@ -10,6 +10,7 @@ import kr.hhplus.be.server.support.exception.coupon.CouponInsufficientException
 import kr.hhplus.be.server.support.exception.coupon.CouponInvalidPeriodException
 import kr.hhplus.be.server.support.exception.coupon.CustomerCouponAlreadyIssuedException
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -17,7 +18,9 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.test.context.ActiveProfiles
+import java.time.Duration
 import java.time.LocalDate
 
 @SpringBootTest
@@ -27,7 +30,8 @@ class CouponFacadeIntegrationTest @Autowired constructor(
     private val couponFacade: CouponFacade,
     private val customerRepository: CustomerRepository,
     private val couponRepository: CouponRepository,
-    private val customerCouponRepository: CustomerCouponRepository
+    private val customerCouponRepository: CustomerCouponRepository,
+    private val stringRedisTemplate: StringRedisTemplate
 ) {
     private lateinit var customer: Customer
     private lateinit var coupon: Coupon
@@ -45,6 +49,19 @@ class CouponFacadeIntegrationTest @Autowired constructor(
             expiredAt = LocalDate.now().plusDays(7)
         )
         couponRepository.save(coupon)
+
+        val stockKey = "coupon:stock:${coupon.id}"
+        stringRedisTemplate.opsForValue().set(
+            stockKey,
+            coupon.totalQuantity.toString(),
+            Duration.ofMinutes(1)
+        )
+    }
+
+    @AfterEach
+    fun cleanUp() {
+        val issuedKey = "coupon:issued:${coupon.id}"
+        stringRedisTemplate.delete(issuedKey)
     }
 
     @Test
@@ -77,6 +94,13 @@ class CouponFacadeIntegrationTest @Autowired constructor(
             expiredAt = LocalDate.now().plusDays(7)
         )
         couponRepository.save(exhaustedCoupon)
+
+        val stockKey = "coupon:stock:${exhaustedCoupon.id}"
+        stringRedisTemplate.opsForValue().set(
+            stockKey,
+            exhaustedCoupon.totalQuantity.toString(),
+            Duration.ofMinutes(1)
+        )
 
         val command = CouponCommand.Issue(
             customerId = customer.id,
@@ -132,8 +156,19 @@ class CouponFacadeIntegrationTest @Autowired constructor(
         )
         couponRepository.save(duplicateCoupon)
 
+        val stockKey = "coupon:stock:${duplicateCoupon.id}"
+        stringRedisTemplate.opsForValue().set(
+            stockKey,
+            duplicateCoupon.totalQuantity.toString(),
+            Duration.ofMinutes(1)
+        )
+
         val customerCoupon = CustomerCoupon.issue(customer, duplicateCoupon)
         customerCouponRepository.save(customerCoupon)
+
+        val issuedKey = "coupon:issued:${duplicateCoupon.id}"
+        stringRedisTemplate.opsForSet().add(issuedKey, customer.id.toString())
+        stringRedisTemplate.expire(issuedKey, Duration.ofMinutes(1))
 
         val command = CouponCommand.Issue(
             customerId = customer.id,
