@@ -38,7 +38,6 @@ class ProductRankService(
 
         } else if (betweenDays <= 7) {
             log.info("⚠️ [Cache Miss] → Redis ZSet 랭킹 생성")
-
             cacheProductRankByUnion(since, today, redisKey, periodKey)
             getProductRanksFromRedis(redisKey)
         } else {
