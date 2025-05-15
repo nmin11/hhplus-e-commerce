@@ -55,25 +55,6 @@ class CouponServiceTest {
     }
 
     @Nested
-    inner class DecreaseQuantity {
-        @Test
-        @DisplayName("쿠폰 수량이 남아 있는 경우 수량을 1 줄이고 저장")
-        fun decreaseQuantity_shouldReduceAndSave() {
-            // given
-            val coupon = mockk<Coupon>(relaxed = true)
-
-            every { coupon.decreaseQuantity() } just Runs
-            every { couponRepository.save(coupon) } returns coupon
-
-            // when
-            couponService.decreaseQuantity(coupon)
-
-            // then
-            verify(exactly = 1) { coupon.decreaseQuantity() }
-        }
-    }
-
-    @Nested
     inner class GetExpiredCoupons {
         @Test
         @DisplayName("지정한 기준 날짜 이전에 만료된 쿠폰들을 반환")
@@ -105,6 +86,25 @@ class CouponServiceTest {
             // then
             assertThat(result).isEqualTo(expiredCoupons)
             verify(exactly = 1) { couponRepository.findAllByExpiredAtBefore(today) }
+        }
+    }
+
+    @Nested
+    inner class DecreaseQuantity {
+        @Test
+        @DisplayName("쿠폰 수량이 남아 있는 경우 수량을 1 줄이고 저장")
+        fun decreaseQuantity_shouldReduceAndSave() {
+            // given
+            val coupon = mockk<Coupon>(relaxed = true)
+
+            every { coupon.decreaseQuantity() } just Runs
+            every { couponRepository.save(coupon) } returns coupon
+
+            // when
+            couponService.decreaseQuantity(coupon)
+
+            // then
+            verify(exactly = 1) { coupon.decreaseQuantity() }
         }
     }
 }
