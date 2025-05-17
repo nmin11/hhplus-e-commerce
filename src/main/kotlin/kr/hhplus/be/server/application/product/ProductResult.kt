@@ -25,6 +25,15 @@ sealed class ProductResult {
                     totalSales = info.totalSales
                 )
             }
+
+            fun from(rank: ProductInfo.Rank, product: Product): Popular {
+                return Popular(
+                    productId = rank.productId,
+                    name = product.name,
+                    basePrice = product.basePrice,
+                    totalSales = rank.totalSales
+                )
+            }
         }
     }
 }

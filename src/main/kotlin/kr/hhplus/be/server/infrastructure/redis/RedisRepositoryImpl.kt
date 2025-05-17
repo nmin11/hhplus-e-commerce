@@ -11,6 +11,10 @@ class RedisRepositoryImpl(
     private val stringRedisTemplate: StringRedisTemplate,
     private val objectMapper: ObjectMapper
 ) : RedisRepository {
+    override fun exists(key: String): Boolean {
+        return stringRedisTemplate.hasKey(key)
+    }
+
     override fun setIfAbsent(key: String, value: String, expire: Duration): Boolean {
         val result = stringRedisTemplate
             .opsForValue()

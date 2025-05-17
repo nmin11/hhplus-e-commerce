@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.application.payment
 
 import kr.hhplus.be.server.application.dataplatform.DataPlatformSender
+import kr.hhplus.be.server.event.ProductEventFactory
 import kr.hhplus.be.server.domain.balance.BalanceHistory
 import kr.hhplus.be.server.domain.balance.BalanceHistoryService
 import kr.hhplus.be.server.domain.balance.BalanceService
@@ -14,6 +15,7 @@ import kr.hhplus.be.server.domain.product.StatisticService
 import kr.hhplus.be.server.domain.product.StockService
 import kr.hhplus.be.server.support.aop.DistributedLock
 import kr.hhplus.be.server.support.lock.LockType
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
@@ -24,10 +26,12 @@ class PaymentFacade(
     private val couponService: CouponService,
     private val customerCouponService: CustomerCouponService,
     private val orderService: OrderService,
+    private val paymentCommandFactory: PaymentCommandFactory,
     private val paymentService: PaymentService,
+    private val productCommandFactory: ProductEventFactory,
     private val statisticService: StatisticService,
     private val stockService: StockService,
-    private val paymentCommandFactory: PaymentCommandFactory,
+    private val eventPublisher: ApplicationEventPublisher,
     private val dataPlatformSender: DataPlatformSender
 ) {
     @Transactional
@@ -82,8 +86,10 @@ class PaymentFacade(
         paymentService.create(payment)
         orderService.markAsPaid(order)
 
+        val orderItems = order.orderItems
+
         // 8. 통계 반영
-        order.orderItems.forEach { item ->
+        orderItems.forEach { item ->
             val stat = Statistic.create(
                 product = item.productOption.product,
                 salesCount = item.quantity
@@ -91,7 +97,11 @@ class PaymentFacade(
             statisticService.record(stat)
         }
 
-        // 9. 데이터 플랫폼 전송
+        // 9. 일일 상품 판매량 집계
+        val salesEventCommand = productCommandFactory.from(orderItems)
+        eventPublisher.publishEvent(salesEventCommand)
+
+        // 10. 데이터 플랫폼 전송
         val orderCommand = paymentCommandFactory.from(order)
         dataPlatformSender.send(orderCommand)
 

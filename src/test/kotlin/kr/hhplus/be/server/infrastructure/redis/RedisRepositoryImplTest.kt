@@ -29,9 +29,38 @@ class RedisRepositoryImplTest {
     }
 
     @Nested
+    inner class Exists {
+        @Test
+        @DisplayName("key가 존재하면 true를 반환")
+        fun returnTrueWhenKeyExists() {
+            // given
+            every { redisTemplate.hasKey("existingKey") } returns true
+
+            // when
+            val result = redisRepository.exists("existingKey")
+
+            // then
+            assertThat(result).isTrue()
+        }
+
+        @Test
+        @DisplayName("key가 존재하지 않으면 false 반환")
+        fun returnFalseWhenKeyDoesNotExist() {
+            // given
+            every { redisTemplate.hasKey("missingKey") } returns false
+
+            // when
+            val result = redisRepository.exists("missingKey")
+
+            // then
+            assertThat(result).isFalse()
+        }
+    }
+
+    @Nested
     inner class SetIfAbsent {
         @Test
-        @DisplayName("정상적으로 true를 반환한다")
+        @DisplayName("정상적으로 true 반환")
         fun returnTrueWhenSet() {
             // given
             every {

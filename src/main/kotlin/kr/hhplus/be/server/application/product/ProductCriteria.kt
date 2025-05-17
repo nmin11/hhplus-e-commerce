@@ -25,5 +25,14 @@ sealed class ProductCriteria {
                 else -> now.minusDays(3)
             }
         }
+
+        fun toPeriodKey(): String {
+            return when {
+                days != null -> if (days % 7 == 0) "${days / 7}w" else "${days}d"
+                weeks != null -> "${weeks}w"
+                months != null -> "${months}m"
+                else -> throw StatisticInvalidPeriodConditionException()
+            }
+        }
     }
 }

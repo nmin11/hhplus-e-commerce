@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component
 class ProductFacade(
     private val productService: ProductService,
     private val productOptionService: ProductOptionService,
-    private val statisticService: StatisticService
+    private val productRankService: ProductRankService
 ) {
     fun getProductDetail(productId: Long): ProductResult.Detail {
         val product = productService.getById(productId)
@@ -17,7 +17,15 @@ class ProductFacade(
 
     fun getPopularProducts(condition: ProductCriteria.PeriodCondition): List<ProductResult.Popular> {
         val since = condition.toStartDate()
-        val infos = statisticService.getTop5PopularProductStatistics(since)
-        return infos.map { ProductResult.Popular.from(it) }
+        val periodKey = condition.toPeriodKey()
+        val infos = productRankService.getProductRanks(since, periodKey)
+        val productIds = infos.map { it.productId }
+        val products = productService.getAllByIds(productIds)
+        val productMap = products.associateBy { it.id }
+
+        return infos.mapNotNull { rank ->
+            val product = productMap[rank.productId] ?: return@mapNotNull null
+            ProductResult.Popular.from(rank, product)
+        }
     }
 }

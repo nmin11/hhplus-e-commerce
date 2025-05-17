@@ -20,4 +20,9 @@ sealed class ProductInfo {
             }
         }
     }
+
+    data class Rank(
+        val productId: Long,
+        val totalSales: Int
+    )
 }
