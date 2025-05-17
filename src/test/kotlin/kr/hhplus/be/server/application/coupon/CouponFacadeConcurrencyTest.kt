@@ -6,13 +6,16 @@ import kr.hhplus.be.server.domain.coupon.CustomerCouponRepository
 import kr.hhplus.be.server.domain.customer.Customer
 import kr.hhplus.be.server.domain.customer.CustomerRepository
 import kr.hhplus.be.server.support.exception.coupon.CouponInsufficientException
+import kr.hhplus.be.server.support.exception.coupon.CustomerCouponAlreadyIssuedException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.test.context.ActiveProfiles
+import java.time.Duration
 import java.time.LocalDate
 import java.util.Collections
 import java.util.concurrent.CountDownLatch
@@ -25,8 +28,11 @@ class CouponFacadeConcurrencyTest @Autowired constructor(
     private val customerRepository: CustomerRepository,
     private val couponRepository: CouponRepository,
     private val customerCouponRepository: CustomerCouponRepository,
+    private val stringRedisTemplate: StringRedisTemplate
 ) {
     private lateinit var coupon: Coupon
+    private lateinit var stockKey: String
+    private lateinit var issuedKey: String
 
     @BeforeEach
     fun setup() {
@@ -39,6 +45,15 @@ class CouponFacadeConcurrencyTest @Autowired constructor(
                 expiredAt = LocalDate.now().plusDays(1)
             )
         )
+
+        stockKey = "coupon:stock:${coupon.id}"
+        issuedKey = "coupon:issued:${coupon.id}"
+        stringRedisTemplate.opsForValue().set(
+            stockKey,
+            coupon.totalQuantity.toString(),
+            Duration.ofMinutes(1)
+        )
+        stringRedisTemplate.delete(issuedKey)
     }
 
     @Test
@@ -48,7 +63,7 @@ class CouponFacadeConcurrencyTest @Autowired constructor(
         val customer = customerRepository.save(Customer.create("concurrent-user"))
         val command = CouponCommand.Issue(customerId = customer.id, couponId = coupon.id)
 
-        val numberOfThreads = 3
+        val numberOfThreads = 5
         val executor = Executors.newFixedThreadPool(numberOfThreads)
         val latch = CountDownLatch(numberOfThreads)
         val exceptions = Collections.synchronizedList(mutableListOf<Exception>())
@@ -74,7 +89,7 @@ class CouponFacadeConcurrencyTest @Autowired constructor(
         val issuedCoupons = customerCouponRepository.findAllByCustomerId(customer.id)
         println("발급된 쿠폰 개수: ${issuedCoupons.size}")
         assertThat(issuedCoupons.size).isEqualTo(1)
-        assertThat(exceptions.count { it.message?.contains("해당 쿠폰은 이미 발급된 쿠폰입니다") == true })
+        assertThat(exceptions.count { it is CustomerCouponAlreadyIssuedException })
             .isEqualTo(numberOfThreads - 1)
     }
 

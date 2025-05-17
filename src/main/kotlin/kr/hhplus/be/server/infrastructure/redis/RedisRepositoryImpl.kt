@@ -23,6 +23,14 @@ class RedisRepositoryImpl(
         return result == true
     }
 
+    override fun <T> executeWithLua(
+        script: RedisScript<T>,
+        keys: List<String>,
+        args: List<String>
+    ): T? {
+        return stringRedisTemplate.execute(script, keys, *args.toTypedArray())
+    }
+
     override fun releaseWithLua(key: String, value: String): Boolean {
         val luaScript = """
             if redis.call("get", KEYS[1]) == ARGV[1] then
