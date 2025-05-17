@@ -13,19 +13,14 @@ local stock = redis.call("GET", KEYS[1])
 if not stock then
     return -1
 end
-if tonumber(stock) <= 0 then
-    return -3
-end
 
 -- 쿠폰 차감
-redis.call("DECR", KEYS[1])
-
--- 사용자에게 쿠폰 발급
-if redis.call("EXISTS", KEYS[2]) == 0 then
-    redis.call("SADD", KEYS[2], ARGV[1])
-    redis.call("EXPIRE", KEYS[2], ARGV[2])
-else
-    redis.call("SADD", KEYS[2], ARGV[1])
+stock = redis.call("DECR", KEYS[1])
+if tonumber(stock) < 0 then return -3
 end
 
+-- 사용자에게 쿠폰 발급
+if redis.call("SADD", KEYS[2], ARGV[1]) == 1 then
+    redis.call("EXPIRE", KEYS[2], ARGV[2])
+end
 return 1
