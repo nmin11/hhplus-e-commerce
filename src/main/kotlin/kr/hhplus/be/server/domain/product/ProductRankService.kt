@@ -1,7 +1,6 @@
 package kr.hhplus.be.server.domain.product
 
-import kr.hhplus.be.server.infrastructure.redis.RedisRepository
-import kr.hhplus.be.server.infrastructure.redis.RedisSortedSetRepository
+import kr.hhplus.be.server.infrastructure.product.ProductRankRedisEntry
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.Duration
@@ -13,8 +12,7 @@ import java.time.temporal.ChronoUnit
 @Service
 class ProductRankService(
     private val statisticService: StatisticService,
-    private val redisRepository: RedisRepository,
-    private val redisSortedSetRepository: RedisSortedSetRepository
+    private val productRankRepository: ProductRankRepository
 ) {
     companion object {
         private const val DST_KEY_PATTERN = "product:rank:%s:%s"
@@ -32,7 +30,7 @@ class ProductRankService(
         val betweenDays = ChronoUnit.DAYS.between(since, today)
         log.info("betweenDays: $betweenDays")
 
-        return if (redisRepository.exists(redisKey)) {
+        return if (productRankRepository.existsRankKey(redisKey)) {
             log.info("✅ [Cache Hit]")
             getProductRanksFromRedis(redisKey)
 
@@ -62,8 +60,8 @@ class ProductRankService(
             )
         }
 
-        redisSortedSetRepository.unionAndStore(threeDaysRankSrcKeys, threeDaysRankDstKey, SCHEDULED_TTL)
-        redisSortedSetRepository.unionAndStore(sevenDaysRankSrcKeys, sevenDaysRankDstKey, SCHEDULED_TTL)
+        productRankRepository.unionRanks(threeDaysRankSrcKeys, threeDaysRankDstKey, SCHEDULED_TTL)
+        productRankRepository.unionRanks(sevenDaysRankSrcKeys, sevenDaysRankDstKey, SCHEDULED_TTL)
     }
 
     private fun ttlForPeriodKey(periodKey: String): Duration {
@@ -94,13 +92,12 @@ class ProductRankService(
         }
 
         val ttl = ttlForPeriodKey(periodKey)
-        redisSortedSetRepository.unionAndStore(sourceKeys, redisKey, ttl)
+        productRankRepository.unionRanks(sourceKeys, redisKey, ttl)
     }
 
     private fun getProductRanksFromRedis(redisKey: String): List<ProductInfo.Rank> {
-        return redisSortedSetRepository.getTopNWithScores(redisKey, 5).map { (value, score) ->
-            val productId = value.toLong()
-            ProductInfo.Rank(productId, score.toInt())
+        return productRankRepository.getTopNWithSalesCount(redisKey, 5).map {
+            ProductInfo.Rank.from(it)
         }
     }
 
@@ -112,8 +109,12 @@ class ProductRankService(
         val result = statisticService.getTop5PopularProductStatistics(since)
             .map { ProductInfo.Rank(it.id, it.totalSales) }
 
-        result.forEach {
-            redisSortedSetRepository.add(redisKey, it.productId.toString(), it.totalSales.toDouble(), ttl)
+        val redisEntries = result.map {
+            ProductRankRedisEntry(it.productId, it.totalSales)
+        }
+
+        redisEntries.forEach {
+            productRankRepository.addRankEntry(redisKey, it, ttl)
         }
 
         return result

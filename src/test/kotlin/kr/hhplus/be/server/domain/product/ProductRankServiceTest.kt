@@ -5,8 +5,7 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.verify
-import kr.hhplus.be.server.infrastructure.redis.RedisRepository
-import kr.hhplus.be.server.infrastructure.redis.RedisSortedSetRepository
+import kr.hhplus.be.server.infrastructure.product.ProductRankRedisEntry
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -17,13 +16,8 @@ import java.time.format.DateTimeFormatter
 
 class ProductRankServiceTest {
     private val statisticService = mockk<StatisticService>()
-    private val redisRepository = mockk<RedisRepository>(relaxed = true)
-    private val redisSortedSetRepository = mockk<RedisSortedSetRepository>(relaxed = true)
-    private val productRankService = ProductRankService(
-        statisticService,
-        redisRepository,
-        redisSortedSetRepository
-    )
+    private val productRankRepository = mockk<ProductRankRepository>(relaxed = true)
+    private val productRankService = ProductRankService(statisticService, productRankRepository)
 
     @Nested
     inner class GetProductRanks {
@@ -35,9 +29,10 @@ class ProductRankServiceTest {
             val periodKey = "3d"
             val redisKey = "product:rank:$periodKey:${today.format(DateTimeFormatter.ofPattern("yyyyMMdd"))}"
 
-            every { redisRepository.exists(redisKey) } returns true
-            every { redisSortedSetRepository.getTopNWithScores(redisKey, 5) } returns listOf(
-                "101" to 10.0, "102" to 5.0
+            every { productRankRepository.existsRankKey(redisKey) } returns true
+            every { productRankRepository.getTopNWithSalesCount(redisKey, 5) } returns listOf(
+                ProductRankRedisEntry(101L, 10),
+                ProductRankRedisEntry(102L, 5)
             )
 
             // when
@@ -46,7 +41,7 @@ class ProductRankServiceTest {
             // then
             assertThat(result).hasSize(2)
             assertThat(result[0].productId).isEqualTo(101)
-            verify(exactly = 1) { redisSortedSetRepository.getTopNWithScores(redisKey, 5) }
+            verify(exactly = 1) { productRankRepository.getTopNWithSalesCount(redisKey, 5) }
             verify(exactly = 0) { statisticService.getTop5PopularProductStatistics(any()) }
         }
 
@@ -59,8 +54,8 @@ class ProductRankServiceTest {
             val periodKey = "3d"
             val redisKey = "product:rank:$periodKey:${today.format(DateTimeFormatter.ofPattern("yyyyMMdd"))}"
 
-            every { redisRepository.exists(redisKey) } returns false
-            every { redisSortedSetRepository.getTopNWithScores(redisKey, 5) } returns emptyList()
+            every { productRankRepository.existsRankKey(redisKey) } returns false
+            every { productRankRepository.getTopNWithSalesCount(redisKey, 5) } returns emptyList()
 
             val expectedKeys = listOf(
                 today,
@@ -75,7 +70,7 @@ class ProductRankServiceTest {
 
             // then
             verify {
-                redisSortedSetRepository.unionAndStore(
+                productRankRepository.unionRanks(
                     expectedKeys,
                     redisKey,
                     match { it.toHours() < 24 }
@@ -92,11 +87,11 @@ class ProductRankServiceTest {
             val periodKey = "10d"
             val redisKey = "product:rank:$periodKey:${today.format(DateTimeFormatter.ofPattern("yyyyMMdd"))}"
 
-            every { redisRepository.exists(redisKey) } returns false
+            every { productRankRepository.existsRankKey(redisKey) } returns false
             every { statisticService.getTop5PopularProductStatistics(since) } returns listOf(
                 ProductInfo.Popular(301L, "청바지", 39000, 100)
             )
-            every { redisSortedSetRepository.add(any(), any(), any(), any()) } just Runs
+            every { productRankRepository.addRankEntry(any(), any(), any()) } just Runs
 
             // when
             val result = productRankService.getProductRanks(since, periodKey)
@@ -105,10 +100,9 @@ class ProductRankServiceTest {
             assertThat(result).hasSize(1)
             verify { statisticService.getTop5PopularProductStatistics(since) }
             verify {
-                redisSortedSetRepository.add(
+                productRankRepository.addRankEntry(
                     eq(redisKey),
-                    eq("301"),
-                    eq(100.0),
+                    eq(ProductRankRedisEntry(301L, 100)),
                     any()
                 )
             }
@@ -147,10 +141,10 @@ class ProductRankServiceTest {
 
             // then
             verify(exactly = 1) {
-                redisSortedSetRepository.unionAndStore(expected3dSrcKeys, expected3dDstKey, Duration.ofHours(25))
+                productRankRepository.unionRanks(expected3dSrcKeys, expected3dDstKey, Duration.ofHours(25))
             }
             verify(exactly = 1) {
-                redisSortedSetRepository.unionAndStore(expected1wSrcKeys, expected1wDstKey, Duration.ofHours(25))
+                productRankRepository.unionRanks(expected1wSrcKeys, expected1wDstKey, Duration.ofHours(25))
             }
         }
     }
