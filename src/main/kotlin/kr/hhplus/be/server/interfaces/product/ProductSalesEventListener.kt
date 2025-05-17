@@ -3,6 +3,7 @@ package kr.hhplus.be.server.interfaces.product
 import kr.hhplus.be.server.event.ProductEvent
 import kr.hhplus.be.server.infrastructure.redis.RedisRepository
 import kr.hhplus.be.server.infrastructure.redis.RedisSortedSetRepository
+import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
 import org.springframework.transaction.event.TransactionPhase
 import org.springframework.transaction.event.TransactionalEventListener
@@ -20,6 +21,7 @@ class ProductSalesEventListener(
         private val dateFormatter = DateTimeFormatter.ofPattern("yyyyMMdd")
     }
 
+    @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     fun handle(command: ProductEvent.SalesUpdated) {
         val today = dateFormatter.format(LocalDate.now())
