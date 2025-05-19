@@ -1,7 +1,7 @@
 package kr.hhplus.be.server.application.payment
 
 import kr.hhplus.be.server.application.dataplatform.DataPlatformSender
-import kr.hhplus.be.server.application.product.event.ProductSoldEvent
+import kr.hhplus.be.server.interfaces.product.ProductSoldEvent
 import kr.hhplus.be.server.domain.balance.BalanceHistory
 import kr.hhplus.be.server.domain.balance.BalanceHistoryService
 import kr.hhplus.be.server.domain.balance.BalanceService

@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.application.product.event
+package kr.hhplus.be.server.interfaces.product
 
 data class ProductSoldEvent(
     val items: List<SoldItem>

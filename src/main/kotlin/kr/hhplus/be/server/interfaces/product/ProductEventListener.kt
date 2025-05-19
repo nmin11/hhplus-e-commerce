@@ -1,6 +1,5 @@
-package kr.hhplus.be.server.application.product.event.listener
+package kr.hhplus.be.server.interfaces.product
 
-import kr.hhplus.be.server.application.product.event.ProductSoldEvent
 import kr.hhplus.be.server.domain.product.ProductRankRepository
 import kr.hhplus.be.server.infrastructure.product.ProductRankRedisEntry
 import org.springframework.scheduling.annotation.Async
@@ -22,7 +21,7 @@ class ProductEventListener(
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    fun handleProductSalesEvent(command: ProductSoldEvent) {
+    fun handleProductSoldEvent(command: ProductSoldEvent) {
         val today = dateFormatter.format(LocalDate.now())
         val redisKey = "product:sales:$today"
 
