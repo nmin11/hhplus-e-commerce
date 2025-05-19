@@ -1,7 +1,7 @@
-package kr.hhplus.be.server.interfaces.product
+package kr.hhplus.be.server.application.product.event.listener
 
+import kr.hhplus.be.server.application.product.event.ProductSoldEvent
 import kr.hhplus.be.server.domain.product.ProductRankRepository
-import kr.hhplus.be.server.event.ProductEvent
 import kr.hhplus.be.server.infrastructure.product.ProductRankRedisEntry
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
@@ -12,7 +12,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @Component
-class ProductSalesEventListener(
+class ProductEventListener(
     private val productRankRepository: ProductRankRepository
 ) {
     companion object {
@@ -22,7 +22,7 @@ class ProductSalesEventListener(
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    fun handle(command: ProductEvent.SalesUpdated) {
+    fun handleProductSalesEvent(command: ProductSoldEvent) {
         val today = dateFormatter.format(LocalDate.now())
         val redisKey = "product:sales:$today"
 

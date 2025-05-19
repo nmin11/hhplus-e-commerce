@@ -1,7 +1,7 @@
 package kr.hhplus.be.server.application.payment
 
 import kr.hhplus.be.server.application.dataplatform.DataPlatformSender
-import kr.hhplus.be.server.event.ProductEventFactory
+import kr.hhplus.be.server.application.product.event.ProductSoldEvent
 import kr.hhplus.be.server.domain.balance.BalanceHistory
 import kr.hhplus.be.server.domain.balance.BalanceHistoryService
 import kr.hhplus.be.server.domain.balance.BalanceService
@@ -28,7 +28,6 @@ class PaymentFacade(
     private val orderService: OrderService,
     private val paymentCommandFactory: PaymentCommandFactory,
     private val paymentService: PaymentService,
-    private val productCommandFactory: ProductEventFactory,
     private val statisticService: StatisticService,
     private val stockService: StockService,
     private val eventPublisher: ApplicationEventPublisher,
@@ -98,8 +97,15 @@ class PaymentFacade(
         }
 
         // 9. 일일 상품 판매량 집계
-        val salesEventCommand = productCommandFactory.from(orderItems)
-        eventPublisher.publishEvent(salesEventCommand)
+        val productSoldEvent = ProductSoldEvent(
+            orderItems.map {
+                ProductSoldEvent.SoldItem(
+                    productId = it.productOption.product.id,
+                    quantity = it.quantity
+                )
+            }
+        )
+        eventPublisher.publishEvent(productSoldEvent)
 
         // 10. 데이터 플랫폼 전송
         val orderCommand = paymentCommandFactory.from(order)
