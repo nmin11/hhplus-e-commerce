@@ -148,4 +148,60 @@ class ProductRankServiceTest {
             }
         }
     }
+
+    @Nested
+    inner class IncreaseProductRanks {
+        @Test
+        @DisplayName("Key 존재 시 모든 항목에 대해 increment 호출")
+        fun increaseProductRanks_shouldIncreaseAllItems() {
+            // given
+            every { productRankRepository.existsRankKey(any()) } returns true
+
+            val ranks = listOf(
+                ProductInfo.SalesIncrement(1L, 3),
+                ProductInfo.SalesIncrement(2L, 5)
+            )
+
+            // when
+            productRankService.increaseProductRanks(ranks)
+
+            // then
+            verify(exactly = 2) { productRankRepository.incrementProductSales(any(), any(), any()) }
+            verify(exactly = 0) { productRankRepository.addRankEntry(any(), any(), any()) }
+        }
+
+        @Test
+        @DisplayName("Key 없을 때 첫 항목은 add, 나머지는 increment")
+        fun increaseProductRanks_shouldAddAndIncreaseItems() {
+            // given
+            every { productRankRepository.existsRankKey(any()) } returns false
+
+            val ranks = listOf(
+                ProductInfo.SalesIncrement(1L, 3),
+                ProductInfo.SalesIncrement(2L, 5)
+            )
+
+            // when
+            productRankService.increaseProductRanks(ranks)
+
+            // then
+            verify(exactly = 1) {
+                productRankRepository.addRankEntry(any(), ProductRankRedisEntry(1L, 3), any())
+            }
+            verify(exactly = 1) {
+                productRankRepository.incrementProductSales(any(), 2L, 5)
+            }
+        }
+
+        @Test
+        @DisplayName("빈 리스트일 경우 어떤 작업도 수행되지 않음")
+        fun increaseProductRanks_shouldDoNothingWhenEmptyList() {
+            // when
+            productRankService.increaseProductRanks(emptyList())
+
+            // then
+            verify(exactly = 0) { productRankRepository.addRankEntry(any(), any(), any()) }
+            verify(exactly = 0) { productRankRepository.incrementProductSales(any(), any(), any()) }
+        }
+    }
 }
