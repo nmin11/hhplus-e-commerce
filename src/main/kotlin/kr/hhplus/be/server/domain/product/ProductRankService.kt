@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.domain.product
 
 import kr.hhplus.be.server.infrastructure.product.ProductRankRedisEntry
+import kr.hhplus.be.server.interfaces.product.ProductPaymentEventListener
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.Duration
@@ -18,6 +19,7 @@ class ProductRankService(
         private const val DST_KEY_PATTERN = "product:rank:%s:%s"
         private const val SRC_KEY_PATTERN = "product:sales:%s"
         private val SCHEDULED_TTL = Duration.ofHours(25)
+        private val DAILY_RANK_TTL = Duration.ofDays(8)
         private val dateFormatter = DateTimeFormatter.ofPattern("yyyyMMdd")
     }
 
@@ -62,6 +64,28 @@ class ProductRankService(
 
         productRankRepository.unionRanks(threeDaysRankSrcKeys, threeDaysRankDstKey, SCHEDULED_TTL)
         productRankRepository.unionRanks(sevenDaysRankSrcKeys, sevenDaysRankDstKey, SCHEDULED_TTL)
+    }
+
+    fun increaseProductRanks(ranks: List<ProductInfo.SalesIncrement>) {
+        val today = dateFormatter.format(LocalDate.now())
+        val redisKey = SRC_KEY_PATTERN.format(today)
+        val keyExists = productRankRepository.existsRankKey(redisKey)
+
+        if (keyExists) {
+            ranks.forEach {
+                productRankRepository.incrementProductSales(redisKey, it.productId, it.quantity)
+            }
+        } else {
+            // Key가 존재하지 않는 경우, 최초 한번은 TTL을 적용해서 삽입
+            ranks.firstOrNull()?.let { first ->
+                val entry = ProductRankRedisEntry(first.productId, first.quantity)
+                productRankRepository.addRankEntry(redisKey, entry, DAILY_RANK_TTL)
+            }
+
+            ranks.drop(1).forEach {
+                productRankRepository.incrementProductSales(redisKey, it.productId, it.quantity)
+            }
+        }
     }
 
     private fun ttlForPeriodKey(periodKey: String): Duration {

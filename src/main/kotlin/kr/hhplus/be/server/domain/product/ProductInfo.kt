@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.product
 
+import kr.hhplus.be.server.domain.payment.PaymentCompletedEvent
 import kr.hhplus.be.server.infrastructure.product.PopularProductRecord
 import kr.hhplus.be.server.infrastructure.product.ProductRankRedisEntry
 
@@ -31,6 +32,20 @@ sealed class ProductInfo {
                 return Rank(
                     productId = entry.productId,
                     totalSales = entry.totalSales
+                )
+            }
+        }
+    }
+
+    data class SalesIncrement(
+        val productId: Long,
+        val quantity: Int
+    ) {
+        companion object {
+            fun from(item: PaymentCompletedEvent.Item): SalesIncrement {
+                return SalesIncrement(
+                    productId = item.productId,
+                    quantity = item.quantity
                 )
             }
         }
