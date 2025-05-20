@@ -1,5 +1,7 @@
 package kr.hhplus.be.server.application.payment
 
+import com.ninjasquad.springmockk.SpykBean
+import io.mockk.verify
 import kr.hhplus.be.server.domain.balance.Balance
 import kr.hhplus.be.server.domain.balance.BalanceRepository
 import kr.hhplus.be.server.domain.coupon.*
@@ -8,6 +10,8 @@ import kr.hhplus.be.server.domain.customer.CustomerRepository
 import kr.hhplus.be.server.domain.order.Order
 import kr.hhplus.be.server.domain.order.OrderItemInfo
 import kr.hhplus.be.server.domain.order.OrderRepository
+import kr.hhplus.be.server.domain.payment.PaymentCompletedEvent
+import kr.hhplus.be.server.domain.payment.PaymentEventPublisher
 import kr.hhplus.be.server.domain.product.*
 import kr.hhplus.be.server.support.exception.balance.BalanceInsufficientException
 import kr.hhplus.be.server.support.exception.coupon.CustomerCouponAlreadyUsedException
@@ -22,10 +26,13 @@ import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.event.ApplicationEvents
+import org.springframework.test.context.event.RecordApplicationEvents
 import java.time.LocalDate
 
 @SpringBootTest
 @ActiveProfiles("test")
+@RecordApplicationEvents
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class PaymentFacadeIntegrationTest @Autowired constructor(
     private val paymentFacade: PaymentFacade,
@@ -38,6 +45,12 @@ class PaymentFacadeIntegrationTest @Autowired constructor(
     private val customerCouponRepository: CustomerCouponRepository,
     private val orderRepository: OrderRepository
 ) {
+    @Autowired
+    lateinit var applicationEvents: ApplicationEvents
+
+    @SpykBean
+    lateinit var paymentEventPublisher: PaymentEventPublisher
+
     private lateinit var product: Product
     private lateinit var option: ProductOption
     private lateinit var stock: Stock
@@ -94,6 +107,15 @@ class PaymentFacadeIntegrationTest @Autowired constructor(
         assertThat(result.originalPrice).isEqualTo(110_000)
         assertThat(result.discountAmount).isEqualTo(11_000)
         assertThat(result.discountedPrice).isEqualTo(99_000)
+
+        // Event 전송 테스트
+        verify(exactly = 1) {
+            paymentEventPublisher.publish(
+                match { it.orderId == order.id }
+            )
+        }
+        assertThat(applicationEvents.stream(PaymentCompletedEvent::class.java))
+            .anyMatch { it.orderId == order.id }
     }
 
     @Test
@@ -123,6 +145,15 @@ class PaymentFacadeIntegrationTest @Autowired constructor(
         assertThat(result.originalPrice).isEqualTo(110_000)
         assertThat(result.discountAmount).isEqualTo(0)
         assertThat(result.discountedPrice).isEqualTo(110_000)
+
+        // Event 전송 테스트
+        verify(exactly = 1) {
+            paymentEventPublisher.publish(
+                match { it.orderId == order.id }
+            )
+        }
+        assertThat(applicationEvents.stream(PaymentCompletedEvent::class.java))
+            .anyMatch { it.orderId == order.id }
     }
 
     @Test
