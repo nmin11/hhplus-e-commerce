@@ -1,7 +1,5 @@
 package kr.hhplus.be.server.application.payment
 
-import kr.hhplus.be.server.application.dataplatform.DataPlatformSender
-import kr.hhplus.be.server.interfaces.product.ProductSoldEvent
 import kr.hhplus.be.server.domain.balance.BalanceHistory
 import kr.hhplus.be.server.domain.balance.BalanceHistoryService
 import kr.hhplus.be.server.domain.balance.BalanceService
@@ -9,13 +7,14 @@ import kr.hhplus.be.server.domain.coupon.CouponService
 import kr.hhplus.be.server.domain.coupon.CustomerCouponService
 import kr.hhplus.be.server.domain.order.OrderService
 import kr.hhplus.be.server.domain.payment.Payment
+import kr.hhplus.be.server.domain.payment.PaymentCompletedEvent
+import kr.hhplus.be.server.domain.payment.PaymentEventPublisher
 import kr.hhplus.be.server.domain.payment.PaymentService
 import kr.hhplus.be.server.domain.product.Statistic
 import kr.hhplus.be.server.domain.product.StatisticService
 import kr.hhplus.be.server.domain.product.StockService
 import kr.hhplus.be.server.support.aop.DistributedLock
 import kr.hhplus.be.server.support.lock.LockType
-import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
@@ -26,12 +25,10 @@ class PaymentFacade(
     private val couponService: CouponService,
     private val customerCouponService: CustomerCouponService,
     private val orderService: OrderService,
-    private val paymentCommandFactory: PaymentCommandFactory,
     private val paymentService: PaymentService,
     private val statisticService: StatisticService,
     private val stockService: StockService,
-    private val eventPublisher: ApplicationEventPublisher,
-    private val dataPlatformSender: DataPlatformSender
+    private val paymentEventPublisher: PaymentEventPublisher
 ) {
     @Transactional
     @DistributedLock(resourceName = "orderId", key = "#command.orderId", lockType = LockType.PUBSUB)
@@ -96,20 +93,9 @@ class PaymentFacade(
             statisticService.record(stat)
         }
 
-        // 9. 일일 상품 판매량 집계
-        val productSoldEvent = ProductSoldEvent(
-            orderItems.map {
-                ProductSoldEvent.SoldItem(
-                    productId = it.productOption.product.id,
-                    quantity = it.quantity
-                )
-            }
-        )
-        eventPublisher.publishEvent(productSoldEvent)
-
-        // 10. 데이터 플랫폼 전송
-        val orderCommand = paymentCommandFactory.from(order)
-        dataPlatformSender.send(orderCommand)
+        // 9. 결제 완료 이벤트 전송
+        val paymentCompletedEvent = PaymentCompletedEvent.from(order)
+        paymentEventPublisher.publish(paymentCompletedEvent)
 
         return PaymentResult.from(payment)
     }
