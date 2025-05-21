@@ -2,17 +2,27 @@ package kr.hhplus.be.server.application.payment
 
 import com.ninjasquad.springmockk.SpykBean
 import io.mockk.verify
+import io.mockk.verifyOrder
 import kr.hhplus.be.server.domain.balance.Balance
 import kr.hhplus.be.server.domain.balance.BalanceRepository
+import kr.hhplus.be.server.domain.balance.event.BalanceDeductRequestedEvent
 import kr.hhplus.be.server.domain.coupon.*
+import kr.hhplus.be.server.domain.coupon.event.CouponRollbackRequestedEvent
+import kr.hhplus.be.server.domain.coupon.event.CouponUseRequestedEvent
 import kr.hhplus.be.server.domain.customer.Customer
 import kr.hhplus.be.server.domain.customer.CustomerRepository
 import kr.hhplus.be.server.domain.order.Order
 import kr.hhplus.be.server.domain.order.OrderItemInfo
 import kr.hhplus.be.server.domain.order.OrderRepository
 import kr.hhplus.be.server.domain.payment.PaymentCompletedEvent
-import kr.hhplus.be.server.domain.payment.PaymentEventPublisher
+import kr.hhplus.be.server.domain.payment.event.PaymentCreateRequestedEvent
+import kr.hhplus.be.server.domain.payment.event.PaymentCreatedEvent
+import kr.hhplus.be.server.domain.payment.event.PaymentEventPublisher
+import kr.hhplus.be.server.domain.payment.event.PaymentInitiatedEvent
 import kr.hhplus.be.server.domain.product.*
+import kr.hhplus.be.server.domain.product.event.StatisticRecordRequestedEvent
+import kr.hhplus.be.server.domain.product.event.StockDecreaseRequestedEvent
+import kr.hhplus.be.server.domain.product.event.StockRollbackRequestedEvent
 import kr.hhplus.be.server.support.exception.balance.BalanceInsufficientException
 import kr.hhplus.be.server.support.exception.coupon.CustomerCouponAlreadyUsedException
 import kr.hhplus.be.server.support.exception.order.OrderNotPayableException
@@ -29,6 +39,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.event.ApplicationEvents
 import org.springframework.test.context.event.RecordApplicationEvents
 import java.time.LocalDate
+import kotlin.jvm.java
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -109,13 +120,16 @@ class PaymentFacadeIntegrationTest @Autowired constructor(
         assertThat(result.discountedPrice).isEqualTo(99_000)
 
         // Event 전송 테스트
-        verify(exactly = 1) {
-            paymentEventPublisher.publish(
-                match { it.orderId == order.id }
-            )
+        verifyOrder {
+            paymentEventPublisher.publish(ofType(PaymentInitiatedEvent::class))
+            paymentEventPublisher.publish(ofType(StockDecreaseRequestedEvent::class))
+            paymentEventPublisher.publish(ofType(CouponUseRequestedEvent::class))
+            paymentEventPublisher.publish(ofType(BalanceDeductRequestedEvent::class))
+            paymentEventPublisher.publish(ofType(PaymentCreateRequestedEvent::class))
+            paymentEventPublisher.publish(ofType(PaymentCreatedEvent::class))
+            paymentEventPublisher.publish(ofType(StatisticRecordRequestedEvent::class))
+            paymentEventPublisher.publish(ofType(PaymentCompletedEvent::class))
         }
-        assertThat(applicationEvents.stream(PaymentCompletedEvent::class.java))
-            .anyMatch { it.orderId == order.id }
     }
 
     @Test
@@ -147,13 +161,15 @@ class PaymentFacadeIntegrationTest @Autowired constructor(
         assertThat(result.discountedPrice).isEqualTo(110_000)
 
         // Event 전송 테스트
-        verify(exactly = 1) {
-            paymentEventPublisher.publish(
-                match { it.orderId == order.id }
-            )
+        verifyOrder {
+            paymentEventPublisher.publish(ofType(PaymentInitiatedEvent::class))
+            paymentEventPublisher.publish(ofType(StockDecreaseRequestedEvent::class))
+            paymentEventPublisher.publish(ofType(BalanceDeductRequestedEvent::class))
+            paymentEventPublisher.publish(ofType(PaymentCreateRequestedEvent::class))
+            paymentEventPublisher.publish(ofType(PaymentCreatedEvent::class))
+            paymentEventPublisher.publish(ofType(StatisticRecordRequestedEvent::class))
+            paymentEventPublisher.publish(ofType(PaymentCompletedEvent::class))
         }
-        assertThat(applicationEvents.stream(PaymentCompletedEvent::class.java))
-            .anyMatch { it.orderId == order.id }
     }
 
     @Test
@@ -247,6 +263,8 @@ class PaymentFacadeIntegrationTest @Autowired constructor(
         // when & then
         assertThatThrownBy { paymentFacade.pay(command) }
             .isInstanceOf(CustomerCouponAlreadyUsedException::class.java)
+
+        assertThat(applicationEvents.stream(StockRollbackRequestedEvent::class.java)).hasSize(1)
     }
 
     @Test
@@ -259,6 +277,18 @@ class PaymentFacadeIntegrationTest @Autowired constructor(
         balance = Balance.create(customer, 0)  // 잔액 없음
         balanceRepository.save(balance)
 
+        val coupon = Coupon.createRateDiscount(
+            name = "10-percent-discount",
+            rate = 10,
+            quantity = 10,
+            startedAt = LocalDate.now().minusDays(1),
+            expiredAt = LocalDate.now().plusDays(7)
+        )
+        couponRepository.save(coupon)
+
+        val customerCoupon = CustomerCoupon.issue(customer, coupon)
+        customerCouponRepository.save(customerCoupon)
+
         val order = Order.createWithItems(customer, listOf(
             OrderItemInfo(option, quantity = 2)
         ))
@@ -266,11 +296,14 @@ class PaymentFacadeIntegrationTest @Autowired constructor(
 
         val command = PaymentCommand(
             orderId = order.id,
-            couponId = null
+            couponId = coupon.id
         )
 
         // when & then
         assertThatThrownBy { paymentFacade.pay(command) }
             .isInstanceOf(BalanceInsufficientException::class.java)
+
+        assertThat(applicationEvents.stream(CouponRollbackRequestedEvent::class.java)).hasSize(1)
+        assertThat(applicationEvents.stream(StockRollbackRequestedEvent::class.java)).hasSize(1)
     }
 }
