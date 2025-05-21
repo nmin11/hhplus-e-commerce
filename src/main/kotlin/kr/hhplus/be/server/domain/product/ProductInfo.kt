@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.product
 
+import kr.hhplus.be.server.domain.order.Order
 import kr.hhplus.be.server.domain.payment.PaymentCompletedEvent
 import kr.hhplus.be.server.infrastructure.product.PopularProductRecord
 import kr.hhplus.be.server.infrastructure.product.ProductRankRedisEntry
@@ -47,6 +48,22 @@ sealed class ProductInfo {
                     productId = item.productId,
                     quantity = item.quantity
                 )
+            }
+        }
+    }
+
+    data class StockItem(
+        val productOptionId: Long,
+        val quantity: Int
+    ) {
+        companion object {
+            fun from(order: Order): List<StockItem> {
+                return order.orderItems.map {
+                    StockItem(
+                        productOptionId = it.productOption.id,
+                        quantity = it.quantity
+                    )
+                }
             }
         }
     }
