@@ -94,7 +94,6 @@ class Coupon private constructor(
     }
 
     fun calculateDiscount(totalPrice: Int): Int {
-        validatePeriod()
         return discountPolicy.calculateDiscount(totalPrice)
     }
 

@@ -17,10 +17,13 @@ class CustomerCouponService(
         return customerCouponRepository.findAllByCustomerId(customerId)
     }
 
-    fun validateIssuedCoupon(customerId: Long, couponId: Long): CustomerCoupon {
-        val customerCoupon = customerCouponRepository.findByCustomerIdAndCouponId(customerId, couponId)
+    fun getIssuedCoupon(customerId: Long, couponId: Long): CustomerCoupon {
+        return customerCouponRepository.findByCustomerIdAndCouponId(customerId, couponId)
             ?: throw CustomerCouponNotFoundException()
+    }
 
+    fun validateIssuedCoupon(customerId: Long, couponId: Long): CustomerCoupon {
+        val customerCoupon = getIssuedCoupon(customerId, couponId)
         return customerCoupon.validateUsable()
     }
 
@@ -49,5 +52,11 @@ class CustomerCouponService(
         } catch (_: ObjectOptimisticLockingFailureException) {
             throw CustomerCouponConflictException()
         }
+    }
+
+    @Transactional
+    fun rollbackUse(customerCoupon: CustomerCoupon) {
+        customerCoupon.rollbackUse()
+        customerCouponRepository.save(customerCoupon)
     }
 }

@@ -132,6 +132,23 @@ class CustomerCouponTest {
     }
 
     @Nested
+    inner class RollbackUse {
+        @Test
+        @DisplayName("사용된 쿠폰을 AVAILABLE 상태로 롤백한다")
+        fun shouldRollbackUsedCouponToAvailableStatus() {
+            // given
+            val customerCoupon = CustomerCoupon.issue(customer, coupon)
+            customerCoupon.markAsUsed() // 먼저 사용 처리
+
+            // when
+            customerCoupon.rollbackUse()
+
+            // then
+            assertThat(customerCoupon.status).isEqualTo(CustomerCouponStatus.AVAILABLE)
+        }
+    }
+
+    @Nested
     inner class ValidateUsable {
         @Test
         @DisplayName("AVAILABLE 상태이면 반환된다")
