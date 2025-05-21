@@ -11,4 +11,8 @@ class PaymentRepositoryImpl(
     override fun save(payment: Payment): Payment {
         return paymentJpaRepository.save(payment)
     }
+
+    override fun deleteById(id: Long) {
+        paymentJpaRepository.deleteById(id)
+    }
 }

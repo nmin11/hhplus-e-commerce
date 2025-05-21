@@ -11,4 +11,9 @@ class PaymentService(
     fun create(payment: Payment): Payment {
         return paymentRepository.save(payment)
     }
+
+    @Transactional
+    fun deleteById(id: Long) {
+        return paymentRepository.deleteById(id)
+    }
 }
