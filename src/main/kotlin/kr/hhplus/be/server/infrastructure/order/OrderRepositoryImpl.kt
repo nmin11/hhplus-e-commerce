@@ -15,4 +15,8 @@ class OrderRepositoryImpl(
     override fun findById(id: Long): Order? {
         return orderJpaRepository.findById(id).orElse(null)
     }
+
+    override fun findByIdWithDetails(id: Long): Order? {
+        return orderJpaRepository.findByIdWithDetails(id)
+    }
 }

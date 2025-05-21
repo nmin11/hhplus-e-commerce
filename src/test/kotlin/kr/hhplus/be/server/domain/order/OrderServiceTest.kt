@@ -90,7 +90,7 @@ class OrderServiceTest {
                 status = OrderStatus.CREATED
             }
 
-            every { orderRepository.findById(orderId) } returns order
+            every { orderRepository.findByIdWithDetails(orderId) } returns order
 
             // when
             val result = orderService.getValidOrderForPayment(orderId)
@@ -110,7 +110,7 @@ class OrderServiceTest {
                 status = OrderStatus.PAID
             }
 
-            every { orderRepository.findById(orderId) } returns order
+            every { orderRepository.findByIdWithDetails(orderId) } returns order
 
             // when
             val exception = assertThrows<OrderNotPayableException> {
@@ -127,7 +127,7 @@ class OrderServiceTest {
         fun throwException_whenOrderNotFound() {
             // given
             val orderId = 1L
-            every { orderRepository.findById(orderId) } returns null
+            every { orderRepository.findByIdWithDetails(orderId) } returns null
 
             // when
             val exception = assertThrows<OrderNotFoundException> {
