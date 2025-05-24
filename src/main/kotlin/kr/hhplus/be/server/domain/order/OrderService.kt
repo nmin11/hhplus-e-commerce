@@ -19,8 +19,13 @@ class OrderService(
             ?: throw OrderNotFoundException()
     }
 
+    fun getByIdWithDetails(id: Long): Order {
+        return orderRepository.findByIdWithDetails(id)
+            ?: throw OrderNotFoundException()
+    }
+
     fun getValidOrderForPayment(orderId: Long): Order {
-        val order = getById(orderId)
+        val order = getByIdWithDetails(orderId)
         if (order.status != OrderStatus.CREATED) {
             throw OrderNotPayableException(order.status.name)
         }

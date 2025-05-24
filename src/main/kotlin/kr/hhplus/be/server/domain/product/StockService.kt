@@ -28,6 +28,13 @@ class StockService(
         stockRepository.save(stock)
     }
 
+    @Transactional
+    fun increase(productOptionId: Long, quantity: Int) {
+        val stock = getByProductOptionId(productOptionId)
+        stock.increase(quantity)
+        stockRepository.save(stock)
+    }
+
     private fun getByProductOptionIdWithLock(productOptionId: Long): Stock {
         return stockRepository.findByProductOptionIdWithLock(productOptionId)
             ?: throw StockNotFoundException()

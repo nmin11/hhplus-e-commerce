@@ -36,4 +36,8 @@ class Stock private constructor(
 
         quantity -= quantityToDecrease
     }
+
+    fun increase(quantityToIncrease: Int) {
+        quantity += quantityToIncrease
+    }
 }

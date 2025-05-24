@@ -20,13 +20,13 @@ class MockApiDataPlatformSenderTest {
     @DisplayName("RestClient 가 올바르게 호출되면 정상 수행")
     fun send_shouldPostOrderData() {
         // given
-        val command = DataPlatformCommand.Order(
+        val command = DataPlatformCommand.OrderPayload(
             orderId = 123L,
             customerId = 1L,
             totalPrice = 40_000,
             createdAt = "2025-04-10T10:00:00",
             items = listOf(
-                DataPlatformCommand.OrderItem(
+                DataPlatformCommand.OrderPayloadItem(
                     productName = "청바지",
                     optionName = "M",
                     quantity = 1,

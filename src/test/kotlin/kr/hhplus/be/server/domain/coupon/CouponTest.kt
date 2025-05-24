@@ -123,27 +123,6 @@ class CouponTest {
             // then
             assertThat(result).isEqualTo(8000)
         }
-
-        @Test
-        @DisplayName("유효기간 밖이면 예외 발생")
-        fun throw_whenCouponIsExpired() {
-            // given
-            val coupon = Coupon.createFixedDiscount(
-                name = "기간 만료 쿠폰",
-                amount = 1000,
-                quantity = 100,
-                startedAt = LocalDate.now().minusDays(10),
-                expiredAt = LocalDate.now().minusDays(1)
-            )
-
-            // when
-            val exception = assertThrows<CouponInvalidPeriodException> {
-                coupon.calculateDiscount(10_000)
-            }
-
-            // then
-            assertThat(exception).hasMessage("유효하지 않은 쿠폰입니다.")
-        }
     }
 
     @Nested

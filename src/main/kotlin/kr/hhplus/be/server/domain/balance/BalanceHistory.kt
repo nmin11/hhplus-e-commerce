@@ -47,5 +47,14 @@ class BalanceHistory private constructor(
                 totalAmount = updatedAmount
             )
         }
+
+        fun rollback(customer: Customer, amount: Int, updatedAmount: Int): BalanceHistory {
+            return BalanceHistory(
+                customer = customer,
+                changeType = BalanceChangeType.ROLLBACK,
+                changeAmount = amount,
+                totalAmount = updatedAmount
+            )
+        }
     }
 }

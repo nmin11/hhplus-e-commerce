@@ -9,6 +9,7 @@ import kr.hhplus.be.server.support.exception.coupon.CustomerCouponAlreadyUsedExc
 import kr.hhplus.be.server.support.exception.coupon.CustomerCouponExpiredException
 import kr.hhplus.be.server.support.exception.coupon.CustomerCouponNotFoundException
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -58,6 +59,58 @@ class CustomerCouponServiceTest {
             // then
             assertThat(result).isEqualTo(expectedCoupons)
             verify(exactly = 1) { customerCouponRepository.findAllByCustomerId(customerId) }
+        }
+    }
+
+    @Nested
+    inner class GetIssuedCoupon {
+        private val customerId = 1L
+        private val couponId = 10L
+
+        @Test
+        @DisplayName("고객과 쿠폰 ID에 해당하는 CustomerCoupon이 존재하면 반환")
+        fun returnIssuedCoupon_whenExists() {
+            // given
+            val customer = Customer.create("tester")
+            val coupon = Coupon.createFixedDiscount(
+                name = "정상 쿠폰",
+                amount = 5000,
+                quantity = 100,
+                startedAt = LocalDate.now().minusDays(1),
+                expiredAt = LocalDate.now().plusDays(7)
+            )
+            val customerCoupon = CustomerCoupon.issue(customer, coupon)
+
+            every {
+                customerCouponRepository.findByCustomerIdAndCouponId(customerId, couponId)
+            } returns customerCoupon
+
+            // when
+            val result = customerCouponService.getIssuedCoupon(customerId, couponId)
+
+            // then
+            assertThat(result).isEqualTo(customerCoupon)
+            verify(exactly = 1) {
+                customerCouponRepository.findByCustomerIdAndCouponId(customerId, couponId)
+            }
+        }
+
+        @Test
+        @DisplayName("해당하는 CustomerCoupon이 없을 경우 예외 발생")
+        fun throwException_whenCouponNotFound() {
+            // given
+            every {
+                customerCouponRepository.findByCustomerIdAndCouponId(customerId, couponId)
+            } returns null
+
+            // expect
+            assertThatThrownBy {
+                customerCouponService.getIssuedCoupon(customerId, couponId)
+            }.isInstanceOf(CustomerCouponNotFoundException::class.java)
+
+            verify(exactly = 1) {
+                customerCouponRepository.findByCustomerIdAndCouponId(customerId, couponId)
+            }
         }
     }
 
@@ -252,6 +305,35 @@ class CustomerCouponServiceTest {
 
             assertThat(used.status).isEqualTo(CustomerCouponStatus.USED)
             verify { customerCouponRepository.saveAll(listOf(used)) }
+        }
+    }
+
+    @Nested
+    inner class RollbackUse {
+        @Test
+        @DisplayName("사용된 쿠폰을 AVAILABLE 상태로 롤백하고 저장한다")
+        fun rollbackUsedCoupon_shouldSetStatusToAvailableAndSave() {
+            // given
+            val customer = Customer.create("tester")
+            val coupon = Coupon.createFixedDiscount(
+                name = "테스트 쿠폰",
+                amount = 3000,
+                quantity = 10,
+                startedAt = LocalDate.now().minusDays(1),
+                expiredAt = LocalDate.now().plusDays(1)
+            )
+            val customerCoupon = CustomerCoupon.issue(customer, coupon).apply {
+                markAsUsed()
+            }
+
+            every { customerCouponRepository.save(customerCoupon) } returns customerCoupon
+
+            // when
+            customerCouponService.rollbackUse(customerCoupon)
+
+            // then
+            assertThat(customerCoupon.status).isEqualTo(CustomerCouponStatus.AVAILABLE)
+            verify(exactly = 1) { customerCouponRepository.save(customerCoupon) }
         }
     }
 }

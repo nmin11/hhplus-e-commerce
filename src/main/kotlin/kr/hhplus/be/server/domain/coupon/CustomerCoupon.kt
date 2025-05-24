@@ -63,6 +63,10 @@ class CustomerCoupon private constructor(
         status = CustomerCouponStatus.USED
     }
 
+    fun rollbackUse() {
+        status = CustomerCouponStatus.AVAILABLE
+    }
+
     fun validateUsable(): CustomerCoupon {
         checkValidation()
         return this

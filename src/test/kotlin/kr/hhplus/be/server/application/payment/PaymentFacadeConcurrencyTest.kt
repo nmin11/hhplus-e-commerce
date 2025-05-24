@@ -12,8 +12,8 @@ import kr.hhplus.be.server.domain.order.Order
 import kr.hhplus.be.server.domain.order.OrderItemInfo
 import kr.hhplus.be.server.domain.order.OrderRepository
 import kr.hhplus.be.server.domain.product.*
+import kr.hhplus.be.server.support.exception.balance.BalanceDeductFailedException
 import kr.hhplus.be.server.support.exception.coupon.CustomerCouponConflictException
-import kr.hhplus.be.server.support.exception.order.OrderNotPayableException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -68,6 +68,9 @@ class PaymentFacadeConcurrencyTest @Autowired constructor(
         orderRepository.save(order)
     }
 
+    /*
+     * 잔액 차감에 대한 낙관적 락 테스트
+     */
     @Test
     @DisplayName("동일한 주문에 대해 동시에 결제를 시도하면 1건만 성공하고 예외 발생")
     fun concurrentPayment_shouldCauseRaceCondition() {
@@ -95,11 +98,13 @@ class PaymentFacadeConcurrencyTest @Autowired constructor(
         executor.shutdown()
 
         // then
-        // 분산 락 적용에 따라 공유 자원 접근이 성립되지 않음
-        assertThat(exceptions.count { it is OrderNotPayableException })
+        assertThat(exceptions.count { it is BalanceDeductFailedException })
             .isEqualTo(numberOfThreads - 1)
     }
 
+    /*
+     * 사용자 쿠폰 사용에 대한 낙관적 락 테스트
+     */
     @Test
     @DisplayName("동일 사용자가 하나의 쿠폰으로 여러 결제를 동시에 시도하면 1건만 성공하고 예외 발생")
     fun concurrentCouponUsage_shouldAllowOnlyOnePayment() {

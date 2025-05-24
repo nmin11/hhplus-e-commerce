@@ -17,7 +17,7 @@ class MockApiDataPlatformSender(
 ) : DataPlatformSender {
     private val log = LoggerFactory.getLogger(MockApiDataPlatformSender::class.java)
 
-    override fun send(command: DataPlatformCommand.Order) {
+    override fun send(command: DataPlatformCommand.OrderPayload) {
         try {
             val response = restClient.post()
                 .uri(apiUrl)

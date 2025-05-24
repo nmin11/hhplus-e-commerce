@@ -138,4 +138,40 @@ class StockServiceTest {
                 .isInstanceOf(StockNotFoundException::class.java)
         }
     }
+
+    @Nested
+    inner class Increase {
+        @Test
+        @DisplayName("정상적인 재고 증가가 이루어짐")
+        fun increaseStockSuccessfully() {
+            // given
+            val optionId = 1L
+            val stock = spyk(Stock.create(productOption = mockk(), quantity = 5))
+            every { stockRepository.findByProductOptionId(optionId) } returns stock
+            every { stockRepository.save(stock) } returns stock
+
+            // when
+            stockService.increase(optionId, 3)
+
+            // then
+            verify { stock.increase(3) }
+            verify(exactly = 1) { stockRepository.save(stock) }
+        }
+
+        @Test
+        @DisplayName("재고 정보가 없으면 예외 발생")
+        fun whenStockNotFound_shouldThrowException() {
+            // given
+            val optionId = 1L
+            every { stockRepository.findByProductOptionId(optionId) } returns null
+
+            // when
+            val exception = assertThrows<StockNotFoundException> {
+                stockService.increase(optionId, 1)
+            }
+
+            // then
+            assertThat(exception).isInstanceOf(StockNotFoundException::class.java)
+        }
+    }
 }
