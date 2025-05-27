@@ -1,7 +1,6 @@
 package kr.hhplus.be.server.application.payment
 
 import com.ninjasquad.springmockk.SpykBean
-import io.mockk.verify
 import io.mockk.verifyOrder
 import kr.hhplus.be.server.domain.balance.Balance
 import kr.hhplus.be.server.domain.balance.BalanceRepository
@@ -61,6 +60,9 @@ class PaymentFacadeIntegrationTest @Autowired constructor(
 
     @SpykBean
     lateinit var paymentEventPublisher: PaymentEventPublisher
+
+    @SpykBean(name = "kafkaPaymentEventPublisher")
+    lateinit var kafkaPaymentEventPublisher: PaymentEventPublisher
 
     private lateinit var product: Product
     private lateinit var option: ProductOption
@@ -128,7 +130,7 @@ class PaymentFacadeIntegrationTest @Autowired constructor(
             paymentEventPublisher.publish(ofType(PaymentCreateRequestedEvent::class))
             paymentEventPublisher.publish(ofType(PaymentCreatedEvent::class))
             paymentEventPublisher.publish(ofType(StatisticRecordRequestedEvent::class))
-            paymentEventPublisher.publish(ofType(PaymentCompletedEvent::class))
+            kafkaPaymentEventPublisher.publish(ofType(PaymentCompletedEvent::class))
         }
     }
 
@@ -168,7 +170,7 @@ class PaymentFacadeIntegrationTest @Autowired constructor(
             paymentEventPublisher.publish(ofType(PaymentCreateRequestedEvent::class))
             paymentEventPublisher.publish(ofType(PaymentCreatedEvent::class))
             paymentEventPublisher.publish(ofType(StatisticRecordRequestedEvent::class))
-            paymentEventPublisher.publish(ofType(PaymentCompletedEvent::class))
+            kafkaPaymentEventPublisher.publish(ofType(PaymentCompletedEvent::class))
         }
     }
 
