@@ -64,13 +64,18 @@ dependencies {
 	// Cache
 	implementation("com.github.ben-manes.caffeine:caffeine:3.2.0")
 
+	// Kafka
+	implementation("org.springframework.kafka:spring-kafka")
+
 	// Docs
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6")
 
 	// Test
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.boot:spring-boot-testcontainers")
+	testImplementation("org.springframework.kafka:spring-kafka-test")
 	testImplementation("org.testcontainers:junit-jupiter")
+	testImplementation("org.testcontainers:kafka:1.19.3")
 	testImplementation("org.testcontainers:mysql")
 	testImplementation("com.ninja-squad:springmockk:4.0.2")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")

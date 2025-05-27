@@ -5,11 +5,12 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.testcontainers.containers.GenericContainer
+import org.testcontainers.containers.KafkaContainer
 import org.testcontainers.containers.MySQLContainer
 import org.testcontainers.utility.DockerImageName
 
 @Configuration
-class TestcontainersConfiguration {
+class TestContainersConfiguration {
     companion object {
         private val mysqlContainer: MySQLContainer<*> = MySQLContainer(DockerImageName.parse("mysql:8.0"))
             .withDatabaseName("hhplus")
@@ -20,9 +21,12 @@ class TestcontainersConfiguration {
             .withExposedPorts(6379)
             .withCommand("redis-server --requirepass root")
 
+        private val kafkaContainer = KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:latest"))
+
         init {
             mysqlContainer.start()
             redisContainer.start()
+            kafkaContainer.start()
         }
 
         @JvmStatic
@@ -36,6 +40,9 @@ class TestcontainersConfiguration {
             // Redis
             registry.add("spring.redis.host") { redisContainer.host }
             registry.add("spring.redis.port") { redisContainer.getMappedPort(6379).toString() }
+
+            // Kafka
+            registry.add("spring.kafka.bootstrap-servers") { kafkaContainer.bootstrapServers }
         }
     }
 
@@ -43,5 +50,6 @@ class TestcontainersConfiguration {
     fun preDestroy() {
         if (mysqlContainer.isRunning) mysqlContainer.stop()
         if (redisContainer.isRunning) redisContainer.stop()
+        if (kafkaContainer.isRunning) kafkaContainer.stop()
     }
 }

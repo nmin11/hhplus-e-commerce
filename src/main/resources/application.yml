@@ -24,6 +24,32 @@ spring:
     host: localhost
     port: 6379
     password: root
+  kafka:
+    bootstrap-servers: localhost:9094
+    properties:
+      request.timeout.ms: 20000
+      retry.backoff.ms: 500
+      auto:
+        create.topics.enable: false
+        register.schemas: false
+        offset.reset: latest
+      use.latest.version: true
+      basic.auth.credentials.source: USER_INFO
+    producer:
+      client-id: coupon-service-producer
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      retries: 5
+    consumer:
+      group-id: coupon-service-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+        enable-auto-commit: false
+    listener:
+      ack-mode: manual
+      concurrency: 2
 
 external:
   data-platform:
