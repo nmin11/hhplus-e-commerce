@@ -1,3 +1,7 @@
+import org.testcontainers.containers.MySQLContainer
+import org.testcontainers.utility.DockerImageName
+import java.sql.DriverManager
+
 plugins {
 	kotlin("jvm") version "2.1.0"
 	kotlin("kapt") version "2.1.0"
@@ -81,27 +85,66 @@ dependencies {
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
+sourceSets["main"].java {
+    srcDir("build/generated/jooq/main")
+}
+
 tasks.withType<Test> {
 	useJUnitPlatform()
 	systemProperty("user.timezone", "UTC")
 }
 
+val mySqlContainer: MySQLContainer<*> = MySQLContainer(DockerImageName.parse("mysql:8.0"))
+    .withDatabaseName("hhplus")
+    .withUsername("root")
+    .withPassword("root")
+    .withReuse(true)
+extra["mySqlContainer"] = mySqlContainer
+
+tasks.register("startMysqlContainer") {
+    doFirst {
+        mySqlContainer.start()
+
+        val connection = DriverManager.getConnection(
+            mySqlContainer.jdbcUrl,
+            mySqlContainer.username,
+            mySqlContainer.password
+        )
+        val ddl = file("src/main/resources/database/schema.sql").readText()
+        connection.use { conn ->
+            conn.createStatement().use { stmt -> stmt.execute(ddl) }
+        }
+    }
+}
+
 jooq {
-    version.set("3.19.22")
+    version.set("3.19.2")
     configurations {
         create("main") {
-            generateSchemaSourceOnCompilation.set(true)
+            generateSchemaSourceOnCompilation.set(false)
+        }
+    }
+}
+
+tasks.named("generateJooq") {
+    dependsOn("startMysqlContainer")
+
+    doFirst {
+        val container = extra["mySqlContainer"] as MySQLContainer<*>
+        val extension = extensions.getByType(nu.studer.gradle.jooq.JooqExtension::class.java)
+
+        extension.configurations.named("main").configure {
             jooqConfiguration.apply {
                 jdbc.apply {
                     driver = "com.mysql.cj.jdbc.Driver"
-                    url = "jdbc:mysql://localhost:3306/hhplus"
-                    user = "root"
-                    password = "root"
+                    url = container.jdbcUrl
+                    user = container.username
+                    password = container.password
                 }
                 generator.apply {
                     database.apply {
                         name = "org.jooq.meta.mysql.MySQLDatabase"
-                        inputSchema = "hhplus"
+                        inputSchema = container.databaseName
                     }
                     generate.apply {
                         isDeprecated = false
@@ -116,5 +159,10 @@ jooq {
                 }
             }
         }
+    }
+
+    doLast {
+        val container = extra["mySqlContainer"] as MySQLContainer<*>
+        if (container.isRunning) container.stop()
     }
 }

@@ -16,17 +16,24 @@ class TestContainersConfiguration {
             .withDatabaseName("hhplus")
             .withUsername("test")
             .withPassword("test")
+            .apply { start() }
 
         private val redisContainer = GenericContainer(DockerImageName.parse("redis:latest"))
             .withExposedPorts(6379)
             .withCommand("redis-server --requirepass root")
+            .apply { start() }
 
         private val kafkaContainer = KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:latest"))
+            .apply { start() }
 
         init {
-            mysqlContainer.start()
-            redisContainer.start()
-            kafkaContainer.start()
+            System.setProperty("spring.datasource.url", mysqlContainer.jdbcUrl + "?characterEncoding=UTF-8&serverTimezone=UTC")
+            System.setProperty("spring.datasource.username", mysqlContainer.username)
+            System.setProperty("spring.datasource.password", mysqlContainer.password)
+            System.setProperty("jakarta.persistence.jdbc.url", mysqlContainer.jdbcUrl)
+            System.setProperty("spring.redis.host", redisContainer.host)
+            System.setProperty("spring.redis.port", redisContainer.firstMappedPort.toString())
+            System.setProperty("spring.kafka.bootstrap-servers", kafkaContainer.bootstrapServers)
         }
 
         @JvmStatic
