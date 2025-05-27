@@ -10,12 +10,14 @@ data class PaymentCompletedEvent(
     val createdAt: LocalDateTime,
     val items: List<Item>
 ) {
+    constructor() : this(0L, 0L, 0, LocalDateTime.now(), emptyList())
+
     data class Item(
-        val productId: Long,
-        val productName: String,
-        val optionName: String,
-        val quantity: Int,
-        val subtotalPrice: Int
+        val productId: Long = 0L,
+        val productName: String = "",
+        val optionName: String = "",
+        val quantity: Int = 0,
+        val subtotalPrice: Int = 0
     )
 
     companion object {

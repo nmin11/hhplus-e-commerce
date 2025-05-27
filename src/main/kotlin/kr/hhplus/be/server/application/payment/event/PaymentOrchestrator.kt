@@ -22,12 +22,15 @@ import kr.hhplus.be.server.domain.product.event.StockDecreasedEvent
 import kr.hhplus.be.server.domain.product.event.StockRollbackRequestedEvent
 import kr.hhplus.be.server.support.exception.payment.PaymentResultNotReadyException
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 
 @Component
 class PaymentOrchestrator(
-    private val paymentEventPublisher: PaymentEventPublisher
+    private val paymentEventPublisher: PaymentEventPublisher,
+    @Qualifier("kafkaPaymentEventPublisher")
+    private val kafkaPaymentEventPublisher: PaymentEventPublisher
 ) {
     private val log = LoggerFactory.getLogger(PaymentOrchestrator::class.java)
 
@@ -134,7 +137,7 @@ class PaymentOrchestrator(
         context.completeStep(PaymentStep.STATISTIC_RECORDED)
 
         val paymentCompletedEvent = PaymentCompletedEvent.from(context.order)
-        paymentEventPublisher.publish(paymentCompletedEvent)
+        kafkaPaymentEventPublisher.publish(paymentCompletedEvent)
         log.info("[Orchestrator] 결제 완료")
     }
 
