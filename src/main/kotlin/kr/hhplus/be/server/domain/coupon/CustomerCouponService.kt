@@ -38,6 +38,11 @@ class CustomerCouponService(
     }
 
     @Transactional
+    fun issueAll(customerCoupons: List<CustomerCoupon>) {
+        customerCouponRepository.saveAll(customerCoupons)
+    }
+
+    @Transactional
     fun updateAsExpired(coupons: List<Coupon>) {
         val expiredCustomerCoupons = customerCouponRepository.findAllByCouponIn(coupons)
         expiredCustomerCoupons.forEach { it.expireIfAvailable() }
