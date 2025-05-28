@@ -32,8 +32,7 @@ interface CouponApi {
                     {
                       "couponId": 2001,
                       "customerId": 1,
-                      "status": "ISSUED",
-                      "issuedAt": "2025-04-02T15:00:00Z"
+                      "status": "AVAILABLE"
                     }
                     """
                         )]

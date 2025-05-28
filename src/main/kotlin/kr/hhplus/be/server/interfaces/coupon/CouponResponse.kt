@@ -7,16 +7,14 @@ sealed class CouponResponse {
     data class Issue(
         val couponId: Long,
         val customerId: Long,
-        val status: String,
-        val issuedAt: String
+        val status: String
     ) {
         companion object {
             fun from(result: CouponResult.Issue): Issue {
                 return Issue(
                     couponId = result.couponId,
                     customerId = result.customerId,
-                    status = result.status,
-                    issuedAt = result.issuedAt
+                    status = result.status
                 )
             }
         }
