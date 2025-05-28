@@ -15,5 +15,6 @@ class CouponScheduler(
     fun expireCoupons() {
         val expiredCoupons = couponService.getExpiredCoupons()
         customerCouponService.updateAsExpired(expiredCoupons)
+        couponService.deleteCouponKeys(expiredCoupons.map { it.id.toString() })
     }
 }

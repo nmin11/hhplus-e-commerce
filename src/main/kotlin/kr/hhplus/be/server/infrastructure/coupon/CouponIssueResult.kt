@@ -5,6 +5,7 @@ enum class CouponIssueResult(val code: Long) {
     NON_FOUND(-1L),
     ALREADY_ISSUED(-2L),
     INSUFFICIENT(-3L),
+    EXPIRED(-4L),
     UNKNOWN(0L);
 
     companion object {

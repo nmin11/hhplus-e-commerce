@@ -1,7 +1,12 @@
 -- KEYS[1] = coupon:stock:{couponId}
 -- KEYS[2] = coupon:issued:{couponId}
 -- ARGV[1] = customerId
--- ARGV[2] = TTL seconds
+
+-- 쿠폰 TTL이 이미 만료되었는지 확인
+local ttl = redis.call("PTTL", KEYS[1])
+if ttl <= 0 then
+    return -4
+end
 
 -- 사용자의 쿠폰 보유 여부 확인
 if redis.call("SISMEMBER", KEYS[2], ARGV[1]) == 1 then
@@ -20,7 +25,6 @@ if tonumber(stock) < 0 then return -3
 end
 
 -- 사용자에게 쿠폰 발급
-if redis.call("SADD", KEYS[2], ARGV[1]) == 1 then
-    redis.call("EXPIRE", KEYS[2], ARGV[2])
-end
+redis.call("SADD", KEYS[2], ARGV[1])
+
 return 1

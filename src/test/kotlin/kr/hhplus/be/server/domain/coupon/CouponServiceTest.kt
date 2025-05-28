@@ -98,19 +98,19 @@ class CouponServiceTest {
     @Nested
     inner class DecreaseQuantity {
         @Test
-        @DisplayName("쿠폰 수량이 남아 있는 경우 수량을 1 줄이고 저장")
+        @DisplayName("쿠폰 수량이 남아 있는 경우 수량을 줄이고 저장")
         fun decreaseQuantity_shouldReduceAndSave() {
             // given
             val coupon = mockk<Coupon>(relaxed = true)
 
-            every { coupon.decreaseQuantity() } just Runs
+            every { coupon.decreaseQuantity(5) } just Runs
             every { couponRepository.save(coupon) } returns coupon
 
             // when
-            couponService.decreaseQuantity(coupon)
+            couponService.decreaseQuantity(coupon, 5)
 
             // then
-            verify(exactly = 1) { coupon.decreaseQuantity() }
+            verify(exactly = 1) { coupon.decreaseQuantity(5) }
         }
     }
 
@@ -119,23 +119,15 @@ class CouponServiceTest {
         private val couponId = 1L
         private val customerId = 100L
 
-        private fun mockCoupon(): Coupon {
-            val coupon = mockk<Coupon>(relaxed = true)
-            every { coupon.id } returns couponId
-            every { coupon.expiredAt } returns LocalDate.now().plusDays(1)
-            return coupon
-        }
-
         @Test
         @DisplayName("쿠폰 발급 성공 시 예외 없이 통과")
         fun shouldSucceed_whenRedisReturnsSuccess() {
             // given
-            val coupon = mockCoupon()
-            every { couponRepository.issue(coupon, customerId) } returns CouponIssueResult.SUCCESS
+            every { couponRepository.issue(couponId, customerId) } returns CouponIssueResult.SUCCESS
 
             // when & then
             assertThatCode {
-                couponService.issue(coupon, customerId)
+                couponService.issue(couponId, customerId)
             }.doesNotThrowAnyException()
         }
 
@@ -143,12 +135,11 @@ class CouponServiceTest {
         @DisplayName("쿠폰 정보가 존재하지 않을 경우 예외 발생")
         fun shouldThrow_whenCouponNotExist() {
             // given
-            val coupon = mockCoupon()
-            every { couponRepository.issue(coupon, customerId) } returns CouponIssueResult.NON_FOUND
+            every { couponRepository.issue(couponId, customerId) } returns CouponIssueResult.NON_FOUND
 
             // when & then
             assertThatThrownBy {
-                couponService.issue(coupon, customerId)
+                couponService.issue(couponId, customerId)
             }.isInstanceOf(CouponNotFoundException::class.java)
         }
 
@@ -156,12 +147,11 @@ class CouponServiceTest {
         @DisplayName("이미 발급된 쿠폰일 경우 예외 발생")
         fun shouldThrow_whenAlreadyIssued() {
             // given
-            val coupon = mockCoupon()
-            every { couponRepository.issue(coupon, customerId) } returns CouponIssueResult.ALREADY_ISSUED
+            every { couponRepository.issue(couponId, customerId) } returns CouponIssueResult.ALREADY_ISSUED
 
             // when & then
             assertThatThrownBy {
-                couponService.issue(coupon, customerId)
+                couponService.issue(couponId, customerId)
             }.isInstanceOf(CustomerCouponAlreadyIssuedException::class.java)
         }
 
@@ -169,12 +159,11 @@ class CouponServiceTest {
         @DisplayName("쿠폰 수량 부족 시 예외 발생")
         fun shouldThrow_whenCouponInsufficient() {
             // given
-            val coupon = mockCoupon()
-            every { couponRepository.issue(coupon, customerId) } returns CouponIssueResult.INSUFFICIENT
+            every { couponRepository.issue(couponId, customerId) } returns CouponIssueResult.INSUFFICIENT
 
             // when & then
             assertThatThrownBy {
-                couponService.issue(coupon, customerId)
+                couponService.issue(couponId, customerId)
             }.isInstanceOf(CouponInsufficientException::class.java)
         }
 
@@ -182,13 +171,33 @@ class CouponServiceTest {
         @DisplayName("기타 예외 상황 발생 시 CouponIssueFailedException 발생")
         fun shouldThrow_whenUnknownErrorOccurs() {
             // given
-            val coupon = mockCoupon()
-            every { couponRepository.issue(coupon, customerId) } returns CouponIssueResult.UNKNOWN
+            every { couponRepository.issue(couponId, customerId) } returns CouponIssueResult.UNKNOWN
 
             // when & then
             assertThatThrownBy {
-                couponService.issue(coupon, customerId)
+                couponService.issue(couponId, customerId)
             }.isInstanceOf(CouponIssueFailedException::class.java)
+        }
+    }
+
+    @Nested
+    inner class DeleteCouponKeys {
+        @Test
+        @DisplayName("쿠폰 ID 리스트에 해당하는 Redis 키를 삭제한다")
+        fun deleteKeys_givenCouponIds_shouldCallRepositoryDelete() {
+            // given
+            val couponIds = listOf("1", "2", "3")
+            val expectedKeys = couponIds.map { "coupon:issued:$it" }
+
+            every { couponRepository.deleteKey(any()) } just Runs
+
+            // when
+            couponService.deleteCouponKeys(couponIds)
+
+            // then
+            expectedKeys.forEach { key ->
+                verify(exactly = 1) { couponRepository.deleteKey(key) }
+            }
         }
     }
 }

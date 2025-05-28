@@ -8,5 +8,6 @@ interface CouponRepository {
     fun findById(id: Long): Coupon?
     fun findAllByExpiredAtBefore(expiredAt: LocalDate): List<Coupon>
     fun findByIdWithLock(id: Long): Coupon?
-    fun issue(coupon: Coupon, customerId: Long): CouponIssueResult
+    fun issue(couponId: Long, customerId: Long): CouponIssueResult
+    fun deleteKey(couponKey: String)
 }

@@ -6,9 +6,7 @@ import kr.hhplus.be.server.infrastructure.redis.lua.LuaScriptId
 import kr.hhplus.be.server.infrastructure.redis.lua.LuaScriptRegistry
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.stereotype.Repository
-import java.time.Duration
 import java.time.LocalDate
-import java.time.LocalDateTime
 
 @Repository
 class CouponRepositoryImpl(
@@ -32,22 +30,22 @@ class CouponRepositoryImpl(
         return couponJpaRepository.findByIdWithLock(id)
     }
 
-    override fun issue(coupon: Coupon, customerId: Long): CouponIssueResult {
+    override fun issue(couponId: Long, customerId: Long): CouponIssueResult {
         val script = luaScriptRegistry.getScript(LuaScriptId.COUPON_ISSUE, Long::class.java)
-        val now = LocalDateTime.now()
-        val expireAt = coupon.expiredAt.atStartOfDay()
-        val ttl = Duration.between(now, expireAt).coerceAtLeast(Duration.ZERO)
 
         val result = stringRedisTemplate.execute(
             script,
             listOf(
-                "coupon:stock:${coupon.id}",
-                "coupon:issued:${coupon.id}"
+                "coupon:stock:${couponId}",
+                "coupon:issued:${couponId}"
             ),
-            customerId.toString(),
-            ttl.seconds.toString()
+            customerId.toString()
         )
 
         return CouponIssueResult.fromCode(result)
+    }
+
+    override fun deleteKey(couponKey: String) {
+        stringRedisTemplate.delete(couponKey)
     }
 }

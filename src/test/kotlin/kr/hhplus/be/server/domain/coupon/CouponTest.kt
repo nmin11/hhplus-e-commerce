@@ -59,7 +59,7 @@ class CouponTest {
                 expiredAt = expiredAt
             )
 
-            coupon.decreaseQuantity()
+            coupon.decreaseQuantity(1)
         }
 
         @Test
@@ -76,7 +76,7 @@ class CouponTest {
 
             // when
             val exception = assertThrows<CouponInsufficientException> {
-                coupon.decreaseQuantity()
+                coupon.decreaseQuantity(3)
             }
 
             // then

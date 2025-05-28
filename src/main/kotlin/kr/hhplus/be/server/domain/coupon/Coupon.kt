@@ -85,12 +85,9 @@ class Coupon private constructor(
         }
     }
 
-    fun decreaseQuantity() {
-        if (currentQuantity <= 0) {
-            throw CouponInsufficientException()
-        }
-
-        currentQuantity -= 1
+    fun decreaseQuantity(quantity: Int) {
+        if (quantity > currentQuantity) throw CouponInsufficientException()
+        currentQuantity -= quantity
     }
 
     fun calculateDiscount(totalPrice: Int): Int {

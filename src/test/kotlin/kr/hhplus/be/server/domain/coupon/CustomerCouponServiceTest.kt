@@ -256,6 +256,43 @@ class CustomerCouponServiceTest {
     }
 
     @Nested
+    inner class IssueAll {
+        @Test
+        @DisplayName("여러 개의 CustomerCoupon 객체를 저장")
+        fun saveAllCustomerCoupons() {
+            // given
+            val customer = Customer.create("tester")
+            val coupon1 = Coupon.createFixedDiscount(
+                name = "5천원 할인",
+                amount = 5000,
+                quantity = 100,
+                startedAt = LocalDate.now().minusDays(1),
+                expiredAt = LocalDate.now().plusDays(5)
+            )
+            val coupon2 = Coupon.createFixedDiscount(
+                name = "1만원 할인",
+                amount = 10000,
+                quantity = 50,
+                startedAt = LocalDate.now().minusDays(2),
+                expiredAt = LocalDate.now().plusDays(3)
+            )
+
+            val customerCoupons = listOf(
+                CustomerCoupon.issue(customer, coupon1),
+                CustomerCoupon.issue(customer, coupon2)
+            )
+
+            every { customerCouponRepository.saveAll(customerCoupons) } returns customerCoupons
+
+            // when
+            customerCouponService.issueAll(customerCoupons)
+
+            // then
+            verify(exactly = 1) { customerCouponRepository.saveAll(customerCoupons) }
+        }
+    }
+
+    @Nested
     inner class UpdateAsExpired {
         @Test
         @DisplayName("AVAILABLE 상태인 쿠폰은 EXPIRED 로 갱신된다")
