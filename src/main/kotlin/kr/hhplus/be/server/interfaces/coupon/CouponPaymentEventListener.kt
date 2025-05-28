@@ -5,6 +5,7 @@ import kr.hhplus.be.server.domain.coupon.event.CouponUseRequestedEvent
 import kr.hhplus.be.server.domain.coupon.event.CouponUsedEvent
 import kr.hhplus.be.server.domain.coupon.CustomerCouponService
 import kr.hhplus.be.server.domain.coupon.event.CouponRollbackRequestedEvent
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional
 @Component
 class CouponPaymentEventListener(
     private val customerCouponService: CustomerCouponService,
+    @Qualifier("springCouponEventPublisher")
     private val couponEventPublisher: CouponEventPublisher
 ) {
     @Transactional
