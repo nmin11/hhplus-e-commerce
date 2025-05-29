@@ -5,9 +5,11 @@ import kr.hhplus.be.server.domain.coupon.CouponRepository
 import kr.hhplus.be.server.domain.coupon.CustomerCouponRepository
 import kr.hhplus.be.server.domain.customer.Customer
 import kr.hhplus.be.server.domain.customer.CustomerRepository
+import kr.hhplus.be.server.interfaces.kafka.KafkaTestListener
 import kr.hhplus.be.server.support.exception.coupon.CouponInsufficientException
 import kr.hhplus.be.server.support.exception.coupon.CustomerCouponAlreadyIssuedException
 import org.assertj.core.api.Assertions.assertThat
+import org.awaitility.Awaitility.await
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -20,6 +22,7 @@ import java.time.LocalDate
 import java.util.Collections
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -86,11 +89,17 @@ class CouponFacadeConcurrencyTest @Autowired constructor(
         executor.shutdown()
 
         // then
-        val issuedCoupons = customerCouponRepository.findAllByCustomerId(customer.id)
-        println("발급된 쿠폰 개수: ${issuedCoupons.size}")
-        assertThat(issuedCoupons.size).isEqualTo(1)
         assertThat(exceptions.count { it is CustomerCouponAlreadyIssuedException })
             .isEqualTo(numberOfThreads - 1)
+
+        await()
+            .pollInterval(Duration.ofMillis(500))
+            .atMost(30, TimeUnit.SECONDS)
+            .untilAsserted {
+                val issuedCoupons = customerCouponRepository.findAllByCustomerId(customer.id)
+                println("발급된 쿠폰 개수: ${issuedCoupons.size}")
+                assertThat(issuedCoupons.size).isEqualTo(1)
+            }
     }
 
     @Test
@@ -125,10 +134,16 @@ class CouponFacadeConcurrencyTest @Autowired constructor(
         executor.shutdown()
 
         // then
-        val issuedCoupons = customerCouponRepository.findAllByCouponIn(listOf(coupon))
-        println("발급된 쿠폰 개수: ${issuedCoupons.size}")
-        assertThat(issuedCoupons.size).isEqualTo(coupon.totalQuantity)
         assertThat(exceptions.count { it is CouponInsufficientException })
             .isEqualTo(numberOfThreads - coupon.totalQuantity)
+
+        await()
+            .pollInterval(Duration.ofMillis(500))
+            .atMost(30, TimeUnit.SECONDS)
+            .untilAsserted {
+                val issuedCoupons = customerCouponRepository.findAllByCouponIn(listOf(coupon))
+                println("발급된 쿠폰 개수: ${issuedCoupons.size}")
+                assertThat(issuedCoupons.size).isEqualTo(coupon.totalQuantity)
+            }
     }
 }

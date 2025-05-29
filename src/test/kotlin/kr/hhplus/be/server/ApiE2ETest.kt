@@ -12,6 +12,7 @@ import kr.hhplus.be.server.domain.product.*
 import kr.hhplus.be.server.interfaces.coupon.CouponRequest
 import kr.hhplus.be.server.interfaces.order.OrderRequest
 import kr.hhplus.be.server.interfaces.payment.PaymentRequest
+import org.awaitility.Awaitility.await
 import org.hamcrest.CoreMatchers.hasItems
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -29,6 +30,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPat
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.Duration
 import java.time.LocalDate
+import java.util.concurrent.TimeUnit
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -245,17 +247,23 @@ class ApiE2ETest @Autowired constructor(
             .andExpect(jsonPath("$.status").value("AVAILABLE"))
 
         // 8. 보유 쿠폰 목록
-        mockMvc.perform(get("/coupons/customer/${customer.id}"))
-            .andExpect(status().isOk)
-            .andExpect(jsonPath("$.length()").value(2))
-            .andExpect(jsonPath("$[0].name").value("첫 구매 할인"))
-            .andExpect(jsonPath("$[0].discountType").value("FIXED"))
-            .andExpect(jsonPath("$[0].discountAmount").value(3_000))
-            .andExpect(jsonPath("$[0].status").value("USED"))
-            .andExpect(jsonPath("$[1].name").value("봄맞이 프로모션"))
-            .andExpect(jsonPath("$[1].discountType").value("RATE"))
-            .andExpect(jsonPath("$[1].discountAmount").value(10))
-            .andExpect(jsonPath("$[1].status").value("AVAILABLE"))
+        // Kafka 배치 작업 대기 로직
+        await()
+            .pollInterval(Duration.ofMillis(250))
+            .atMost(5, TimeUnit.SECONDS)
+            .untilAsserted {
+                mockMvc.perform(get("/coupons/customer/${customer.id}"))
+                    .andExpect(status().isOk)
+                    .andExpect(jsonPath("$.length()").value(2))
+                    .andExpect(jsonPath("$[0].name").value("첫 구매 할인"))
+                    .andExpect(jsonPath("$[0].discountType").value("FIXED"))
+                    .andExpect(jsonPath("$[0].discountAmount").value(3_000))
+                    .andExpect(jsonPath("$[0].status").value("USED"))
+                    .andExpect(jsonPath("$[1].name").value("봄맞이 프로모션"))
+                    .andExpect(jsonPath("$[1].discountType").value("RATE"))
+                    .andExpect(jsonPath("$[1].discountAmount").value(10))
+                    .andExpect(jsonPath("$[1].status").value("AVAILABLE"))
+            }
 
         // 9. 잔액 조회
         mockMvc.perform(get("/balances/${customer.id}"))

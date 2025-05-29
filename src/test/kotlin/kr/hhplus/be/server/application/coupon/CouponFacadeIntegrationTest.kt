@@ -10,6 +10,7 @@ import kr.hhplus.be.server.support.exception.coupon.CouponInsufficientException
 import kr.hhplus.be.server.support.exception.coupon.CouponInvalidPeriodException
 import kr.hhplus.be.server.support.exception.coupon.CustomerCouponAlreadyIssuedException
 import org.assertj.core.api.Assertions.assertThat
+import org.awaitility.Awaitility.await
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.DisplayName
@@ -22,6 +23,7 @@ import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.test.context.ActiveProfiles
 import java.time.Duration
 import java.time.LocalDate
+import java.util.concurrent.TimeUnit
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -77,9 +79,14 @@ class CouponFacadeIntegrationTest @Autowired constructor(
         assertThat(result.customerId).isEqualTo(customer.id)
         assertThat(result.couponId).isEqualTo(coupon.id)
 
-        val customerCoupon = customerCouponRepository.findByCustomerIdAndCouponId(customer.id, coupon.id)
-        assertThat(customerCoupon).isNotNull
-        assertThat(customerCoupon!!.status.name).isEqualTo("AVAILABLE")
+        await()
+            .pollInterval(Duration.ofMillis(500))
+            .atMost(30, TimeUnit.SECONDS)
+            .untilAsserted {
+                val customerCoupon = customerCouponRepository.findByCustomerIdAndCouponId(customer.id, coupon.id)
+                assertThat(customerCoupon).isNotNull
+                assertThat(customerCoupon!!.status.name).isEqualTo("AVAILABLE")
+            }
     }
 
     @Test
