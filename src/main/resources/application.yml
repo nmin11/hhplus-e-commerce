@@ -36,12 +36,12 @@ spring:
       use.latest.version: true
       basic.auth.credentials.source: USER_INFO
     producer:
-      client-id: coupon-service-producer
+      client-id: e-commerce-service-producer
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       retries: 5
     consumer:
-      group-id: coupon-service-group
+      group-id: e-commerce-service-group
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:

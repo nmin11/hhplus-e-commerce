@@ -21,50 +21,50 @@ class KafkaPaymentEventPublisher(
     private val kafkaTemplate: KafkaTemplate<String, Any>
 ) : PaymentEventPublisher {
     override fun publish(event: PaymentInitiatedEvent) {
-        kafkaTemplate.send("payment-initiated-topic", event)
+        kafkaTemplate.send("inside.payment.initiated", event)
     }
 
     override fun publish(event: StockDecreaseRequestedEvent) {
-        kafkaTemplate.send("stock-decrease-requested-topic", event)
+        kafkaTemplate.send("inside.stock.decrease-requested", event)
     }
 
     override fun publish(event: CouponUseRequestedEvent) {
-        kafkaTemplate.send("coupon-use-requested-topic", event)
+        kafkaTemplate.send("inside.coupon.use-requested", event)
     }
 
     override fun publish(event: BalanceDeductRequestedEvent) {
-        kafkaTemplate.send("balance-deduct-requested-topic", event)
+        kafkaTemplate.send("inside.balance.deduct-requested", event)
     }
 
     override fun publish(event: PaymentCreateRequestedEvent) {
-        kafkaTemplate.send("payment-create-requested-topic", event)
+        kafkaTemplate.send("inside.payment.create-requested", event)
     }
 
     override fun publish(event: PaymentCreatedEvent) {
-        kafkaTemplate.send("payment-created-topic", event)
+        kafkaTemplate.send("inside.payment.created", event)
     }
 
     override fun publish(event: StatisticRecordRequestedEvent) {
-        kafkaTemplate.send("statistic-record-requested-topic", event)
+        kafkaTemplate.send("inside.statistic.record-requested", event)
     }
 
     override fun publish(event: PaymentCompletedEvent) {
-        kafkaTemplate.send("payment-completed-topic", event)
+        kafkaTemplate.send("inside.payment.completed", event)
     }
 
     override fun publish(event: StockRollbackRequestedEvent) {
-        kafkaTemplate.send("stock-rollback-requested-topic", event)
+        kafkaTemplate.send("inside.stock.rollback-requested", event)
     }
 
     override fun publish(event: CouponRollbackRequestedEvent) {
-        kafkaTemplate.send("coupon-rollback-requested-topic", event)
+        kafkaTemplate.send("inside.coupon.rollback-requested", event)
     }
 
     override fun publish(event: BalanceRollbackRequestedEvent) {
-        kafkaTemplate.send("balance-rollback-requested-topic", event)
+        kafkaTemplate.send("inside.balance.rollback-requested", event)
     }
 
     override fun publish(event: PaymentRollbackRequestedEvent) {
-        kafkaTemplate.send("payment-rollback-requested-topic", event)
+        kafkaTemplate.send("inside.payment.rollback-requested", event)
     }
 }

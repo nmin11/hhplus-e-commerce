@@ -13,20 +13,19 @@ class DataPlatformPaymentKafkaListener(
     private val dataPlatformSender: DataPlatformSender
 ) {
     companion object {
-        private const val TOPIC_NAME = "payment-completed-topic"
-        private const val GROUP_ID = "data-platform-consumer-group"
+        private const val TOPIC_NAME = "inside.payment.completed"
+        private const val GROUP_ID = "data-platform-group"
     }
 
     private val log = LoggerFactory.getLogger(javaClass)
 
     @KafkaListener(topics = [TOPIC_NAME], groupId = GROUP_ID)
-    fun listen(event: PaymentCompletedEvent, acknowledgment: Acknowledgment) {
+    fun listen(event: PaymentCompletedEvent, ack: Acknowledgment) {
         log.info("[Kafka] [DataPlatform] 결제 완료 이벤트 수신")
 
         val orderPayload = DataPlatformCommand.OrderPayload.from(event)
         dataPlatformSender.send(orderPayload)
 
-        log.info("[Kafka] [DataPlatform] 데이터 플랫폼에 주문 정보 전송 완료")
-        acknowledgment.acknowledge()
+        ack.acknowledge()
     }
 }

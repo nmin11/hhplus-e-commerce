@@ -13,14 +13,14 @@ class ProductPaymentKafkaListener(
     private val productRankService: ProductRankService
 ) {
     companion object {
-        private const val TOPIC_NAME = "payment-completed-topic"
-        private const val GROUP_ID = "product-rank-consumer-group"
+        private const val TOPIC_NAME = "inside.payment.completed"
+        private const val GROUP_ID = "product-rank-service-group"
     }
 
     private val log = LoggerFactory.getLogger(javaClass)
 
     @KafkaListener(topics = [TOPIC_NAME], groupId = GROUP_ID)
-    fun listen(event: PaymentCompletedEvent, acknowledgment: Acknowledgment) {
+    fun listen(event: PaymentCompletedEvent, ack: Acknowledgment) {
         log.info("[Kafka] [ProductRank] 결제 완료 이벤트 수신")
 
         val increments = event.items.map {
@@ -28,7 +28,6 @@ class ProductPaymentKafkaListener(
         }
         productRankService.increaseProductRanks(increments)
 
-        log.info("[Kafka] [ProductRank] 상품 랭킹 정보 업데이트 완료")
-        acknowledgment.acknowledge()
+        ack.acknowledge()
     }
 }
