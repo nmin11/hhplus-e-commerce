@@ -19,12 +19,13 @@ class CouponKafkaListener(
 ) {
     companion object {
         private const val TOPIC_NAME = "inside.coupon.issued"
+        private const val GROUP_ID = "coupon-service-group"
     }
 
     private val log = LoggerFactory.getLogger(javaClass)
 
     @Transactional
-    @KafkaListener(topics = [TOPIC_NAME])
+    @KafkaListener(topics = [TOPIC_NAME], groupId = GROUP_ID, batch = "true")
     fun listen(events: List<CouponIssuedEvent>, ack: Acknowledgment) {
         log.info("[Kafka] [Coupon] 쿠폰 발급 메시지 수신: size=${events.size}")
 

@@ -50,7 +50,6 @@ spring:
         max.poll.records: 100
         fetch.max.wait.ms: 500
     listener:
-      type: batch
       ack-mode: manual
       concurrency: 2
 
