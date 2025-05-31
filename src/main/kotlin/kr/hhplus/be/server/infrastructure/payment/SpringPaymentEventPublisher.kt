@@ -14,10 +14,12 @@ import kr.hhplus.be.server.domain.product.event.StatisticRecordRequestedEvent
 import kr.hhplus.be.server.domain.product.event.StockDecreaseRequestedEvent
 import kr.hhplus.be.server.domain.product.event.StockRollbackRequestedEvent
 import org.springframework.context.ApplicationEventPublisher
+import org.springframework.context.annotation.Primary
 import org.springframework.stereotype.Component
 
 @Component
-class PaymentEventPublisherImpl(
+@Primary
+class SpringPaymentEventPublisher(
     private val eventPublisher: ApplicationEventPublisher
 ) : PaymentEventPublisher {
     override fun publish(event: PaymentInitiatedEvent) {

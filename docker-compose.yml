@@ -32,7 +32,7 @@ services:
       - INFLUXDB_ADMIN_USER=admin
       - INFLUXDB_ADMIN_PASSWORD=root
     volumes:
-      - influxdb_data:/var/lib/influxdb
+      - influxdb-data:/var/lib/influxdb
 
   grafana:
     image: grafana/grafana
@@ -43,12 +43,28 @@ services:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=root
     volumes:
-      - grafana_data:/var/lib/grafana
+      - grafana-data:/var/lib/grafana
+
+  kafka:
+    image: public.ecr.aws/bitnami/kafka:3.5.1
+    ports:
+      - "9094:9094"
+    volumes:
+      - kafka-data:/bitnami/kafka
+    environment:
+      KAFKA_CFG_NODE_ID: 0
+      KAFKA_CFG_PROCESS_ROLES: controller,broker
+      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:9094
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,EXTERNAL://localhost:9094
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 0@127.0.0.1:9093
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
 
 networks:
   default:
     driver: bridge
 
 volumes:
-  influxdb_data:
-  grafana_data:
+  influxdb-data:
+  grafana-data:
+  kafka-data:

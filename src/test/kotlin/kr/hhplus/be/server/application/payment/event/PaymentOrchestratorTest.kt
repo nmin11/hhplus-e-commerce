@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test
 
 class PaymentOrchestratorTest {
     private val paymentEventPublisher = mockk<PaymentEventPublisher>(relaxed = true)
-    private val orchestrator = PaymentOrchestrator(paymentEventPublisher)
+    private val orchestrator = PaymentOrchestrator(paymentEventPublisher, paymentEventPublisher)
 
     private val order = mockk<Order>(relaxed = true) {
         every { id } returns 1L
