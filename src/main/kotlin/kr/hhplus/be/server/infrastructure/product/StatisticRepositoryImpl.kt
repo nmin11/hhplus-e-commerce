@@ -7,14 +7,14 @@ import java.time.LocalDateTime
 
 @Repository
 class StatisticRepositoryImpl(
-    private val statisticJpaRepository: StatisticJpaRepository,
-    private val statisticJooqRepository: StatisticJooqRepository
+    private val statisticJpaRepository: StatisticJpaRepository
 ) : StatisticRepository {
     override fun save(statistic: Statistic): Statistic {
         return statisticJpaRepository.save(statistic)
     }
 
     override fun findTop5ProductSales(since: LocalDateTime): List<PopularProductRecord> {
-        return statisticJooqRepository.findTop5ProductSales(since)
+        return statisticJpaRepository.findTop5PopularProducts(since)
+            .map { PopularProductRecord.from(it) }
     }
 }

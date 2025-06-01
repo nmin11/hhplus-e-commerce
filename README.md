@@ -1,7 +1,7 @@
 # 테스트 실행 방법
 
 - 테스트 시 Docker 기반 테스트 컨테이너를 구동하기 때문에 Docker 실행 필요 (Docker Desktop 등)
-- 이후 프로젝트에서 직접 테스트를 실행하거나, 혹은 아래와 같은 명령어로 테스트 실행
+- 이후 `./gradlew build` 명령어로 빌드 및 테스트 진행
 
 ```sh
 ./gradlew test

@@ -1,7 +1,3 @@
-import org.testcontainers.containers.MySQLContainer
-import org.testcontainers.utility.DockerImageName
-import java.sql.DriverManager
-
 plugins {
 	kotlin("jvm") version "2.1.0"
 	kotlin("kapt") version "2.1.0"
@@ -9,7 +5,6 @@ plugins {
 	kotlin("plugin.jpa") version "2.1.0"
 	id("org.springframework.boot") version "3.4.1"
 	id("io.spring.dependency-management") version "1.1.7"
-	id("nu.studer.jooq") version "8.2"
 }
 
 fun getGitHash(): String {
@@ -56,14 +51,11 @@ dependencies {
 	implementation("org.springframework.retry:spring-retry:2.0.11")
 
 	// DB
-	implementation("org.springframework.boot:spring-boot-starter-jooq")
 	implementation("org.springframework.boot:spring-boot-starter-data-redis")
-	implementation("org.jooq:jooq")
 	implementation("org.redisson:redisson-spring-boot-starter:3.45.1")
+    implementation("com.mysql:mysql-connector-j:9.3.0")
 
-	jooqGenerator("com.mysql:mysql-connector-j")
-
-	runtimeOnly("com.mysql:mysql-connector-j")
+	runtimeOnly("com.mysql:mysql-connector-j:9.3.0")
 
 	// Cache
 	implementation("com.github.ben-manes.caffeine:caffeine:3.2.0")
@@ -92,77 +84,4 @@ sourceSets["main"].java {
 tasks.withType<Test> {
 	useJUnitPlatform()
 	systemProperty("user.timezone", "UTC")
-}
-
-val mySqlContainer: MySQLContainer<*> = MySQLContainer(DockerImageName.parse("mysql:8.0"))
-    .withDatabaseName("hhplus")
-    .withUsername("root")
-    .withPassword("root")
-    .withReuse(true)
-extra["mySqlContainer"] = mySqlContainer
-
-tasks.register("startMysqlContainer") {
-    doFirst {
-        mySqlContainer.start()
-
-        val connection = DriverManager.getConnection(
-            mySqlContainer.jdbcUrl,
-            mySqlContainer.username,
-            mySqlContainer.password
-        )
-        val ddl = file("src/main/resources/database/schema.sql").readText()
-        connection.use { conn ->
-            conn.createStatement().use { stmt -> stmt.execute(ddl) }
-        }
-    }
-}
-
-jooq {
-    version.set("3.19.2")
-    configurations {
-        create("main") {
-            generateSchemaSourceOnCompilation.set(false)
-        }
-    }
-}
-
-tasks.named("generateJooq") {
-    dependsOn("startMysqlContainer")
-
-    doFirst {
-        val container = extra["mySqlContainer"] as MySQLContainer<*>
-        val extension = extensions.getByType(nu.studer.gradle.jooq.JooqExtension::class.java)
-
-        extension.configurations.named("main").configure {
-            jooqConfiguration.apply {
-                jdbc.apply {
-                    driver = "com.mysql.cj.jdbc.Driver"
-                    url = container.jdbcUrl
-                    user = container.username
-                    password = container.password
-                }
-                generator.apply {
-                    database.apply {
-                        name = "org.jooq.meta.mysql.MySQLDatabase"
-                        inputSchema = container.databaseName
-                    }
-                    generate.apply {
-                        isDeprecated = false
-                        isRecords = true
-                        isImmutablePojos = true
-                        isFluentSetters = true
-                    }
-                    target.apply {
-                        packageName = "kr.hhplus.jooq"
-                        directory = "build/generated/jooq/main"
-                    }
-                }
-            }
-        }
-    }
-
-    doLast {
-        val container = extra["mySqlContainer"] as MySQLContainer<*>
-        if (container.isRunning) container.stop()
-    }
 }

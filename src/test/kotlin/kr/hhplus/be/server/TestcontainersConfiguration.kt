@@ -14,8 +14,8 @@ class TestContainersConfiguration {
     companion object {
         private val mysqlContainer: MySQLContainer<*> = MySQLContainer(DockerImageName.parse("mysql:8.0"))
             .withDatabaseName("hhplus")
-            .withUsername("test")
-            .withPassword("test")
+            .withUsername("root")
+            .withPassword("root")
             .apply { start() }
 
         private val redisContainer = GenericContainer(DockerImageName.parse("redis:latest"))

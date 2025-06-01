@@ -5,4 +5,15 @@ data class PopularProductRecord(
     val name: String,
     val basePrice: Int,
     val totalSales: Int
-)
+) {
+    companion object {
+        fun from(projection: PopularProductProjection): PopularProductRecord {
+            return PopularProductRecord(
+                id = projection.getId(),
+                name = projection.getName(),
+                basePrice = projection.getBasePrice(),
+                totalSales = projection.getTotalSales()
+            )
+        }
+    }
+}
