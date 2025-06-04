@@ -104,6 +104,6 @@ export default function () {
   else otherCount.add(1);
 
   check(paymentRes, {
-    'payment success or duplicated': (r) => r.status === 201
+    'payment success': (r) => r.status === 201
   });
 }
