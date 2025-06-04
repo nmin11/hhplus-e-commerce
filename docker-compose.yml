@@ -21,6 +21,8 @@ services:
     ports:
       - "6379:6379"
     command: redis-server --requirepass root
+    volumes:
+      - ./scripts/lua:/scripts
     networks:
       - hhplus-net
 

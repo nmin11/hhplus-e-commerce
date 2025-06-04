@@ -93,4 +93,4 @@ spring:
     init:
       mode: always
       schema-locations: classpath:database/schema.sql
-      data-locations: classpath:database/data.sql
+      data-locations: classpath:database/load-test-data.sql
