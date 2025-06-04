@@ -2,7 +2,7 @@
 
 COUPON_ID=4001
 COUPON_STOCK=1000
-TTL=720
+TTL=30
 SCRIPT_PATH=/scripts/init-coupon.lua
 
 docker exec -i redis \
