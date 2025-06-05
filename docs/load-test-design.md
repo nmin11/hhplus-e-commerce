@@ -151,6 +151,25 @@ VALUES (
 - 하나의 선착순 쿠폰 발급 이벤트가 있다고 가정해서 1,000장의 재고가 있는 쿠폰 하나 데이터 생성
   - ID: 4,001
 
+```lua
+local couponId = ARGV[1]
+local stock = tonumber(ARGV[2])
+local ttl = tonumber(ARGV[3])
+
+local stockKey = "coupon:stock:" .. couponId
+local issuedKey = "coupon:issued:" .. couponId
+
+redis.call("DEL", stockKey)
+redis.call("DEL", issuedKey)
+
+redis.call("SET", stockKey, stock)
+redis.call("EXPIRE", stockKey, ttl)
+
+return true
+```
+
+- 쿠폰의 경우 Redis에도 쿠폰을 저장해두어야 하므로, 위와 같은 Lua Script를 작성해두고 Docker volume에 넣어둔 뒤,<br>`docker exec` 명령어를 통해 초기화 스크립트를 실행할 수 있도록 마련
+
 ```sql
 INSERT INTO product (id, name, base_price, created_at, updated_at)
 VALUES
@@ -626,5 +645,5 @@ WARN[0248] 🚨 Payment failed: body={"code":"BALANCE_DEDUCT_FAILED","message":"
 |                          | Latency (P90)    | ≤ 1s                      | 259.02ms             | ✅ 달성     |
 
 전반적으로 시스템이 예상한 수준의 부하를 견딜 수 있다는 점이 확인되었습니다.  
-하지만 선착순 쿠폰 발급의 경우에만 심각한 응답 지연 현상이 관측되므로 성능 개선이 시급한 상황입니다.  
+하지만 선착순 쿠폰 발급의 경우에는 심각한 응답 지연 현상이 관측되므로 성능 개선이 시급한 상황입니다.  
 따라서 후속 작업으로 쿠폰 발급 로직의 개선 혹은 인프라 구성의 scale-up을 고려해봐야 합니다.
