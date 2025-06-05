@@ -20,11 +20,21 @@ services:
     container_name: redis
     ports:
       - "6379:6379"
-    command: redis-server --requirepass root
+    command: >
+      redis-server
+      --requirepass root
+      --maxmemory 4gb
+      --maxmemory-policy volatile-lru
     volumes:
       - ./scripts/lua:/scripts
     networks:
       - hhplus-net
+    deploy:
+      resources:
+        limits:
+          memory: 4g
+        reservations:
+          memory: 2g
 
   influxdb:
     image: influxdb:1.8
