@@ -1,5 +1,6 @@
 version: '3'
 services:
+
   mysql:
     image: mysql:8.0
     ports:
@@ -11,6 +12,8 @@ services:
       - MYSQL_DATABASE=hhplus
     volumes:
       - ./data/mysql/:/var/lib/mysql
+    networks:
+      - hhplus-net
 
   redis:
     image: redis:latest
@@ -18,8 +21,10 @@ services:
     ports:
       - "6379:6379"
     command: redis-server --requirepass root
+    volumes:
+      - ./scripts/lua:/scripts
     networks:
-      - default
+      - hhplus-net
 
   influxdb:
     image: influxdb:1.8
@@ -33,6 +38,8 @@ services:
       - INFLUXDB_ADMIN_PASSWORD=root
     volumes:
       - influxdb-data:/var/lib/influxdb
+    networks:
+      - hhplus-net
 
   grafana:
     image: grafana/grafana
@@ -44,6 +51,8 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=root
     volumes:
       - grafana-data:/var/lib/grafana
+    networks:
+      - hhplus-net
 
   kafka:
     image: public.ecr.aws/bitnami/kafka:3.5.1
@@ -59,9 +68,30 @@ services:
       KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
       KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 0@127.0.0.1:9093
       KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
+    networks:
+      - hhplus-net
+
+#  app:
+#    image: hhplus-e-commerce-image
+#    build:
+#      context: ./
+#    ports:
+#      - "8080:8080"
+#    environment:
+#      JAVA_OPTS: "-Xms1024m -Xmx2048m"
+#      SPRING_PROFILES_ACTIVE: docker
+#    deploy:
+#      resources:
+#        limits:
+#          cpus: "1.0"
+#          memory: 2G
+#    depends_on:
+#      - mysql
+#      - redis
+#      - kafka
 
 networks:
-  default:
+  hhplus-net:
     driver: bridge
 
 volumes:

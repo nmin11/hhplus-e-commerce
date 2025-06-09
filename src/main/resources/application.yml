@@ -73,3 +73,24 @@ spring:
       mode: always
       schema-locations: classpath:database/schema.sql
       data-locations: classpath:database/data.sql
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: jdbc:mysql://mysql:3306/hhplus?characterEncoding=UTF-8&serverTimezone=UTC
+    username: application
+    password: application
+  redis:
+    host: redis
+    port: 6379
+    password: root
+  kafka:
+    bootstrap-servers: kafka:9092
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:database/schema.sql
+      data-locations: classpath:database/load-test-data.sql
