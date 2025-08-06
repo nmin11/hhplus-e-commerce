@@ -23,7 +23,7 @@ class TestContainersConfiguration {
             .withCommand("redis-server --requirepass root")
             .apply { start() }
 
-        private val kafkaContainer = KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:latest"))
+        private val kafkaContainer = KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.5.1"))
             .apply { start() }
 
         init {
