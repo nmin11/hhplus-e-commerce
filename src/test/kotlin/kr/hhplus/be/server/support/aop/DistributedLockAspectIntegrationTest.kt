@@ -14,6 +14,7 @@ import kr.hhplus.be.server.support.lock.LockType
 import kr.hhplus.be.server.support.lock.RedisPubSubLockTemplate
 import kr.hhplus.be.server.support.lock.RedisSpinLockTemplate
 import kr.hhplus.be.server.support.transaction.RequireNewTransactionExecutor
+import kr.hhplus.be.server.testcontainers.AbstractIntegrationTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -22,13 +23,9 @@ import org.junit.jupiter.api.assertThrows
 import org.redisson.api.RLock
 import org.redisson.api.RedissonClient
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
 import java.util.concurrent.TimeUnit
 
-@SpringBootTest
-@ActiveProfiles("test")
-class DistributedLockAspectIntegrationTest {
+class DistributedLockAspectIntegrationTest : AbstractIntegrationTest() {
     @Autowired
     lateinit var lockExampleService: LockExampleService
 

@@ -9,32 +9,27 @@ import kr.hhplus.be.server.domain.customer.CustomerRepository
 import kr.hhplus.be.server.support.exception.coupon.CouponInsufficientException
 import kr.hhplus.be.server.support.exception.coupon.CouponInvalidPeriodException
 import kr.hhplus.be.server.support.exception.coupon.CustomerCouponAlreadyIssuedException
+import kr.hhplus.be.server.testcontainers.AbstractIntegrationTest
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.Awaitility.await
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.redis.core.StringRedisTemplate
-import org.springframework.test.context.ActiveProfiles
 import java.time.Duration
 import java.time.LocalDate
 import java.util.concurrent.TimeUnit
 
-@SpringBootTest
-@ActiveProfiles("test")
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class CouponFacadeIntegrationTest @Autowired constructor(
     private val couponFacade: CouponFacade,
     private val customerRepository: CustomerRepository,
     private val couponRepository: CouponRepository,
     private val customerCouponRepository: CustomerCouponRepository,
     private val stringRedisTemplate: StringRedisTemplate
-) {
+) : AbstractIntegrationTest() {
     private lateinit var customer: Customer
     private lateinit var coupon: Coupon
 

@@ -4,25 +4,22 @@ import kr.hhplus.be.server.domain.customer.Customer
 import kr.hhplus.be.server.domain.customer.CustomerRepository
 import kr.hhplus.be.server.support.exception.balance.BalanceChargeFailedException
 import kr.hhplus.be.server.support.exception.balance.BalanceDeductFailedException
+import kr.hhplus.be.server.testcontainers.AbstractIntegrationTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
 import java.util.*
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.Executors
 
-@SpringBootTest
-@ActiveProfiles("test")
 class BalanceServiceConcurrencyTest @Autowired constructor(
     private val balanceService: BalanceService,
     private val customerRepository: CustomerRepository,
     private val balanceRepository: BalanceRepository
-) {
+) : AbstractIntegrationTest() {
     private lateinit var customer: Customer
     private lateinit var balance: Balance
     val initAmount = 10_000

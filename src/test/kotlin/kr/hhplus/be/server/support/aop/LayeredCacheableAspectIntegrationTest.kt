@@ -2,19 +2,16 @@ package kr.hhplus.be.server.support.aop
 
 import kr.hhplus.be.server.infrastructure.redis.RedisRepository
 import kr.hhplus.be.server.support.cache.InMemoryCache
+import kr.hhplus.be.server.testcontainers.AbstractIntegrationTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
 import java.time.Duration
 import java.time.LocalDate
 
-@SpringBootTest
-@ActiveProfiles("test")
-class LayeredCacheableAspectIntegrationTest {
+class LayeredCacheableAspectIntegrationTest : AbstractIntegrationTest() {
     @Autowired
     lateinit var dummyCachedService: CacheExampleService
 

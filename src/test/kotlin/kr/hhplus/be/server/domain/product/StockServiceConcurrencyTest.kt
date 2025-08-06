@@ -1,24 +1,21 @@
 package kr.hhplus.be.server.domain.product
 
+import kr.hhplus.be.server.testcontainers.AbstractIntegrationTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
 import java.util.Collections
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 
-@SpringBootTest
-@ActiveProfiles("test")
 class StockServiceConcurrencyTest @Autowired constructor(
     private val stockService: StockService,
     private val productRepository: ProductRepository,
     private val productOptionRepository: ProductOptionRepository,
     private val stockRepository: StockRepository
-) {
+) : AbstractIntegrationTest() {
     private lateinit var option: ProductOption
     private lateinit var stock: Stock
     val stockQuantity = 1

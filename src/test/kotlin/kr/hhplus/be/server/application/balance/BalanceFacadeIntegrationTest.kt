@@ -4,21 +4,18 @@ import kr.hhplus.be.server.domain.balance.Balance
 import kr.hhplus.be.server.domain.balance.BalanceRepository
 import kr.hhplus.be.server.domain.customer.Customer
 import kr.hhplus.be.server.domain.customer.CustomerRepository
+import kr.hhplus.be.server.testcontainers.AbstractIntegrationTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
 
-@SpringBootTest
-@ActiveProfiles("test")
 class BalanceFacadeIntegrationTest @Autowired constructor(
     private val balanceFacade: BalanceFacade,
     private val balanceRepository: BalanceRepository,
     private val customerRepository: CustomerRepository
-) {
+) : AbstractIntegrationTest() {
     private lateinit var customer: Customer
 
     @BeforeEach

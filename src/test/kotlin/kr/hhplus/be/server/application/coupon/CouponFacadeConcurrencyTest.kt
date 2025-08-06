@@ -5,18 +5,16 @@ import kr.hhplus.be.server.domain.coupon.CouponRepository
 import kr.hhplus.be.server.domain.coupon.CustomerCouponRepository
 import kr.hhplus.be.server.domain.customer.Customer
 import kr.hhplus.be.server.domain.customer.CustomerRepository
-import kr.hhplus.be.server.interfaces.kafka.KafkaTestListener
 import kr.hhplus.be.server.support.exception.coupon.CouponInsufficientException
 import kr.hhplus.be.server.support.exception.coupon.CustomerCouponAlreadyIssuedException
+import kr.hhplus.be.server.testcontainers.AbstractIntegrationTest
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.Awaitility.await
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.redis.core.StringRedisTemplate
-import org.springframework.test.context.ActiveProfiles
 import java.time.Duration
 import java.time.LocalDate
 import java.util.Collections
@@ -24,15 +22,13 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
-@SpringBootTest
-@ActiveProfiles("test")
 class CouponFacadeConcurrencyTest @Autowired constructor(
     private val couponFacade: CouponFacade,
     private val customerRepository: CustomerRepository,
     private val couponRepository: CouponRepository,
     private val customerCouponRepository: CustomerCouponRepository,
     private val stringRedisTemplate: StringRedisTemplate
-) {
+) : AbstractIntegrationTest() {
     private lateinit var coupon: Coupon
     private lateinit var stockKey: String
     private lateinit var issuedKey: String

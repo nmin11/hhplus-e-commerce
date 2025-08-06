@@ -6,26 +6,21 @@ import kr.hhplus.be.server.domain.product.*
 import kr.hhplus.be.server.support.exception.order.OrderItemEmptyException
 import kr.hhplus.be.server.support.exception.product.ProductOptionMismatchException
 import kr.hhplus.be.server.support.exception.product.StockInsufficientException
+import kr.hhplus.be.server.testcontainers.AbstractIntegrationTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
 
-@SpringBootTest
-@ActiveProfiles("test")
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class OrderFacadeIntegrationTest @Autowired constructor(
     private val orderFacade: OrderFacade,
     private val customerRepository: CustomerRepository,
     private val productRepository: ProductRepository,
     private val productOptionRepository: ProductOptionRepository,
     private val stockRepository: StockRepository,
-) {
+) : AbstractIntegrationTest() {
     private lateinit var customer: Customer
     private lateinit var product1: Product
     private lateinit var product2: Product

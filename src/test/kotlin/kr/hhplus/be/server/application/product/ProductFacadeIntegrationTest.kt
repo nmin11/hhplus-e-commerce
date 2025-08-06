@@ -1,29 +1,24 @@
 package kr.hhplus.be.server.application.product
 
 import kr.hhplus.be.server.domain.product.*
+import kr.hhplus.be.server.testcontainers.AbstractIntegrationTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.redis.core.StringRedisTemplate
-import org.springframework.test.context.ActiveProfiles
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-@SpringBootTest
-@ActiveProfiles("test")
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ProductFacadeIntegrationTest @Autowired constructor(
     private val productFacade: ProductFacade,
     private val productRepository: ProductRepository,
     private val productOptionRepository: ProductOptionRepository,
     private val statisticRepository: StatisticRepository,
     private val stringRedisTemplate: StringRedisTemplate
-) {
+) : AbstractIntegrationTest() {
     private lateinit var product: Product
     private lateinit var option1: ProductOption
     private lateinit var option2: ProductOption

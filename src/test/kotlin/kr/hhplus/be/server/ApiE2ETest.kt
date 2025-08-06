@@ -12,6 +12,7 @@ import kr.hhplus.be.server.domain.product.*
 import kr.hhplus.be.server.interfaces.coupon.CouponRequest
 import kr.hhplus.be.server.interfaces.order.OrderRequest
 import kr.hhplus.be.server.interfaces.payment.PaymentRequest
+import kr.hhplus.be.server.testcontainers.AbstractIntegrationTest
 import org.awaitility.Awaitility.await
 import org.hamcrest.CoreMatchers.hasItems
 import org.junit.jupiter.api.AfterEach
@@ -20,10 +21,8 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
-import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.http.MediaType
-import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
@@ -32,9 +31,7 @@ import java.time.Duration
 import java.time.LocalDate
 import java.util.concurrent.TimeUnit
 
-@SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
 class ApiE2ETest @Autowired constructor(
     val mockMvc: MockMvc,
     val objectMapper: ObjectMapper,
@@ -48,7 +45,7 @@ class ApiE2ETest @Autowired constructor(
     val couponRepository: CouponRepository,
     val customerCouponRepository: CustomerCouponRepository,
     val stringRedisTemplate: StringRedisTemplate
-) {
+) : AbstractIntegrationTest() {
     private lateinit var customer: Customer
     private lateinit var coupon1: Coupon
     private lateinit var coupon2: Coupon

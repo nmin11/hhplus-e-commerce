@@ -26,24 +26,19 @@ import kr.hhplus.be.server.support.exception.balance.BalanceInsufficientExceptio
 import kr.hhplus.be.server.support.exception.coupon.CustomerCouponAlreadyUsedException
 import kr.hhplus.be.server.support.exception.order.OrderNotPayableException
 import kr.hhplus.be.server.support.exception.product.StockInsufficientException
+import kr.hhplus.be.server.testcontainers.AbstractIntegrationTest
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.event.ApplicationEvents
 import org.springframework.test.context.event.RecordApplicationEvents
 import java.time.LocalDate
 import kotlin.jvm.java
 
-@SpringBootTest
-@ActiveProfiles("test")
 @RecordApplicationEvents
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class PaymentFacadeIntegrationTest @Autowired constructor(
     private val paymentFacade: PaymentFacade,
     private val customerRepository: CustomerRepository,
@@ -54,7 +49,7 @@ class PaymentFacadeIntegrationTest @Autowired constructor(
     private val couponRepository: CouponRepository,
     private val customerCouponRepository: CustomerCouponRepository,
     private val orderRepository: OrderRepository
-) {
+) : AbstractIntegrationTest() {
     @Autowired
     lateinit var applicationEvents: ApplicationEvents
 

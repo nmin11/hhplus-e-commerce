@@ -1,23 +1,20 @@
 package kr.hhplus.be.server.interfaces.kafka
 
+import kr.hhplus.be.server.testcontainers.AbstractIntegrationTest
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.Awaitility.await
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.Duration
 import java.util.concurrent.TimeUnit
 
-@SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
-class KafkaTestControllerE2ETest {
+class KafkaTestControllerE2ETest : AbstractIntegrationTest() {
     @Autowired
     lateinit var mockMvc: MockMvc
 
